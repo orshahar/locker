@@ -1,0 +1,5 @@
+<resources>
+    <declare-styleable name="Key">
+        <attr name="value" format="string" />
+    </declare-styleable>
+</resources>
