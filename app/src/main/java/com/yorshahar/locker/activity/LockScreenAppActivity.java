@@ -115,7 +115,7 @@ public class LockScreenAppActivity extends AppCompatActivity implements
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 if (position == 0) {
-                    dimView.setAlpha((1.0f - positionOffset) / 2.0f);
+                    dimView.setAlpha((1.0f - positionOffset) / 1.7f);
                 } else {
                     dimView.setAlpha(0.0f);
                 }
