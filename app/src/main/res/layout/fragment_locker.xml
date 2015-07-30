@@ -14,10 +14,12 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="50dp"
-        android:text="DigitalClock"
+        android:text="@string/digital_clock"
         android:textColor="#ffffffff"
         android:textSize="90sp"
-        android:typeface="monospace" />
+        android:typeface="monospace"
+        android:inputType="time"
+        android:gravity="center" />
 
     <TextView
         android:id="@+id/dateTextView"
@@ -35,8 +37,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:text="> slide to unlock"
-        android:textColor="#ffffffff"
+        android:text="@string/slide_to_unlock_text"
+        android:textColor="#FFFFFFFF"
         android:textSize="25sp"
         android:focusableInTouchMode="true"
         android:layout_alignParentBottom="true"
