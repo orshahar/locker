@@ -20,7 +20,9 @@ public class NotificationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         int a = 2;
-        delegate.gotIt();
+        if (delegate != null) {
+            delegate.gotIt();
+        }
     }
 
     public Delegate getDelegate() {

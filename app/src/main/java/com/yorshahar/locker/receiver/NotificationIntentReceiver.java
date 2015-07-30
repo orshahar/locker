@@ -26,7 +26,9 @@ public class NotificationIntentReceiver extends BroadcastReceiver {
             int a = 2;
         }
 
-        delegate.gotIt();
+        if (delegate != null) {
+            delegate.gotIt();
+        }
     }
 
     public Delegate getDelegate() {
