@@ -2,8 +2,11 @@ package com.yorshahar.locker.util;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.KeyguardManager;
+import android.os.Bundle;
 import android.view.Gravity;
 import android.view.MotionEvent;
+import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 
 import com.yorshahar.locker.R;
@@ -26,6 +29,15 @@ public class LockscreenUtils {
 
     // Display overlay dialog with a view to prevent home button click
     public void lock(Activity activity) {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+//
+//        AlertDialog alert = builder.create();
+//        alert.show();
+//
+//        //use this line to disable home key
+//        alert.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
+
+
         if (mOverlayDialog == null) {
             mOverlayDialog = new OverlayDialog(activity);
             mOverlayDialog.show();
@@ -56,12 +68,13 @@ public class LockscreenUtils {
     private static class OverlayDialog extends AlertDialog {
 
         public OverlayDialog(Activity activity) {
-            super(activity, R.attr.dialogTheme);
+            super(activity, R.style.AlertDialog_AppCompat_Light);
             LayoutParams params = getWindow().getAttributes();
             params.type = LayoutParams.TYPE_SYSTEM_ERROR;
             params.dimAmount = 0.0F;
             params.width = 0;
             params.height = 0;
+            params.alpha = 0.2f;
             params.gravity = Gravity.BOTTOM;
             getWindow().setAttributes(params);
             getWindow().setFlags(LayoutParams.FLAG_SHOW_WHEN_LOCKED | LayoutParams.FLAG_NOT_TOUCH_MODAL,

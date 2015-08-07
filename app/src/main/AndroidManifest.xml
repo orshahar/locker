@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.yorshahar.locker" >
+    package="com.yorshahar.locker">
 
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -12,47 +12,54 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+
         <activity
-            android:name=".activity.LockScreenAppActivity"
-            android:excludeFromRecents="true"
-            android:hardwareAccelerated="false"
+            android:name=".activity.SettingsActivity"
             android:label="@string/app_name"
-            android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.HOME" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <service android:name=".service.LockscreenService" />
+        <activity
+            android:name=".activity.ContainerActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        </activity>
 
-        <receiver
-            android:name=".receiver.LockscreenIntentReceiver"
-            android:enabled="true" >
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
+        <activity
+            android:name=".activity.LockerMainActivity"
+            android:excludeFromRecents="true"
+            android:label="@string/app_name"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait">
+        </activity>
 
         <service android:name=".service.NotificationService" />
 
         <receiver
             android:name=".receiver.NotificationIntentReceiver"
             android:enabled="true"
-            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" >
-        </receiver>
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" />
 
-        <service
-            android:name=".service.MyService" />
+        <service android:name=".service.MyService" />
 
         <receiver
             android:name=".receiver.NotificationReceiver"
             android:enabled="true">
+            <intent-filter>
+                <action android:name="android.intent.action.SCREEN_ON" />
+                <action android:name="android.intent.action.SCREEN_OFF" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="com.hmkcode.android.USER_ACTION" />
+            </intent-filter>
 
         </receiver>
 

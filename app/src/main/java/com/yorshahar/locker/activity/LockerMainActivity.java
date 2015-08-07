@@ -1,8 +1,15 @@
 package com.yorshahar.locker.activity;
 
-import android.app.KeyguardManager;
+import android.app.Service;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,30 +24,32 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.yorshahar.locker.R;
 import com.yorshahar.locker.fragment.LockerFragment;
 import com.yorshahar.locker.fragment.PasscodeFragment;
-import com.yorshahar.locker.service.LockscreenService;
 import com.yorshahar.locker.service.MyService;
-import com.yorshahar.locker.service.NotificationService;
 import com.yorshahar.locker.util.LockscreenUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 
-public class LockScreenAppActivity extends AppCompatActivity implements
+public class LockerMainActivity extends AppCompatActivity implements
         LockscreenUtils.OnLockStatusChangedListener {
 
     private LockscreenUtils mLockscreenUtils;
+    private ServiceConnection serviceConnection;
+    private Service service;
+
 
     private ImageView dimView;
 
     // Set appropriate flags to make the screen appear over the keyguard
     @Override
     public void onAttachedToWindow() {
-//        getWindow().setType(
-//                WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
         getWindow().addFlags(
                 WindowManager.LayoutParams.FLAG_FULLSCREEN
                         | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
@@ -52,22 +61,43 @@ public class LockScreenAppActivity extends AppCompatActivity implements
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+
+        Intent intent = new Intent(this, MyService.class);
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
-        getWindow().setType(
-                WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
+        serviceConnection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder binder) {
+                int a = 2;
+                try {
+                    if (MyService.class.getSimpleName().equals(binder.getInterfaceDescriptor())) {
+                        service = (Service) binder.queryLocalInterface(binder.getInterfaceDescriptor());
+                        ((MyService) service).setContainerView((RelativeLayout) findViewById(R.id.layout));
+                    }
 
-//        getWindow().addFlags(
-//                WindowManager.LayoutParams.FLAG_FULLSCREEN
-//                        | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-//                        | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-//                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
-//        );
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
 
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                int a = 2;
+            }
+        };
 
-        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         mLockscreenUtils = new LockscreenUtils();
 
         // unlock screen in case of app get killed by system
@@ -85,9 +115,9 @@ public class LockScreenAppActivity extends AppCompatActivity implements
                 lockHomeButton();
 
                 // start service for observing intents
-                startService(new Intent(this, MyService.class));
-                startService(new Intent(this, NotificationService.class));
-                startService(new Intent(this, LockscreenService.class));
+//                startService(new Intent(this, MyService.class));
+//                startService(new Intent(this, NotificationService.class));
+//                startService(new Intent(this, LockscreenService.class));
 
                 // listen the events get fired during the call
                 StateListener phoneStateListener = new StateListener();
@@ -103,7 +133,7 @@ public class LockScreenAppActivity extends AppCompatActivity implements
 
         // Set up the ViewPager with the sections adapter.
         ViewPager mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.setAdapter(sectionsPagerAdapter);
 
         View decorView = getWindow().getDecorView();
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
@@ -187,7 +217,8 @@ public class LockScreenAppActivity extends AppCompatActivity implements
                 || (event.getKeyCode() == KeyEvent.KEYCODE_POWER)) {
             return false;
         }
-        if ((event.getKeyCode() == KeyEvent.KEYCODE_HOME)) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_HOME
+                || event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
 
             return true;
         }
@@ -197,11 +228,56 @@ public class LockScreenAppActivity extends AppCompatActivity implements
     // Lock home button
     public void lockHomeButton() {
         mLockscreenUtils.lock(this);
+
+//        if (!isMyLauncherDefault()) {
+//            clearDefaultLauncher(false);
+//            makeMyLauncherDefault();
+//        }
+
     }
 
     // Unlock home button and wait for its callback
     public void unlockHomeButton() {
         mLockscreenUtils.unlock();
+
+//        if (isMyLauncherDefault()) {
+//            clearDefaultLauncher(true);
+//            makeTheirLauncherDefault();
+//        }
+
+    }
+
+    private void clearDefaultLauncher(final boolean isMyLauncher) {
+        PackageManager p = getPackageManager();
+
+        if (isMyLauncher) {
+            p.clearPackagePreferredActivities(getPackageName());
+        } else {
+            ComponentName cN = new ComponentName(this, LockerMainActivity.class);
+            p.setComponentEnabledSetting(cN, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+            startActivity(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME));
+            p.setComponentEnabledSetting(cN, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+        }
+    }
+
+    private void makeTheirLauncherDefault() {
+        PackageManager pm = getPackageManager();
+        IntentFilter filter = new IntentFilter("android.intent.action.MAIN");
+        filter.addCategory("android.intent.category.HOME");
+        filter.addCategory("android.intent.category.DEFAULT");
+        ComponentName component = new ComponentName("net.suckga.ilauncher2", "net.suckga.ilauncher2.LauncherActivity");
+        ComponentName[] components = new ComponentName[]{new ComponentName("net.suckga.ilauncher2", "net.suckga.ilauncher2.LauncherActivity"),
+                component};
+//        pm.addPreferredActivity(filter, IntentFilter.MATCH_CATEGORY_SCHEME, components, component);
+    }
+
+    private void makeMyLauncherDefault() {
+        PackageManager pm = getPackageManager();
+        IntentFilter filter = new IntentFilter("android.intent.action.MAIN");
+        filter.addCategory("android.intent.category.HOME");
+        filter.addCategory("android.intent.category.DEFAULT");
+        ComponentName component = new ComponentName(getPackageName(), LockerMainActivity.class.getName());
+//        pm.addPreferredActivity(filter, IntentFilter.MATCH_CATEGORY_EMPTY, null, component);
     }
 
 //    @Override
@@ -291,25 +367,53 @@ public class LockScreenAppActivity extends AppCompatActivity implements
 
     @SuppressWarnings("deprecation")
     private void disableKeyguard() {
-        KeyguardManager mKM = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
-        KeyguardManager.KeyguardLock mKL = mKM.newKeyguardLock("IN");
-        mKL.disableKeyguard();
-//        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+//        KeyguardManager mKM = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
+//        KeyguardManager.KeyguardLock mKL = mKM.newKeyguardLock(KEYGUARD_SERVICE);
+//        mKL.disableKeyguard();
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+
     }
 
     @SuppressWarnings("deprecation")
     private void enableKeyguard() {
-        KeyguardManager mKM = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
-        KeyguardManager.KeyguardLock mKL = mKM.newKeyguardLock("IN");
-        mKL.reenableKeyguard();
-//        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+//        KeyguardManager mKM = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
+//        KeyguardManager.KeyguardLock mKL = mKM.newKeyguardLock(KEYGUARD_SERVICE);
+//        mKL.reenableKeyguard();
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
     }
 
     //Simply unlock device by finishing the activity
     private void unlockDevice() {
+        Intent intnet = new Intent("com.hmkcode.android.USER_ACTION");
+        sendBroadcast(intnet);
+
         finish();
     }
 
+    private boolean isMyLauncherDefault() {
+        final IntentFilter filter = new IntentFilter(Intent.ACTION_MAIN);
+        filter.addCategory(Intent.CATEGORY_HOME);
+
+        List<IntentFilter> filters = new ArrayList<>();
+        filters.add(filter);
+
+        final String myPackageName = getPackageName();
+        List<ComponentName> activities = new ArrayList<>();
+        PackageManager packageManager = getPackageManager();
+
+        // You can use name of your package here as third argument
+        packageManager.getPreferredActivities(filters, activities, null);
+
+        if (activities.size() == 0) //no default
+            return true;
+
+        for (ComponentName activity : activities) {
+            if (myPackageName.equals(activity.getPackageName())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 ////////////////////////////////////////////////////
 // LockscreenUtils.OnLockStatusChangedListener
