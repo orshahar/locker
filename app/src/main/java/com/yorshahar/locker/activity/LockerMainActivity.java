@@ -4,9 +4,7 @@ import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -30,17 +28,13 @@ import com.yorshahar.locker.R;
 import com.yorshahar.locker.fragment.LockerFragment;
 import com.yorshahar.locker.fragment.PasscodeFragment;
 import com.yorshahar.locker.service.MyService;
-import com.yorshahar.locker.util.LockscreenUtils;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 
-public class LockerMainActivity extends AppCompatActivity implements
-        LockscreenUtils.OnLockStatusChangedListener {
+public class LockerMainActivity extends AppCompatActivity {
 
-    private LockscreenUtils mLockscreenUtils;
+    //    private LockscreenUtils mLockscreenUtils;
     private ServiceConnection serviceConnection;
     private Service service;
 
@@ -98,36 +92,18 @@ public class LockerMainActivity extends AppCompatActivity implements
         };
 
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-        mLockscreenUtils = new LockscreenUtils();
+//        mLockscreenUtils = new LockscreenUtils();
 
         // unlock screen in case of app get killed by system
         if (getIntent() != null && getIntent().hasExtra("kill")
                 && getIntent().getExtras().getInt("kill") == 1) {
-            enableKeyguard();
-            unlockHomeButton();
+            unlockDevice();
         } else {
-
-            try {
-                // disable keyguard
-                disableKeyguard();
-
-                // lock home button
-                lockHomeButton();
-
-                // start service for observing intents
-//                startService(new Intent(this, MyService.class));
-//                startService(new Intent(this, NotificationService.class));
-//                startService(new Intent(this, LockscreenService.class));
-
-                // listen the events get fired during the call
-                StateListener phoneStateListener = new StateListener();
-                TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-                telephonyManager.listen(phoneStateListener,
-                        PhoneStateListener.LISTEN_CALL_STATE);
-
-            } catch (Exception e) {
-                int a = 2;
-            }
+            // listen the events get fired during the call
+            StateListener phoneStateListener = new StateListener();
+            TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+            telephonyManager.listen(phoneStateListener,
+                    PhoneStateListener.LISTEN_CALL_STATE);
 
         }
 
@@ -173,7 +149,7 @@ public class LockerMainActivity extends AppCompatActivity implements
             super.onCallStateChanged(state, incomingNumber);
             switch (state) {
                 case TelephonyManager.CALL_STATE_RINGING:
-                    unlockHomeButton();
+                    unlockDevice();
                     break;
                 case TelephonyManager.CALL_STATE_OFFHOOK:
                     break;
@@ -183,13 +159,10 @@ public class LockerMainActivity extends AppCompatActivity implements
         }
     }
 
-    ;
-
     // Don't finish Activity on Back press
     @Override
     public void onBackPressed() {
         int a = 2;
-
     }
 
     // Handle button clicks
@@ -224,68 +197,6 @@ public class LockerMainActivity extends AppCompatActivity implements
         }
         return false;
     }
-
-    // Lock home button
-    public void lockHomeButton() {
-        mLockscreenUtils.lock(this);
-
-//        if (!isMyLauncherDefault()) {
-//            clearDefaultLauncher(false);
-//            makeMyLauncherDefault();
-//        }
-
-    }
-
-    // Unlock home button and wait for its callback
-    public void unlockHomeButton() {
-        mLockscreenUtils.unlock();
-
-//        if (isMyLauncherDefault()) {
-//            clearDefaultLauncher(true);
-//            makeTheirLauncherDefault();
-//        }
-
-    }
-
-    private void clearDefaultLauncher(final boolean isMyLauncher) {
-        PackageManager p = getPackageManager();
-
-        if (isMyLauncher) {
-            p.clearPackagePreferredActivities(getPackageName());
-        } else {
-            ComponentName cN = new ComponentName(this, LockerMainActivity.class);
-            p.setComponentEnabledSetting(cN, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            startActivity(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME));
-            p.setComponentEnabledSetting(cN, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-        }
-    }
-
-    private void makeTheirLauncherDefault() {
-        PackageManager pm = getPackageManager();
-        IntentFilter filter = new IntentFilter("android.intent.action.MAIN");
-        filter.addCategory("android.intent.category.HOME");
-        filter.addCategory("android.intent.category.DEFAULT");
-        ComponentName component = new ComponentName("net.suckga.ilauncher2", "net.suckga.ilauncher2.LauncherActivity");
-        ComponentName[] components = new ComponentName[]{new ComponentName("net.suckga.ilauncher2", "net.suckga.ilauncher2.LauncherActivity"),
-                component};
-//        pm.addPreferredActivity(filter, IntentFilter.MATCH_CATEGORY_SCHEME, components, component);
-    }
-
-    private void makeMyLauncherDefault() {
-        PackageManager pm = getPackageManager();
-        IntentFilter filter = new IntentFilter("android.intent.action.MAIN");
-        filter.addCategory("android.intent.category.HOME");
-        filter.addCategory("android.intent.category.DEFAULT");
-        ComponentName component = new ComponentName(getPackageName(), LockerMainActivity.class.getName());
-//        pm.addPreferredActivity(filter, IntentFilter.MATCH_CATEGORY_EMPTY, null, component);
-    }
-
-//    @Override
-//    protected void onPostResume() {
-//        super.onPostResume();
-//        View decorView = getWindow().getDecorView();
-//        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
-//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -360,26 +271,9 @@ public class LockerMainActivity extends AppCompatActivity implements
 
         @Override
         public void onPasscodePassed() {
-            mLockscreenUtils.unlock();
+            unlockDevice();
         }
 
-    }
-
-    @SuppressWarnings("deprecation")
-    private void disableKeyguard() {
-//        KeyguardManager mKM = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
-//        KeyguardManager.KeyguardLock mKL = mKM.newKeyguardLock(KEYGUARD_SERVICE);
-//        mKL.disableKeyguard();
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-
-    }
-
-    @SuppressWarnings("deprecation")
-    private void enableKeyguard() {
-//        KeyguardManager mKM = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
-//        KeyguardManager.KeyguardLock mKL = mKM.newKeyguardLock(KEYGUARD_SERVICE);
-//        mKL.reenableKeyguard();
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
     }
 
     //Simply unlock device by finishing the activity
@@ -388,42 +282,6 @@ public class LockerMainActivity extends AppCompatActivity implements
         sendBroadcast(intnet);
 
         finish();
-    }
-
-    private boolean isMyLauncherDefault() {
-        final IntentFilter filter = new IntentFilter(Intent.ACTION_MAIN);
-        filter.addCategory(Intent.CATEGORY_HOME);
-
-        List<IntentFilter> filters = new ArrayList<>();
-        filters.add(filter);
-
-        final String myPackageName = getPackageName();
-        List<ComponentName> activities = new ArrayList<>();
-        PackageManager packageManager = getPackageManager();
-
-        // You can use name of your package here as third argument
-        packageManager.getPreferredActivities(filters, activities, null);
-
-        if (activities.size() == 0) //no default
-            return true;
-
-        for (ComponentName activity : activities) {
-            if (myPackageName.equals(activity.getPackageName())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-////////////////////////////////////////////////////
-// LockscreenUtils.OnLockStatusChangedListener
-////////////////////////////////////////////////////
-
-    @Override
-    public void onLockStatusChanged(boolean isLocked) {
-        if (!isLocked) {
-            unlockDevice();
-        }
     }
 
 
