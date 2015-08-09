@@ -21,10 +21,6 @@ public class LockscreenIntentReceiver extends BroadcastReceiver {
                 startLockscreen(context);
                 break;
             }
-            case "com.hmkcode.android.USER_ACTION": {
-                lockscreenOn = false;
-                break;
-            }
             default: {
 
             }

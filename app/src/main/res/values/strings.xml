@@ -30,4 +30,6 @@
     <string name="digital_clock">DigitalClock</string>
     <string name="slide_to_unlock_text"><![CDATA[> slide to unlock]]></string>
 
+    <string name="passcode">2483</string>
+
 </resources>

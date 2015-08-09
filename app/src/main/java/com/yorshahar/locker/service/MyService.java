@@ -8,8 +8,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.PixelFormat;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
-import android.os.IInterface;
 import android.support.v4.app.NotificationCompat;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -22,10 +22,12 @@ import com.yorshahar.locker.R;
 import com.yorshahar.locker.activity.LockerMainActivity;
 import com.yorshahar.locker.receiver.NotificationReceiver;
 
-public class MyService extends Service implements NotificationReceiver.Delegate, IInterface {
+public class MyService extends Service implements NotificationReceiver.Delegate {
 
     private BroadcastReceiver mReceiver;
     private WindowManager windowManager;
+    private LockerMainActivity activity;
+    private final IBinder myBinder = new MyLocalBinder();
 
     private RelativeLayout containerView;
     private RelativeLayout lockerView;
@@ -33,15 +35,22 @@ public class MyService extends Service implements NotificationReceiver.Delegate,
     public MyService() {
     }
 
+    public LockerMainActivity getActivity() {
+        return activity;
+    }
+
+    public void setActivity(LockerMainActivity activity) {
+        this.activity = activity;
+    }
+
     public RelativeLayout getContainerView() {
         return containerView;
     }
 
     public void setContainerView(RelativeLayout lockerView) {
-        this.lockerView = lockerView;
-
         containerView.removeAllViews();
 
+        this.lockerView = lockerView;
         ViewGroup lockerParent = (ViewGroup) lockerView.getParent();
         if (lockerParent != null) {
             lockerParent.removeView(lockerView);
@@ -52,9 +61,7 @@ public class MyService extends Service implements NotificationReceiver.Delegate,
 
     @Override
     public IBinder onBind(Intent intent) {
-//        return null;
-
-        return asBinder();
+        return myBinder;
     }
 
     @Override
@@ -63,22 +70,35 @@ public class MyService extends Service implements NotificationReceiver.Delegate,
 
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        containerView = (RelativeLayout) inflater.inflate(R.layout.main_activity, null);
-
+        containerView = new RelativeLayout(this);
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
 
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.TYPE_PHONE,
+                WindowManager.LayoutParams.TYPE_SYSTEM_ERROR,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN
-                        | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-                        | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD,
+                        | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                        | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+                        | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
                 PixelFormat.TRANSLUCENT);
 
         params.gravity = Gravity.CENTER;
 
         windowManager.addView(containerView, params);
         containerView.setVisibility(View.INVISIBLE);
+
+        // Hide the status bar.
+        if (Build.VERSION.SDK_INT >= 16) {
+            int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+            containerView.setSystemUiVisibility(uiOptions);
+//        } else {
+//            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+//                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
+
+// Remember that you should never show the action bar if the
+// status bar is hidden, so hide that too if necessary.
+//        ActionBar actionBar = getActionBar();
+//        actionBar.hide();
     }
 
     @Override
@@ -86,12 +106,15 @@ public class MyService extends Service implements NotificationReceiver.Delegate,
         IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
         filter.addAction(Intent.ACTION_SCREEN_OFF);
         filter.addAction(Intent.ACTION_BOOT_COMPLETED);
-        filter.addAction("com.hmkcode.android.USER_ACTION");
 
         mReceiver = new NotificationReceiver();
         ((NotificationReceiver) mReceiver).setDelegate(this);
         registerReceiver(mReceiver, filter);
         startForeground();
+
+        Intent containerIntent = new Intent(this, LockerMainActivity.class);
+        containerIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(containerIntent);
 
         return START_STICKY;
     }
@@ -177,11 +200,11 @@ public class MyService extends Service implements NotificationReceiver.Delegate,
 
     @Override
     public void lock() {
-//        containerView.setVisibility(View.VISIBLE);
+        if (activity != null) {
+            activity.reset();
+        }
 
-        Intent containerIntent = new Intent(this, LockerMainActivity.class);
-        containerIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(containerIntent);
+        containerView.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -189,11 +212,10 @@ public class MyService extends Service implements NotificationReceiver.Delegate,
         containerView.setVisibility(View.INVISIBLE);
     }
 
-    @Override
-    public IBinder asBinder() {
-        Binder binder = new Binder();
-        binder.attachInterface(this, "MyService");
-
-        return binder;
+    public class MyLocalBinder extends Binder {
+        public MyService getService() {
+            return MyService.this;
+        }
     }
+
 }

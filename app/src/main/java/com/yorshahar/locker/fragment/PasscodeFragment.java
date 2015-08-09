@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.yorshahar.locker.R;
+import com.yorshahar.locker.activity.LockerMainActivity;
 import com.yorshahar.locker.font.FontLoader;
 import com.yorshahar.locker.ui.widget.Key;
 
@@ -20,7 +21,7 @@ import com.yorshahar.locker.ui.widget.Key;
  * <p/>
  * Created by yorshahar on 7/23/15.
  */
-public class PasscodeFragment extends Fragment implements Key.KeyDelegate {
+public class PasscodeFragment extends Fragment implements View.OnClickListener, Key.KeyDelegate {
 
     public interface FragmentDelegate {
 
@@ -56,8 +57,8 @@ public class PasscodeFragment extends Fragment implements Key.KeyDelegate {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        passcodeSize = 4;
-        passcode = "1234";
+        passcode = getString(R.string.passcode);
+        passcodeSize = passcode.length();
         enteredKeysBuffer = new StringBuffer(passcodeSize);
         circleImageViews = new ImageView[passcodeSize];
     }
@@ -77,6 +78,7 @@ public class PasscodeFragment extends Fragment implements Key.KeyDelegate {
 
         TextView cancelTextView = (TextView) view.findViewById(R.id.cancelTextView);
         cancelTextView.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.APPLE_THIN));
+        cancelTextView.setOnClickListener(this);
 
         Key key0 = (Key) view.findViewById(R.id.key0);
         key0.setDelegate(this);
@@ -249,10 +251,11 @@ public class PasscodeFragment extends Fragment implements Key.KeyDelegate {
     }
 
     private void unlock() {
+        reset();
         delegate.onPasscodePassed();
     }
 
-    
+
 /////////////////////////////////////////////////
 // KeyDelegate methods
 /////////////////////////////////////////////////
@@ -299,6 +302,26 @@ public class PasscodeFragment extends Fragment implements Key.KeyDelegate {
                 processing = false;
             }
         }
+    }
+
+
+/////////////////////////////////////////////////
+// View.OnClickListener methods
+/////////////////////////////////////////////////
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.cancelTextView: {
+                reset();
+                ((LockerMainActivity) getActivity()).reset();
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+
     }
 
 }

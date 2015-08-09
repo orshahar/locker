@@ -28,19 +28,11 @@
         </activity>
 
         <activity
-            android:name=".activity.ContainerActivity"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        </activity>
-
-        <activity
             android:name=".activity.LockerMainActivity"
             android:excludeFromRecents="true"
             android:label="@string/app_name"
             android:launchMode="singleInstance"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait" />
 
         <service android:name=".service.NotificationService" />
 
@@ -58,7 +50,6 @@
                 <action android:name="android.intent.action.SCREEN_ON" />
                 <action android:name="android.intent.action.SCREEN_OFF" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="com.hmkcode.android.USER_ACTION" />
             </intent-filter>
 
         </receiver>

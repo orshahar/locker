@@ -32,12 +32,6 @@ public class NotificationReceiver extends BroadcastReceiver {
                 }
                 break;
             }
-            case "com.hmkcode.android.USER_ACTION": {
-                if (delegate != null) {
-                    delegate.unlock();
-                }
-                break;
-            }
             default: {
 
             }

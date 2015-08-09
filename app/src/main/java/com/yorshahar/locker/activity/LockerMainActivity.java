@@ -1,13 +1,11 @@
 package com.yorshahar.locker.activity;
 
-import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -16,6 +14,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,10 +35,13 @@ public class LockerMainActivity extends AppCompatActivity {
 
     //    private LockscreenUtils mLockscreenUtils;
     private ServiceConnection serviceConnection;
-    private Service service;
-
+    private MyService myService;
+    private boolean isBound = false;
+    private boolean isWindowAttached = false;
 
     private ImageView dimView;
+    private ViewPager mViewPager;
+    private SectionsPagerAdapter sectionsPagerAdapter;
 
     // Set appropriate flags to make the screen appear over the keyguard
     @Override
@@ -52,17 +54,57 @@ public class LockerMainActivity extends AppCompatActivity {
         );
 
         super.onAttachedToWindow();
+
+        isWindowAttached = true;
+
+        sendViewToService();
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    public void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
 
-
-        Intent intent = new Intent(this, MyService.class);
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-
+        isWindowAttached = false;
     }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+
+//        if (!isBound) {
+//            Intent intent = new Intent(this, MyService.class);
+//            bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+//        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        mViewPager.setCurrentItem(1);
+//        sectionsPagerAdapter.getItem(0)
+        sectionsPagerAdapter.instantiateItem(mViewPager, 0);
+
+//        if (!isBound) {
+//            Intent intent = new Intent(this, MyService.class);
+//            bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+//        }
+    }
+
+    @Override
+    public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
+        return super.onCreateView(parent, name, context, attrs);
+    }
+
+    //    @Override
+//    protected void onStart() {
+//        super.onStart();
+//
+//        Intent intent = new Intent(this, MyService.class);
+//
+////            unbindService(serviceConnection);
+//        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,29 +112,7 @@ public class LockerMainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
-        serviceConnection = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder binder) {
-                int a = 2;
-                try {
-                    if (MyService.class.getSimpleName().equals(binder.getInterfaceDescriptor())) {
-                        service = (Service) binder.queryLocalInterface(binder.getInterfaceDescriptor());
-                        ((MyService) service).setContainerView((RelativeLayout) findViewById(R.id.layout));
-                    }
-
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                int a = 2;
-            }
-        };
-
-        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-//        mLockscreenUtils = new LockscreenUtils();
+        sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // unlock screen in case of app get killed by system
         if (getIntent() != null && getIntent().hasExtra("kill")
@@ -108,7 +128,7 @@ public class LockerMainActivity extends AppCompatActivity {
         }
 
         // Set up the ViewPager with the sections adapter.
-        ViewPager mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(sectionsPagerAdapter);
 
         View decorView = getWindow().getDecorView();
@@ -139,6 +159,38 @@ public class LockerMainActivity extends AppCompatActivity {
         });
 
         dimView = (ImageView) findViewById(R.id.dimView);
+
+        serviceConnection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                MyService.MyLocalBinder binder = (MyService.MyLocalBinder) service;
+                myService = binder.getService();
+                isBound = true;
+
+                myService.setActivity(LockerMainActivity.this);
+                sendViewToService();
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                isBound = false;
+            }
+        };
+
+        bindToService();
+    }
+
+    private void sendViewToService() {
+        if (isBound && isWindowAttached) {
+            myService.setContainerView((RelativeLayout) findViewById(R.id.layout));
+        }
+    }
+
+    private void bindToService() {
+        if (!isBound) {
+            Intent intent = new Intent(this, MyService.class);
+            bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+        }
     }
 
     // Handle events of calls and unlock screen if necessary
@@ -278,11 +330,28 @@ public class LockerMainActivity extends AppCompatActivity {
 
     //Simply unlock device by finishing the activity
     private void unlockDevice() {
-        Intent intnet = new Intent("com.hmkcode.android.USER_ACTION");
-        sendBroadcast(intnet);
-
-        finish();
+        myService.unlock();
+//        finish();
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
 
+//        unbindService(serviceConnection);
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (isBound) {
+            unbindService(serviceConnection);
+        }
+
+        super.onDestroy();
+    }
+
+    public void reset() {
+        mViewPager.setCurrentItem(1, true);
+        sectionsPagerAdapter.instantiateItem(mViewPager, 0);
+    }
 }
