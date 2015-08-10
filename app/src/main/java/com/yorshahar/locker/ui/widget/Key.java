@@ -30,6 +30,8 @@ public class Key extends View implements Runnable {
 
         void onKeyCanceled(View key);
 
+        void onAnimationStarted(View key);
+
         void onAnimationEnded(View key);
 
     }
@@ -155,6 +157,7 @@ public class Key extends View implements Runnable {
 
     private void startFadeOutAnimation() {
         animating = true;
+        delegate.onAnimationStarted(this);
         invalidate();
     }
 

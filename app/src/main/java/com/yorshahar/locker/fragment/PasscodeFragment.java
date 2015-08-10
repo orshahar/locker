@@ -42,6 +42,7 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
     private static final int LARGE_EMPTY_CIRCLE_IMAGE = R.drawable.gray_circle_empty;
     private static final int LARGE_FILLED_CIRCLE_IMAGE = R.drawable.gray_circle_filled;
     private boolean processing = false;
+    private int keysAnimating = 0;
     private boolean passcodeMatch = false;
     private boolean securityFailed = false;
 
@@ -246,6 +247,7 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
             circleImageView.setImageResource(SMALL_EMPTY_CIRCLE_IMAGE);
         }
         processing = false;
+        keysAnimating = 0;
         passcodeMatch = false;
         securityFailed = false;
     }
@@ -255,6 +257,9 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
         delegate.onPasscodePassed();
     }
 
+    private boolean isAnimatingKeys() {
+        return keysAnimating > 0;
+    }
 
 /////////////////////////////////////////////////
 // KeyDelegate methods
@@ -291,15 +296,23 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
     }
 
     @Override
+    public void onAnimationStarted(View key) {
+        keysAnimating++;
+    }
+
+    @Override
     public void onAnimationEnded(View key) {
         if (!processing) {
-            processing = true;
-            if (passcodeMatch) {
-                unlock();
-            } else if (securityFailed) {
-                shakeCircles();
-            } else {
-                processing = false;
+            keysAnimating--;
+            if (!isAnimatingKeys()) {
+                processing = true;
+                if (passcodeMatch) {
+                    unlock();
+                } else if (securityFailed) {
+                    shakeCircles();
+                } else {
+                    processing = false;
+                }
             }
         }
     }
