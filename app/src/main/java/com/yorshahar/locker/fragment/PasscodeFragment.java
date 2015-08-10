@@ -297,13 +297,17 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
 
     @Override
     public void onAnimationStarted(View key) {
-        keysAnimating++;
+        if (keysAnimating < passcodeSize) {
+            keysAnimating++;
+        }
     }
 
     @Override
     public void onAnimationEnded(View key) {
         if (!processing) {
-            keysAnimating--;
+            if (isAnimatingKeys()) {
+                keysAnimating--;
+            }
             if (!isAnimatingKeys()) {
                 processing = true;
                 if (passcodeMatch) {
