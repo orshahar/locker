@@ -67,8 +67,6 @@ public class MyService extends Service implements NotificationReceiver.Delegate 
     public void onCreate() {
         super.onCreate();
 
-        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
         containerView = new RelativeLayout(this);
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
 

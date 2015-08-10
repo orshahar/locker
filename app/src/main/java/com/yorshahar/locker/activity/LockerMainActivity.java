@@ -33,7 +33,6 @@ import java.util.Locale;
 
 public class LockerMainActivity extends AppCompatActivity {
 
-    //    private LockscreenUtils mLockscreenUtils;
     private ServiceConnection serviceConnection;
     private MyService myService;
     private boolean isBound = false;
