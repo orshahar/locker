@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.PixelFormat;
 import android.os.Binder;
-import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.view.Gravity;
@@ -75,10 +74,9 @@ public class MyService extends Service implements NotificationReceiver.Delegate 
 
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.TYPE_SYSTEM_ERROR,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN
+                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
                         | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                        | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
-                        | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+                        | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
                 PixelFormat.TRANSLUCENT);
 
         params.gravity = Gravity.CENTER;
@@ -87,13 +85,8 @@ public class MyService extends Service implements NotificationReceiver.Delegate 
         containerView.setVisibility(View.INVISIBLE);
 
         // Hide the status bar.
-        if (Build.VERSION.SDK_INT >= 16) {
-            int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-            containerView.setSystemUiVisibility(uiOptions);
-//        } else {
-//            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-//                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        }
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        containerView.setSystemUiVisibility(uiOptions);
 
 // Remember that you should never show the action bar if the
 // status bar is hidden, so hide that too if necessary.
@@ -205,6 +198,9 @@ public class MyService extends Service implements NotificationReceiver.Delegate 
         }
 
         containerView.setVisibility(View.VISIBLE);
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        containerView.setSystemUiVisibility(uiOptions);
+        lockerView.setSystemUiVisibility(uiOptions);
     }
 
     @Override
