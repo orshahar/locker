@@ -182,7 +182,7 @@ public class LockerMainActivity extends AppCompatActivity {
 
     private void sendViewToService() {
         if (isBound && isWindowAttached) {
-            myService.setContainerView((RelativeLayout) findViewById(R.id.layout));
+            myService.setLockerView((RelativeLayout) findViewById(R.id.layout));
         }
     }
 

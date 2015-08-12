@@ -26,8 +26,8 @@ public class MyService extends Service implements NotificationReceiver.Delegate 
     private LockerMainActivity activity;
     private final IBinder myBinder = new MyLocalBinder();
 
-    private RelativeLayout containerView;
     private RelativeLayout lockerView;
+    private WindowManager.LayoutParams params;
 
     public MyService() {
     }
@@ -40,20 +40,23 @@ public class MyService extends Service implements NotificationReceiver.Delegate 
         this.activity = activity;
     }
 
-    public RelativeLayout getContainerView() {
-        return containerView;
+    public void setLockerView(RelativeLayout lockerView) {
+        this.lockerView = lockerView;
+
+        updateLockerView();
     }
 
-    public void setContainerView(RelativeLayout lockerView) {
-        containerView.removeAllViews();
-
-        this.lockerView = lockerView;
+    private void updateLockerView() {
         ViewGroup lockerParent = (ViewGroup) lockerView.getParent();
         if (lockerParent != null) {
             lockerParent.removeView(lockerView);
         }
-        containerView.addView(lockerView);
-        containerView.setVisibility(View.VISIBLE);
+
+        windowManager.addView(lockerView, params);
+        lockerView.setVisibility(View.VISIBLE);
+
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        lockerView.setSystemUiVisibility(uiOptions);
     }
 
     @Override
@@ -65,10 +68,9 @@ public class MyService extends Service implements NotificationReceiver.Delegate 
     public void onCreate() {
         super.onCreate();
 
-        containerView = new RelativeLayout(this);
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
 
-        WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+        params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.TYPE_SYSTEM_ERROR,
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
                         | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
@@ -76,13 +78,6 @@ public class MyService extends Service implements NotificationReceiver.Delegate 
                 PixelFormat.TRANSLUCENT);
 
         params.gravity = Gravity.CENTER;
-
-        windowManager.addView(containerView, params);
-        containerView.setVisibility(View.INVISIBLE);
-
-        // Hide the status bar.
-        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-        containerView.setSystemUiVisibility(uiOptions);
 
 // Remember that you should never show the action bar if the
 // status bar is hidden, so hide that too if necessary.
@@ -182,7 +177,10 @@ public class MyService extends Service implements NotificationReceiver.Delegate 
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(mReceiver);
-        if (containerView != null) windowManager.removeView(containerView);
+
+        if (lockerView != null) {
+            windowManager.removeView(lockerView);
+        }
     }
 
 
@@ -192,15 +190,14 @@ public class MyService extends Service implements NotificationReceiver.Delegate 
             activity.reset();
         }
 
-        containerView.setVisibility(View.VISIBLE);
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-        containerView.setSystemUiVisibility(uiOptions);
         lockerView.setSystemUiVisibility(uiOptions);
+        lockerView.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void unlock() {
-        containerView.setVisibility(View.INVISIBLE);
+        lockerView.setVisibility(View.INVISIBLE);
     }
 
     public class MyLocalBinder extends Binder {
