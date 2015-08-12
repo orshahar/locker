@@ -4,13 +4,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.yorshahar.locker.activity.LockerMainActivity;
-
 public class NotificationReceiver extends BroadcastReceiver {
 
     public interface Delegate {
 
-        void lock();
+        void lock(boolean reset);
 
         void unlock();
 
@@ -24,11 +22,15 @@ public class NotificationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         switch (intent.getAction()) {
-            case Intent.ACTION_SCREEN_OFF:
-            case Intent.ACTION_SCREEN_ON:
-            case Intent.ACTION_BOOT_COMPLETED: {
+            case Intent.ACTION_SCREEN_OFF: {
                 if (delegate != null) {
-                    delegate.lock();
+                    delegate.lock(true);
+                }
+                break;
+            }
+            case Intent.ACTION_SCREEN_ON: {
+                if (delegate != null) {
+                    delegate.lock(false);
                 }
                 break;
             }

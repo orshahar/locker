@@ -3,7 +3,6 @@ package com.yorshahar.locker.service;
 import android.app.Notification;
 import android.app.Service;
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.PixelFormat;
@@ -11,7 +10,6 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -96,7 +94,6 @@ public class MyService extends Service implements NotificationReceiver.Delegate 
     public int onStartCommand(Intent intent, int flags, int startId) {
         IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
         filter.addAction(Intent.ACTION_SCREEN_OFF);
-        filter.addAction(Intent.ACTION_BOOT_COMPLETED);
 
         mReceiver = new NotificationReceiver();
         ((NotificationReceiver) mReceiver).setDelegate(this);
@@ -190,8 +187,8 @@ public class MyService extends Service implements NotificationReceiver.Delegate 
 
 
     @Override
-    public void lock() {
-        if (activity != null) {
+    public void lock(boolean reset) {
+        if (reset && activity != null) {
             activity.reset();
         }
 
