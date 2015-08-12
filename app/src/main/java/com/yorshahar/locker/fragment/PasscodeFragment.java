@@ -2,6 +2,7 @@ package com.yorshahar.locker.fragment;
 
 
 import android.animation.Animator;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -68,6 +69,7 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_password, container, false);
+        view.setBackgroundColor(Color.TRANSPARENT);
 
         WindowManager.LayoutParams windowManager = getActivity().getWindow().getAttributes();
         windowManager.dimAmount = 0.75f;
@@ -76,9 +78,11 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
 
         TextView enterPasscodeLabelView = (TextView) view.findViewById(R.id.enterPasscodeView);
         enterPasscodeLabelView.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.APPLE_THIN));
+        enterPasscodeLabelView.getPaint().setFakeBoldText(true);
 
         TextView cancelTextView = (TextView) view.findViewById(R.id.cancelTextView);
         cancelTextView.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.APPLE_THIN));
+        cancelTextView.getPaint().setFakeBoldText(true);
         cancelTextView.setOnClickListener(this);
 
         Key key0 = (Key) view.findViewById(R.id.key0);

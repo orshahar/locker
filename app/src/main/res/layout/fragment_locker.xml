@@ -14,10 +14,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="23dp"
         android:text="@string/digital_clock"
         android:textColor="#ffffffff"
-        android:textSize="90sp"
+        android:textSize="92dp"
         android:typeface="monospace"
         android:inputType="time"
         android:gravity="center" />
@@ -29,9 +29,10 @@
         android:layout_centerHorizontal="true"
         android:text="Monday, July 29"
         android:textColor="#ffffffff"
-        android:textSize="22sp"
+        android:textSize="20dp"
         android:layout_below="@+id/textClock"
-        android:focusableInTouchMode="true" />
+        android:focusableInTouchMode="true"
+        android:layout_marginTop="-3dp" />
 
     <com.yorshahar.locker.ui.widget.ShinyTextView
         android:id="@+id/unlockTextView"
@@ -40,9 +41,9 @@
         android:layout_centerHorizontal="true"
         android:text="@string/slide_to_unlock_text"
         android:textColor="#FFFFFFFF"
-        android:textSize="25dp"
+        android:textSize="26dp"
         android:focusableInTouchMode="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="60sp" />
+        android:layout_marginBottom="52dp" />
 
 </RelativeLayout>

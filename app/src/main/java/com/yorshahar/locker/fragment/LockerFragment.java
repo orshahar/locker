@@ -36,13 +36,16 @@ public class LockerFragment extends Fragment {
 
         TextView dateView = (TextView) view.findViewById(R.id.dateTextView);
         dateView.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.HELVETICA_NEUE_ULTRA_LIGHT));
+        dateView.getPaint().setFakeBoldText(true);
+
 
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE, MMMM dd", Locale.US);
         String dateString = sdf.format(System.currentTimeMillis());
         dateView.setText(dateString);
 
         ShinyTextView unlockTextView = (ShinyTextView) view.findViewById(R.id.unlockTextView);
-        unlockTextView.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.HELVETICA_NEUE_ULTRA_LIGHT));
+        unlockTextView.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.APPLE_THIN));
+        unlockTextView.getPaint().setFakeBoldText(true);
 
         return view;
     }
