@@ -1,16 +1,19 @@
 package com.yorshahar.locker.fragment;
 
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.yorshahar.locker.R;
 import com.yorshahar.locker.font.FontLoader;
 import com.yorshahar.locker.ui.widget.CustomDigitalClock;
+import com.yorshahar.locker.ui.widget.ShinyTextView;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -25,7 +28,8 @@ public class LockerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_locker, container, false);
+        RelativeLayout view = (RelativeLayout) inflater.inflate(R.layout.fragment_locker, container, false);
+        view.setBackgroundColor(Color.TRANSPARENT);
 
         CustomDigitalClock timeView = (CustomDigitalClock) view.findViewById(R.id.textClock);
         timeView.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.HELVETICA_NEUE_ULTRA_LIGHT));
@@ -37,7 +41,7 @@ public class LockerFragment extends Fragment {
         String dateString = sdf.format(System.currentTimeMillis());
         dateView.setText(dateString);
 
-        TextView unlockTextView = (TextView) view.findViewById(R.id.unlockTextView);
+        ShinyTextView unlockTextView = (ShinyTextView) view.findViewById(R.id.unlockTextView);
         unlockTextView.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.HELVETICA_NEUE_ULTRA_LIGHT));
 
         return view;
