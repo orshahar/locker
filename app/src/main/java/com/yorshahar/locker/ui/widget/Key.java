@@ -156,6 +156,9 @@ public class Key extends View implements Runnable {
     }
 
     private void startFadeOutAnimation() {
+        if (animating) {
+            delegate.onAnimationEnded(this);
+        }
         animating = true;
         delegate.onAnimationStarted(this);
         invalidate();
