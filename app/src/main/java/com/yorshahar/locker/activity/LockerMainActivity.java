@@ -80,9 +80,10 @@ public class LockerMainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        mViewPager.setCurrentItem(1);
+//        mViewPager.setCurrentItem(1);
 //        sectionsPagerAdapter.getItem(0)
-        sectionsPagerAdapter.instantiateItem(mViewPager, 0);
+//        sectionsPagerAdapter.instantiateItem(mViewPager, 0);
+//        reset();
 
 //        if (!isBound) {
 //            Intent intent = new Intent(this, MyService.class);
@@ -330,6 +331,7 @@ public class LockerMainActivity extends AppCompatActivity {
     //Simply unlock device by finishing the activity
     private void unlockDevice() {
         myService.unlock();
+        reset();
 //        finish();
     }
 
@@ -338,6 +340,11 @@ public class LockerMainActivity extends AppCompatActivity {
         super.onStop();
 
 //        unbindService(serviceConnection);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 
     @Override
