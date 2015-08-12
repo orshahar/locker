@@ -65,6 +65,15 @@ public class MyService extends Service implements NotificationReceiver.Delegate 
     }
 
     @Override
+    public boolean onUnbind(Intent intent) {
+        windowManager.removeView(lockerView);
+        activity = null;
+        lockerView = null;
+
+        return super.onUnbind(intent);
+    }
+
+    @Override
     public void onCreate() {
         super.onCreate();
 

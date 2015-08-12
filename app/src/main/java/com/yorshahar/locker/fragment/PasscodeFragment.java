@@ -72,7 +72,7 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
         view.setBackgroundColor(Color.TRANSPARENT);
 
         WindowManager.LayoutParams windowManager = getActivity().getWindow().getAttributes();
-        windowManager.dimAmount = 0.75f;
+        windowManager.dimAmount = 0.0f;
         getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
 
 

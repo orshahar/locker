@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -31,7 +32,7 @@ import com.yorshahar.locker.service.MyService;
 import java.util.Locale;
 
 
-public class LockerMainActivity extends AppCompatActivity {
+public class LockerMainActivity extends FragmentActivity {
 
     private ServiceConnection serviceConnection;
     private MyService myService;
@@ -45,12 +46,12 @@ public class LockerMainActivity extends AppCompatActivity {
     // Set appropriate flags to make the screen appear over the keyguard
     @Override
     public void onAttachedToWindow() {
-        getWindow().addFlags(
-                WindowManager.LayoutParams.FLAG_FULLSCREEN
-                        | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-                        | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
-        );
+//        getWindow().addFlags(
+//                WindowManager.LayoutParams.FLAG_FULLSCREEN
+//                        | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+//                        | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+//                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+//        );
 
         super.onAttachedToWindow();
 
@@ -122,8 +123,7 @@ public class LockerMainActivity extends AppCompatActivity {
             // listen the events get fired during the call
             StateListener phoneStateListener = new StateListener();
             TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-            telephonyManager.listen(phoneStateListener,
-                    PhoneStateListener.LISTEN_CALL_STATE);
+            telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
 
         }
 
@@ -204,6 +204,7 @@ public class LockerMainActivity extends AppCompatActivity {
                     unlockDevice();
                     break;
                 case TelephonyManager.CALL_STATE_OFFHOOK:
+                    myService.lock(true);
                     break;
                 case TelephonyManager.CALL_STATE_IDLE:
                     break;
