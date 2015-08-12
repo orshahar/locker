@@ -34,13 +34,6 @@
             android:launchMode="singleInstance"
             android:screenOrientation="portrait" />
 
-        <service android:name=".service.NotificationService" />
-
-        <receiver
-            android:name=".receiver.NotificationIntentReceiver"
-            android:enabled="true"
-            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" />
-
         <service android:name=".service.MyService" />
 
         <receiver
@@ -53,6 +46,17 @@
             </intent-filter>
 
         </receiver>
+
+        <service
+            android:name=".service.NotificationService"
+            android:enabled="true"
+            android:exported="false"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+        </service>
+
 
     </application>
 
