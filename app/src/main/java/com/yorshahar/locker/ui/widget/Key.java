@@ -166,7 +166,7 @@ public class Key extends View implements Runnable {
     @Override
     public void run() {
         if (animating) {
-            alpha -= 25;
+            alpha -= 20;
             if (alpha < 0) {
                 alpha = 0;
                 animating = false;
