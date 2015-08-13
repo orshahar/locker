@@ -245,7 +245,7 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
         }).start();
     }
 
-    private void reset() {
+    public void reset() {
         enteredKeysBuffer.delete(0, enteredKeysBuffer.length());
         for (ImageView circleImageView : circleImageViews) {
             circleImageView.setImageResource(SMALL_EMPTY_CIRCLE_IMAGE);
@@ -325,6 +325,17 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
         }
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        reset();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        reset();
+    }
 
 /////////////////////////////////////////////////
 // View.OnClickListener methods
@@ -334,7 +345,6 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.cancelTextView: {
-                reset();
                 ((LockerMainActivity) getActivity()).reset();
                 break;
             }

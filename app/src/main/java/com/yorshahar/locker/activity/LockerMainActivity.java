@@ -25,6 +25,7 @@ import android.widget.RelativeLayout;
 import com.yorshahar.locker.R;
 import com.yorshahar.locker.fragment.LockerFragment;
 import com.yorshahar.locker.fragment.PasscodeFragment;
+import com.yorshahar.locker.fragment.SmartFragmentStatePagerAdapter;
 import com.yorshahar.locker.service.MyService;
 
 import java.util.Locale;
@@ -144,7 +145,10 @@ public class LockerMainActivity extends FragmentActivity {
 
             @Override
             public void onPageSelected(int position) {
-
+                if (position == 1) {
+                    PasscodeFragment passcodeFragment = (PasscodeFragment) sectionsPagerAdapter.getRegisteredFragment(0);
+                    passcodeFragment.reset();
+                }
             }
 
             @Override
@@ -272,7 +276,7 @@ public class LockerMainActivity extends FragmentActivity {
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter implements PasscodeFragment.FragmentDelegate {
+    public class SectionsPagerAdapter extends SmartFragmentStatePagerAdapter implements PasscodeFragment.FragmentDelegate {
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -354,6 +358,5 @@ public class LockerMainActivity extends FragmentActivity {
 
     public void reset() {
         mViewPager.setCurrentItem(1, true);
-        sectionsPagerAdapter.instantiateItem(mViewPager, 0);
     }
 }
