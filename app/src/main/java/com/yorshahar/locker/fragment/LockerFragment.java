@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -21,7 +20,6 @@ import com.yorshahar.locker.ui.widget.ShinyTextView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -35,7 +33,6 @@ public class LockerFragment extends Fragment {
 
     ListView notificationsListView;
     ListAdapter listAdapter;
-//    List<String> notifications = Arrays.asList("Meeting status", "Buy eggs", "Download complete.");
     List<Notification> notifications = new ArrayList<>(3);
 
     {
@@ -69,9 +66,6 @@ public class LockerFragment extends Fragment {
         notificationsListView = (ListView) view.findViewById(R.id.notificationsListView);
         listAdapter = new NotificationListAdapter(getActivity(), notifications);
         notificationsListView.setAdapter(listAdapter);
-
-
-
 
         return view;
     }
