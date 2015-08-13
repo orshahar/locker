@@ -32,5 +32,10 @@
 
     <string name="passcode">2483</string>
     <string name="welcome">Welcome</string>
+    <string name="notification_icon">Nitification icon</string>
+    <string name="title">Title</string>
+    <string name="body">Body</string>
+    <string name="six_min_ago">6 min ago</string>
+    <string name="gmail">Gmail</string>
 
 </resources>

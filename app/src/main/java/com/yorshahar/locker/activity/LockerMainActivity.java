@@ -12,7 +12,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.AttributeSet;
@@ -20,7 +19,6 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
@@ -42,21 +40,14 @@ public class LockerMainActivity extends FragmentActivity {
     private ImageView dimView;
     private ViewPager mViewPager;
     private SectionsPagerAdapter sectionsPagerAdapter;
+    private boolean hasNotifications = true;
 
     // Set appropriate flags to make the screen appear over the keyguard
     @Override
     public void onAttachedToWindow() {
-//        getWindow().addFlags(
-//                WindowManager.LayoutParams.FLAG_FULLSCREEN
-//                        | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-//                        | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-//                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
-//        );
-
         super.onAttachedToWindow();
 
         isWindowAttached = true;
-
         sendViewToService();
     }
 
@@ -140,10 +131,14 @@ public class LockerMainActivity extends FragmentActivity {
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                if (position == 0) {
-                    dimView.setAlpha((1.0f - positionOffset) / 1.7f);
+                if (hasNotifications) {
+                    dimView.setAlpha(1.0f);
                 } else {
-                    dimView.setAlpha(0.0f);
+                    if (position == 0) {
+                        dimView.setAlpha((1.0f - positionOffset));
+                    } else {
+                        dimView.setAlpha(0.0f);
+                    }
                 }
             }
 

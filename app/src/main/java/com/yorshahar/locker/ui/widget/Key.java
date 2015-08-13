@@ -2,7 +2,6 @@ package com.yorshahar.locker.ui.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -36,7 +35,7 @@ public class Key extends View implements Runnable {
 
     }
 
-    public static final float CIRCLE_WIDTH =3.0f;
+    public static final float CIRCLE_WIDTH = 3.0f;
     public static final int CIRCLE_COLOR = Color.argb(255, 81, 74, 85);
 
     private Typeface typeface;

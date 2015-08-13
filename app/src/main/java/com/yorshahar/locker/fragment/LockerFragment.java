@@ -7,15 +7,23 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.yorshahar.locker.R;
 import com.yorshahar.locker.font.FontLoader;
+import com.yorshahar.locker.model.notification.Notification;
 import com.yorshahar.locker.ui.widget.CustomDigitalClock;
 import com.yorshahar.locker.ui.widget.ShinyTextView;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -24,6 +32,17 @@ import java.util.Locale;
  * Created by yorshahar on 7/23/15.
  */
 public class LockerFragment extends Fragment {
+
+    ListView notificationsListView;
+    ListAdapter listAdapter;
+//    List<String> notifications = Arrays.asList("Meeting status", "Buy eggs", "Download complete.");
+    List<Notification> notifications = new ArrayList<>(3);
+
+    {
+        notifications.add(new Notification("Gmail", new Date(), "Allen Kiehl via LinkedIn", "Yaniv, Please add me to your LinkedIn network."));
+        notifications.add(new Notification("Gmail", new Date(), "Tim Bricks", "Hi, The meeting tomorrow will be at the main studio. Please let everyone in your team know."));
+        notifications.add(new Notification("Calendar", new Date(), "Scrum in 15 min", ""));
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -46,6 +65,13 @@ public class LockerFragment extends Fragment {
         ShinyTextView unlockTextView = (ShinyTextView) view.findViewById(R.id.unlockTextView);
         unlockTextView.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.APPLE_THIN));
         unlockTextView.getPaint().setFakeBoldText(true);
+
+        notificationsListView = (ListView) view.findViewById(R.id.notificationsListView);
+        listAdapter = new NotificationListAdapter(getActivity(), notifications);
+        notificationsListView.setAdapter(listAdapter);
+
+
+
 
         return view;
     }
