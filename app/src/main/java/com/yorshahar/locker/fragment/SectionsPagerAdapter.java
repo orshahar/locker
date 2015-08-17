@@ -65,4 +65,8 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter implements Passco
 //        mLockscreenUtils.unlock();
     }
 
+    @Override
+    public void requestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+    }
 }

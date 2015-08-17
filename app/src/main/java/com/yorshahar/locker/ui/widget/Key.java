@@ -33,6 +33,8 @@ public class Key extends View implements Runnable {
 
         void onAnimationEnded(View key);
 
+        void requestDisallowInterceptTouchEvent(boolean disallowIntercept);
+
     }
 
     public static final float CIRCLE_WIDTH = 3.0f;
@@ -127,6 +129,7 @@ public class Key extends View implements Runnable {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN: {
+                delegate.requestDisallowInterceptTouchEvent(true);
                 delegate.onKeyDown(this);
                 setPressed(true);
                 alpha = 255;
@@ -142,6 +145,7 @@ public class Key extends View implements Runnable {
                 break;
             }
             case MotionEvent.ACTION_CANCEL: {
+                delegate.requestDisallowInterceptTouchEvent(false);
                 delegate.onKeyCanceled(this);
                 setPressed(false);
                 animating = true;
@@ -149,6 +153,12 @@ public class Key extends View implements Runnable {
                 handled = true;
                 break;
             }
+            case MotionEvent.ACTION_MOVE:
+                if (event.getX() < -10 || event.getX() > 10) {
+                    delegate.requestDisallowInterceptTouchEvent(true);
+                } else {
+                    delegate.requestDisallowInterceptTouchEvent(false);
+                }
         }
 
         return handled;

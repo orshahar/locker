@@ -28,6 +28,8 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
 
         void onPasscodePassed();
 
+        void requestDisallowInterceptTouchEvent(boolean disallowIntercept);
+
     }
 
     private FragmentDelegate delegate;
@@ -323,6 +325,11 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
                 }
             }
         }
+    }
+
+    @Override
+    public void requestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+        delegate.requestDisallowInterceptTouchEvent(disallowIntercept);
     }
 
     @Override
