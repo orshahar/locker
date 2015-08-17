@@ -35,7 +35,7 @@ import java.util.Calendar;
 public class CustomDigitalClock extends TextView {
 
     private Calendar mCalendar;
-    private final static String m12 = "hh:mm";
+    private final static String m12 = "h:mm";
     private final static String m24 = "k:mm";
 
     @SuppressWarnings("FieldCanBeLocal") // We must keep a reference to this observer
