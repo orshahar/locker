@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-public class NotificationReceiver extends BroadcastReceiver {
+public class LockReceiver extends BroadcastReceiver {
 
     public interface Delegate {
 
@@ -16,7 +16,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 
     private Delegate delegate;
 
-    public NotificationReceiver() {
+    public LockReceiver() {
     }
 
     @Override

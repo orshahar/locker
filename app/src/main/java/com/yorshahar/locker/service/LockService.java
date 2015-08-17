@@ -17,9 +17,9 @@ import android.widget.RelativeLayout;
 
 import com.yorshahar.locker.R;
 import com.yorshahar.locker.activity.LockerMainActivity;
-import com.yorshahar.locker.receiver.NotificationReceiver;
+import com.yorshahar.locker.receiver.LockReceiver;
 
-public class MyService extends Service implements NotificationReceiver.Delegate {
+public class LockService extends Service implements LockReceiver.Delegate {
 
     private BroadcastReceiver mReceiver;
     private WindowManager windowManager;
@@ -29,7 +29,7 @@ public class MyService extends Service implements NotificationReceiver.Delegate 
     private RelativeLayout lockerView;
     private WindowManager.LayoutParams params;
 
-    public MyService() {
+    public LockService() {
     }
 
     public LockerMainActivity getActivity() {
@@ -99,8 +99,8 @@ public class MyService extends Service implements NotificationReceiver.Delegate 
         IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
         filter.addAction(Intent.ACTION_SCREEN_OFF);
 
-        mReceiver = new NotificationReceiver();
-        ((NotificationReceiver) mReceiver).setDelegate(this);
+        mReceiver = new LockReceiver();
+        ((LockReceiver) mReceiver).setDelegate(this);
         registerReceiver(mReceiver, filter);
         startForeground();
 
@@ -210,8 +210,8 @@ public class MyService extends Service implements NotificationReceiver.Delegate 
     }
 
     public class MyLocalBinder extends Binder {
-        public MyService getService() {
-            return MyService.this;
+        public LockService getService() {
+            return LockService.this;
         }
     }
 

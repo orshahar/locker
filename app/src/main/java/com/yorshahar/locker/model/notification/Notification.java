@@ -1,5 +1,7 @@
 package com.yorshahar.locker.model.notification;
 
+import android.graphics.drawable.Drawable;
+
 import java.util.Date;
 
 /**
@@ -10,12 +12,14 @@ public class Notification {
     private Date dateArrived;
     private String title;
     private String body;
+    private Drawable icon;
 
-    public Notification(String source, Date dateArrived, String title, String body) {
+    public Notification(String source, Date dateArrived, String title, String body, Drawable icon) {
         this.source = source;
         this.dateArrived = dateArrived;
         this.title = title;
         this.body = body;
+        this.icon = icon;
     }
 
     public String getSource() {
@@ -34,4 +38,25 @@ public class Notification {
         return body;
     }
 
+    public Drawable getIcon() {
+        return icon;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Notification that = (Notification) o;
+
+        if (source != null ? !source.equals(that.source) : that.source != null) return false;
+        return !(body != null ? !body.equals(that.body) : that.body != null);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = source != null ? source.hashCode() : 0;
+        result = 31 * result + (body != null ? body.hashCode() : 0);
+        return result;
+    }
 }

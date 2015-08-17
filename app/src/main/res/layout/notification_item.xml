@@ -45,18 +45,6 @@
         android:layout_marginBottom="1dp" />
 
     <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_toEndOf="@+id/icon"
-        android:layout_toRightOf="@+id/icon"
-        android:gravity="start|top"
-        android:text="@string/title"
-        android:textSize="16sp"
-        android:layout_below="@+id/source" />
-
-    <TextView
         android:id="@+id/body"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -64,13 +52,13 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="false"
-        android:layout_below="@+id/title"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_toEndOf="@+id/icon"
         android:layout_toRightOf="@+id/icon"
         android:gravity="start|top"
         android:text="@string/body"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:layout_below="@+id/source" />
 
 </RelativeLayout>

@@ -3,7 +3,6 @@ package com.yorshahar.locker.activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
@@ -26,22 +25,27 @@ import com.yorshahar.locker.R;
 import com.yorshahar.locker.fragment.LockerFragment;
 import com.yorshahar.locker.fragment.PasscodeFragment;
 import com.yorshahar.locker.fragment.SmartFragmentStatePagerAdapter;
-import com.yorshahar.locker.service.MyService;
+import com.yorshahar.locker.model.notification.Notification;
+import com.yorshahar.locker.service.LockService;
+import com.yorshahar.locker.service.NotificationService;
+import com.yorshahar.locker.service.connection.AbstractServiceConnectionImpl;
 
 import java.util.Locale;
 
 
-public class LockerMainActivity extends FragmentActivity {
+public class LockerMainActivity extends FragmentActivity implements NotificationService.Delegate {
 
-    private ServiceConnection serviceConnection;
-    private MyService myService;
-    private boolean isBound = false;
+    private AbstractServiceConnectionImpl lockServiceConnection;
+    private AbstractServiceConnectionImpl notificationServiceConnection;
+    private LockService lockService;
+    private NotificationService notificationService;
+    private boolean isLockServiceBound = false;
+    private boolean isNotificationServiceBound = false;
     private boolean isWindowAttached = false;
 
     private ImageView dimView;
     private ViewPager mViewPager;
     private SectionsPagerAdapter sectionsPagerAdapter;
-    private boolean hasNotifications = true;
 
     // Set appropriate flags to make the screen appear over the keyguard
     @Override
@@ -64,8 +68,8 @@ public class LockerMainActivity extends FragmentActivity {
         super.onRestart();
 
 //        if (!isBound) {
-//            Intent intent = new Intent(this, MyService.class);
-//            bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+//            Intent intent = new Intent(this, LockService.class);
+//            bindService(intent, lockServiceConnection, Context.BIND_AUTO_CREATE);
 //        }
     }
 
@@ -79,8 +83,8 @@ public class LockerMainActivity extends FragmentActivity {
 //        reset();
 
 //        if (!isBound) {
-//            Intent intent = new Intent(this, MyService.class);
-//            bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+//            Intent intent = new Intent(this, LockService.class);
+//            bindService(intent, lockServiceConnection, Context.BIND_AUTO_CREATE);
 //        }
     }
 
@@ -93,10 +97,10 @@ public class LockerMainActivity extends FragmentActivity {
 //    protected void onStart() {
 //        super.onStart();
 //
-//        Intent intent = new Intent(this, MyService.class);
+//        Intent intent = new Intent(this, LockService.class);
 //
-////            unbindService(serviceConnection);
-//        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+////            unbindService(lockServiceConnection);
+//        bindService(intent, lockServiceConnection, Context.BIND_AUTO_CREATE);
 //    }
 
     @Override
@@ -132,7 +136,7 @@ public class LockerMainActivity extends FragmentActivity {
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                if (hasNotifications) {
+                if (hasNotifications()) {
                     dimView.setAlpha(1.0f);
                 } else {
                     if (position == 0) {
@@ -159,36 +163,82 @@ public class LockerMainActivity extends FragmentActivity {
 
         dimView = (ImageView) findViewById(R.id.dimView);
 
-        serviceConnection = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                MyService.MyLocalBinder binder = (MyService.MyLocalBinder) service;
-                myService = binder.getService();
-                isBound = true;
+        lockServiceConnection = new LockServiceConnection(LockService.class);
+        notificationServiceConnection = new NotificationServiceConnection(NotificationService.class);
 
-                myService.setActivity(LockerMainActivity.this);
-                sendViewToService();
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                isBound = false;
-            }
-        };
-
-        bindToService();
+        bindToServices();
     }
 
-    private void sendViewToService() {
-        if (isBound && isWindowAttached) {
-            myService.setLockerView((RelativeLayout) findViewById(R.id.layout));
+    private boolean hasNotifications() {
+        LockerFragment lockerFragment = (LockerFragment) sectionsPagerAdapter.getRegisteredFragment(1);
+        return lockerFragment.hasNotifications();
+    }
+
+    private class LockServiceConnection extends AbstractServiceConnectionImpl {
+
+        public LockServiceConnection(Class clazz) {
+            super(clazz);
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            LockService.MyLocalBinder binder = (LockService.MyLocalBinder) service;
+            lockService = binder.getService();
+            isLockServiceBound = true;
+
+            lockService.setActivity(LockerMainActivity.this);
+            sendViewToService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            isLockServiceBound = false;
         }
     }
 
-    private void bindToService() {
-        if (!isBound) {
-            Intent intent = new Intent(this, MyService.class);
-            bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+    private class NotificationServiceConnection extends AbstractServiceConnectionImpl {
+
+        public NotificationServiceConnection(Class clazz) {
+            super(clazz);
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            notificationService = NotificationService.getInstance();
+            if (notificationService != null) {
+                isNotificationServiceBound = true;
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            isNotificationServiceBound = false;
+        }
+    }
+
+    private void sendViewToService() {
+        if (isLockServiceBound && isWindowAttached) {
+            lockService.setLockerView((RelativeLayout) findViewById(R.id.layout));
+        }
+    }
+
+    private void bindToServices() {
+        if (!isLockServiceBound) {
+            Intent intent = new Intent(this, lockServiceConnection.getClazz());
+            bindService(intent, lockServiceConnection, Context.BIND_AUTO_CREATE);
+        }
+
+//        if (!isNotificationServiceBound) {
+//            Intent intent = new Intent(this, notificationServiceConnection.getClazz());
+//            bindService(intent, notificationServiceConnection, Context.BIND_AUTO_CREATE);
+//        }
+
+        if (!isNotificationServiceBound) {
+            notificationService = NotificationService.getInstance();
+            if (notificationService != null) {
+                notificationService.setDelegate(this);
+                isNotificationServiceBound = true;
+            }
         }
     }
 
@@ -203,7 +253,7 @@ public class LockerMainActivity extends FragmentActivity {
                     unlockDevice();
                     break;
                 case TelephonyManager.CALL_STATE_OFFHOOK:
-                    myService.lock(true);
+                    lockService.lock(true);
                     break;
                 case TelephonyManager.CALL_STATE_IDLE:
                     break;
@@ -326,11 +376,16 @@ public class LockerMainActivity extends FragmentActivity {
             unlockDevice();
         }
 
+        @Override
+        public void requestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+            mViewPager.requestDisallowInterceptTouchEvent(disallowIntercept);
+        }
+
     }
 
     //Simply unlock device by finishing the activity
     private void unlockDevice() {
-        myService.unlock();
+        lockService.unlock();
         reset();
 //        finish();
     }
@@ -339,7 +394,7 @@ public class LockerMainActivity extends FragmentActivity {
     protected void onStop() {
         super.onStop();
 
-//        unbindService(serviceConnection);
+//        unbindService(lockServiceConnection);
     }
 
     @Override
@@ -349,8 +404,8 @@ public class LockerMainActivity extends FragmentActivity {
 
     @Override
     protected void onDestroy() {
-        if (isBound) {
-            unbindService(serviceConnection);
+        if (isLockServiceBound) {
+            unbindService(lockServiceConnection);
         }
 
         super.onDestroy();
@@ -358,5 +413,16 @@ public class LockerMainActivity extends FragmentActivity {
 
     public void reset() {
         mViewPager.setCurrentItem(1, true);
+
+        bindToServices();
     }
+
+
+    @Override
+    public void onNotification(Notification notification) {
+        LockerFragment lockerFragment = (LockerFragment) sectionsPagerAdapter.getRegisteredFragment(1);
+        lockerFragment.addNotification(notification);
+    }
+
+
 }

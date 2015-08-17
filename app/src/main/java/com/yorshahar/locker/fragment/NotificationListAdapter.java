@@ -5,10 +5,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.yorshahar.locker.R;
 import com.yorshahar.locker.model.notification.Notification;
+import com.yorshahar.locker.util.TimeUtil;
 
 import java.util.List;
 
@@ -34,9 +36,13 @@ public class NotificationListAdapter extends ArrayAdapter<Notification> {
         TextView sourceTxtView = (TextView) item.findViewById(R.id.source);
         sourceTxtView.setText(notification.getSource());
 
-        TextView titleTextView = (TextView) item.findViewById(R.id.title);
-//        titleTextView.setTypeface(FontLoader.getTypeface(getContext(), FontLoader.HELVETICA_NEUE_ULTRA_LIGHT));
-        titleTextView.setText(notification.getTitle());
+//        TextView titleTextView = (TextView) item.findViewById(R.id.title);
+////        titleTextView.setTypeface(FontLoader.getTypeface(getContext(), FontLoader.HELVETICA_NEUE_ULTRA_LIGHT));
+//        titleTextView.setText(notification.getTitle());
+////        if (notification.getTitle() == null || notification.getTitle().length() == 0) {
+////            titleTextView.setVisibility(View.INVISIBLE);
+////            titleTextView.setHeight(0);
+////        }
 
         TextView bodyTextView = (TextView) item.findViewById(R.id.body);
 //        bodyTextView.setTypeface(FontLoader.getTypeface(getContext(), FontLoader.HELVETICA_NEUE_ULTRA_LIGHT));
@@ -44,7 +50,13 @@ public class NotificationListAdapter extends ArrayAdapter<Notification> {
 
 
         TextView dateArrivedTextView = (TextView) item.findViewById(R.id.dateArrived);
+        dateArrivedTextView.setText(TimeUtil.formatDuration(notification.getDateArrived()));
+
+        ImageView iconImageView = (ImageView) item.findViewById(R.id.icon);
+        iconImageView.setImageDrawable(notification.getIcon());
+
         return item;
+
     }
 
 }

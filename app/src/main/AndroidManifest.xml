@@ -35,10 +35,10 @@
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
 
-        <service android:name=".service.MyService" />
+        <service android:name=".service.LockService" />
 
         <receiver
-            android:name=".receiver.NotificationReceiver"
+            android:name=".receiver.LockReceiver"
             android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.SCREEN_ON" />

@@ -2,14 +2,11 @@ package com.yorshahar.locker.activity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.PixelFormat;
 import android.os.Bundle;
-import android.view.Gravity;
-import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.yorshahar.locker.R;
-import com.yorshahar.locker.service.MyService;
+import com.yorshahar.locker.service.LockService;
 
 /**
  * Created by yorshahar on 8/6/15.
@@ -24,7 +21,7 @@ public class SettingsActivity extends Activity {
 
         setContentView(R.layout.settings_layout);
 
-        startService(new Intent(this, MyService.class));
+        startService(new Intent(this, LockService.class));
 
         textView = (TextView) findViewById(R.id.textView);
         textView.setText("Welcome to Locker");

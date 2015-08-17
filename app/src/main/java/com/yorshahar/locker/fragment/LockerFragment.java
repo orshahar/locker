@@ -20,7 +20,6 @@ import com.yorshahar.locker.ui.widget.ShinyTextView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -34,12 +33,6 @@ public class LockerFragment extends Fragment {
     ListView notificationsListView;
     ListAdapter listAdapter;
     List<Notification> notifications = new ArrayList<>(3);
-
-    {
-        notifications.add(new Notification("Gmail", new Date(), "Allen Kiehl via LinkedIn", "Yaniv, Please add me to your LinkedIn network."));
-        notifications.add(new Notification("Gmail", new Date(), "Tim Bricks", "Hi, The meeting tomorrow will be at the main studio. Please let everyone in your team know."));
-        notifications.add(new Notification("Calendar", new Date(), "Scrum in 15 min", ""));
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -68,6 +61,21 @@ public class LockerFragment extends Fragment {
         notificationsListView.setAdapter(listAdapter);
 
         return view;
+    }
+
+    public void addNotification(Notification notification) {
+        if (!notifications.contains(notification)) {
+            notifications.add(0, notification);
+            notificationsListView.invalidate();
+        }
+    }
+
+    public int notificationCount() {
+        return notifications.size();
+    }
+
+    public boolean hasNotifications() {
+        return !notifications.isEmpty();
     }
 
 }
