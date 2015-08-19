@@ -253,7 +253,6 @@ public class LockerMainActivity extends FragmentActivity implements Notification
                     unlockDevice();
                     break;
                 case TelephonyManager.CALL_STATE_OFFHOOK:
-                    lockService.lock(true);
                     break;
                 case TelephonyManager.CALL_STATE_IDLE:
                     break;
