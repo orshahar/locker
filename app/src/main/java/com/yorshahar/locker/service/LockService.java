@@ -52,11 +52,11 @@ public class LockService extends Service implements LockReceiver.Delegate {
             lockerParent.removeView(lockerView);
         }
 
-        windowManager.addView(lockerView, params);
-        lockerView.setVisibility(View.VISIBLE);
-
-        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-        lockerView.setSystemUiVisibility(uiOptions);
+//        windowManager.addView(lockerView, params);
+//        lockerView.setVisibility(View.VISIBLE);
+//
+//        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+//        lockerView.setSystemUiVisibility(uiOptions);
     }
 
     @Override
@@ -199,14 +199,30 @@ public class LockService extends Service implements LockReceiver.Delegate {
             activity.reset();
         }
 
-        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-        lockerView.setSystemUiVisibility(uiOptions);
-        lockerView.setVisibility(View.VISIBLE);
+        if (reset && lockerView != null) {
+            try {
+                windowManager.addView(lockerView, params);
+
+                int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+                lockerView.setSystemUiVisibility(uiOptions);
+                lockerView.setVisibility(View.VISIBLE);
+            } catch (Exception e) {
+                int a = 2;
+            }
+        }
+
     }
 
     @Override
     public void unlock() {
-        lockerView.setVisibility(View.INVISIBLE);
+//        lockerView.setVisibility(View.INVISIBLE);
+        if (lockerView != null) {
+            try {
+                windowManager.removeView(lockerView);
+            } catch (Exception e) {
+                int a = 2;
+            }
+        }
     }
 
     public class MyLocalBinder extends Binder {
