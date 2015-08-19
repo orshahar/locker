@@ -37,5 +37,8 @@
     <string name="body">Body</string>
     <string name="six_min_ago">6 min ago</string>
     <string name="gmail">Gmail</string>
+    <string name="sample_date">Monday, July 29</string>
+    <string name="border">border</string>
+    <string name="slide_to_view">slide to view</string>
 
 </resources>

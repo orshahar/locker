@@ -1,7 +1,9 @@
 package com.yorshahar.locker.util;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 
 /**
@@ -59,8 +61,20 @@ public class TimeUtil {
     }
 
     public static void main(String args[]) {
-        Date then = new Date(new Date().getTime() - 43976123L);
+        long time = 15910940L;
+//        Date then = new Date(new Date().getTime() - time);
 
+//        GregorianCalendar cal = new GregorianCalendar();
+//        cal.setTimeInMillis(new Date().getTime() - time);
+//        Date then = cal.getTime();
+
+        GregorianCalendar cal = new GregorianCalendar();
+//        cal.setTimeInMillis(time);
+        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.setTimeInMillis(cal.getTimeInMillis() + time);
+        cal.add(Calendar.HOUR, -4);
+        Date then = cal.getTime();
         System.out.println(formatDuration(then));
 
     }

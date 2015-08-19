@@ -15,9 +15,16 @@ import com.yorshahar.locker.util.TimeUtil;
 import java.util.List;
 
 /**
+ * List Adapter class for the notification list.
+ * <p/>
  * Created by yorshahar on 8/12/15.
  */
 public class NotificationListAdapter extends ArrayAdapter<Notification> {
+
+//    private int mDiffX;
+//    private int mDiffY;
+//    private float mLastX;
+//    private float mLastY;
 
     public NotificationListAdapter(Context context, List<Notification> notifications) {
         super(context, R.layout.notification_item, notifications);
@@ -28,7 +35,7 @@ public class NotificationListAdapter extends ArrayAdapter<Notification> {
         View item = convertView;
         if (item == null) {
             LayoutInflater inflater = LayoutInflater.from(getContext());
-            item = inflater.inflate(R.layout.notification_item, null, true);
+            item = inflater.inflate(R.layout.notification_item, parent, false);
         }
 
         Notification notification = getItem(position);
@@ -54,6 +61,55 @@ public class NotificationListAdapter extends ArrayAdapter<Notification> {
 
         ImageView iconImageView = (ImageView) item.findViewById(R.id.icon);
         iconImageView.setImageDrawable(notification.getIcon());
+
+        View topBorder = item.findViewById(R.id.topBorder);
+        topBorder.setVisibility(View.INVISIBLE);
+
+        View bottomBorder = item.findViewById(R.id.bottomBorder);
+        bottomBorder.setVisibility(View.VISIBLE);
+
+        if (position == 0) {
+            topBorder.setVisibility(View.VISIBLE);
+        }
+
+        if (position == getCount() - 1) {
+            bottomBorder.setVisibility(View.VISIBLE);
+        }
+
+        item.setTag(position);
+
+//        item.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                switch (event.getAction()) {
+//                    case MotionEvent.ACTION_DOWN:
+//                        mDiffX = 0;
+//                        mDiffY = 0;
+//
+//                        mLastX = event.getX();
+//                        mLastY = event.getY();
+//                        break;
+//
+//                    case MotionEvent.ACTION_MOVE:
+//                        final float curX = event.getX();
+//                        final float curY = event.getY();
+//                        mDiffX += Math.abs(curX - mLastX);
+//                        mDiffY += Math.abs(curY - mLastY);
+//                        mLastX = curX;
+//                        mLastY = curY;
+//
+//                        // don't intercept event, when user tries to scroll vertically
+//                        if (mDiffX > mDiffY) {
+//                            return false; // do not react to horizontal touch events, these events will be passed to your list item view
+//                        }
+//                }
+//
+////                int position = (Integer)v.getTag();
+////                remove(getItem(position));
+////                notifyDataSetInvalidated();
+//                return true;
+//            }
+//        });
 
         return item;
 
