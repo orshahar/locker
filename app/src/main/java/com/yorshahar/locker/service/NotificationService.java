@@ -57,7 +57,13 @@ public class NotificationService extends AccessibilityService {
                         Drawable icon = getApplicationIcon(packageName);
                         String applicationName = getApplicationName(packageName);
                         String text = getNotificationText(event);
-                        Date dateArrived = new Date(new Date().getTime() - event.getEventTime());
+                        Date dateArrived = new Date();
+//                        GregorianCalendar cal = new GregorianCalendar();
+//                        cal.set(Calendar.HOUR, 0);
+//                        cal.set(Calendar.MINUTE, 0);
+//                        cal.setTimeInMillis(cal.getTimeInMillis() + event.getEventTime());
+//                        cal.add(Calendar.HOUR, -4);
+//                        Date dateArrived = cal.getTime();
 
                         Notification notification = new Notification(
                                 applicationName,
