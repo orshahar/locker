@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -31,8 +32,9 @@ import java.util.Locale;
 public class LockerFragment extends Fragment {
 
     ListView notificationsListView;
-    ListAdapter listAdapter;
-    List<Notification> notifications = new ArrayList<>(3);
+    ArrayAdapter listAdapter;
+    List<Notification> notifications = new ArrayList<>();
+    private TextView dateView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -43,7 +45,7 @@ public class LockerFragment extends Fragment {
         CustomDigitalClock timeView = (CustomDigitalClock) view.findViewById(R.id.textClock);
         timeView.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.HELVETICA_NEUE_ULTRA_LIGHT));
 
-        TextView dateView = (TextView) view.findViewById(R.id.dateTextView);
+        dateView = (TextView) view.findViewById(R.id.dateTextView);
         dateView.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.HELVETICA_NEUE_ULTRA_LIGHT));
         dateView.getPaint().setFakeBoldText(true);
 
@@ -66,7 +68,7 @@ public class LockerFragment extends Fragment {
     public void addNotification(Notification notification) {
         if (!notifications.contains(notification)) {
             notifications.add(0, notification);
-            notificationsListView.invalidate();
+            listAdapter.notifyDataSetChanged();
         }
     }
 
@@ -76,6 +78,21 @@ public class LockerFragment extends Fragment {
 
     public boolean hasNotifications() {
         return !notifications.isEmpty();
+    }
+
+    public void update() {
+        updateDate();
+        updateNotifications();
+    }
+
+    private void updateDate() {
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE, MMMM dd", Locale.US);
+        String dateString = sdf.format(System.currentTimeMillis());
+        dateView.setText(dateString);
+    }
+
+    private void updateNotifications() {
+        listAdapter.notifyDataSetChanged();
     }
 
 }

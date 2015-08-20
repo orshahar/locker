@@ -17,11 +17,15 @@ import android.widget.RelativeLayout;
 
 import com.yorshahar.locker.R;
 import com.yorshahar.locker.activity.LockerMainActivity;
+import com.yorshahar.locker.receiver.BootReceiver;
 import com.yorshahar.locker.receiver.LockReceiver;
+import com.yorshahar.locker.receiver.TimeReceiver;
 
-public class LockService extends Service implements LockReceiver.Delegate {
+public class LockService extends Service implements LockReceiver.Delegate, TimeReceiver.Delegate {
 
-    private BroadcastReceiver mReceiver;
+    private BroadcastReceiver lockReceiver;
+    private BroadcastReceiver bootReceiver;
+    private BroadcastReceiver timeReceiver;
     private WindowManager windowManager;
     private LockerMainActivity activity;
     private final IBinder myBinder = new MyLocalBinder();
@@ -44,6 +48,7 @@ public class LockService extends Service implements LockReceiver.Delegate {
         this.lockerView = lockerView;
 
         updateLockerView();
+        lock(true);
     }
 
     private void updateLockerView() {
@@ -96,14 +101,34 @@ public class LockService extends Service implements LockReceiver.Delegate {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        // TODO: Register all these receivers as part of the settings activity
+
+        // Register the lock receiver
         IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
         filter.addAction(Intent.ACTION_SCREEN_OFF);
+        lockReceiver = new LockReceiver();
+        ((LockReceiver) lockReceiver).setDelegate(this);
+        registerReceiver(lockReceiver, filter);
 
-        mReceiver = new LockReceiver();
-        ((LockReceiver) mReceiver).setDelegate(this);
-        registerReceiver(mReceiver, filter);
+        // Register the boot receiver
+        filter = new IntentFilter(Intent.ACTION_BOOT_COMPLETED);
+        filter.addAction(Intent.ACTION_USER_PRESENT);
+//        filter.addAction(Intent.ACTION_USER_INITIALIZE); // Required API 17 :(
+        bootReceiver = new BootReceiver();
+        registerReceiver(bootReceiver, filter);
+
+        // Register the time receiver
+        filter = new IntentFilter(Intent.ACTION_TIME_TICK);
+        filter.addAction(Intent.ACTION_TIME_CHANGED);
+        filter.addAction(Intent.ACTION_DATE_CHANGED);
+        timeReceiver = new TimeReceiver();
+        ((TimeReceiver) timeReceiver).setDelegate(this);
+        registerReceiver(timeReceiver, filter);
+
         startForeground();
 
+        // Start the lock main activity
+        // TODO: Should I start the activity here?
         Intent containerIntent = new Intent(this, LockerMainActivity.class);
         containerIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(containerIntent);
@@ -185,13 +210,18 @@ public class LockService extends Service implements LockReceiver.Delegate {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(mReceiver);
+        unregisterReceiver(lockReceiver);
+        unregisterReceiver(bootReceiver);
+        unregisterReceiver(timeReceiver);
 
         if (lockerView != null) {
             windowManager.removeView(lockerView);
         }
     }
 
+//////////////////////////////////////////////////////////////////////
+// LockReceiver.Delegate
+//////////////////////////////////////////////////////////////////////
 
     @Override
     public void lock(boolean reset) {
@@ -223,6 +253,22 @@ public class LockService extends Service implements LockReceiver.Delegate {
                 int a = 2;
             }
         }
+    }
+
+//////////////////////////////////////////////////////////////////////
+// TimeReceiver.Delegate
+//////////////////////////////////////////////////////////////////////
+
+    @Override
+    public void onTimeTicked() {
+        if (activity != null) {
+            activity.updateTimes();
+        }
+    }
+
+    @Override
+    public void onDateChanged() {
+        int a = 2;
     }
 
     public class MyLocalBinder extends Binder {

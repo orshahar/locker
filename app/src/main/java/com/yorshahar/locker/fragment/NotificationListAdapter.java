@@ -66,7 +66,7 @@ public class NotificationListAdapter extends ArrayAdapter<Notification> {
         topBorder.setVisibility(View.INVISIBLE);
 
         View bottomBorder = item.findViewById(R.id.bottomBorder);
-        bottomBorder.setVisibility(View.VISIBLE);
+        bottomBorder.setVisibility(View.INVISIBLE);
 
         if (position == 0) {
             topBorder.setVisibility(View.VISIBLE);

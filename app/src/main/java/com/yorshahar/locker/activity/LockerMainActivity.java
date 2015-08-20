@@ -174,6 +174,11 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         return lockerFragment.hasNotifications();
     }
 
+    public void updateTimes() {
+        LockerFragment lockerFragment = (LockerFragment) sectionsPagerAdapter.getRegisteredFragment(1);
+        lockerFragment.update();
+    }
+
     private class LockServiceConnection extends AbstractServiceConnectionImpl {
 
         public LockServiceConnection(Class clazz) {
@@ -421,7 +426,17 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     public void onNotification(Notification notification) {
         LockerFragment lockerFragment = (LockerFragment) sectionsPagerAdapter.getRegisteredFragment(1);
         lockerFragment.addNotification(notification);
-    }
 
+        if (lockerFragment.hasNotifications()) {
+            if (mViewPager.getCurrentItem() == 1 && dimView.getAlpha() == 0.0f) {
+                dimView.animate()
+                        .alpha(1.0f)
+                        .setDuration(1000)
+                        .start();
+            } else {
+                mViewPager.setAlpha(1.0f);
+            }
+        }
+    }
 
 }

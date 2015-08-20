@@ -33,6 +33,11 @@ public class NotificationService extends AccessibilityService {
 
     public NotificationService() {
         super();
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
 
         allowedApps.add("com.google.android.calendar");
         allowedApps.add("com.google.android.keep");
@@ -43,6 +48,8 @@ public class NotificationService extends AccessibilityService {
         allowedApps.add("com.android.vending");
         allowedApps.add("com.android.email");
         allowedApps.add("com.google.android.googlequicksearchbox");
+
+        instance = this;
     }
 
     @Override
@@ -103,7 +110,7 @@ public class NotificationService extends AccessibilityService {
         try {
             ApplicationInfo appInfo = pm.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
             appName = pm.getApplicationLabel(appInfo).toString();
-        } catch (final PackageManager.NameNotFoundException e) {
+        } catch (final PackageManager.NameNotFoundException ignored) {
 
         }
 
@@ -145,8 +152,6 @@ public class NotificationService extends AccessibilityService {
         info.notificationTimeout = 100;
         setServiceInfo(info);
         pm = getPackageManager();
-
-        instance = this;
     }
 
     public static NotificationService getInstance() {
