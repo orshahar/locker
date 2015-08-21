@@ -1,5 +1,6 @@
 package com.yorshahar.locker.service;
 
+import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -7,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.PixelFormat;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.view.Gravity;
@@ -71,8 +73,13 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
 
     @Override
     public boolean onUnbind(Intent intent) {
-        windowManager.removeView(lockerView);
-        activity = null;
+        try {
+            windowManager.removeView(lockerView);
+        } catch (IllegalArgumentException ignored) {
+
+        }
+
+//        activity = null;
         lockerView = null;
 
         return super.onUnbind(intent);
@@ -99,6 +106,7 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
 //        actionBar.hide();
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // TODO: Register all these receivers as part of the settings activity
@@ -113,7 +121,7 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
         // Register the boot receiver
         filter = new IntentFilter(Intent.ACTION_BOOT_COMPLETED);
         filter.addAction(Intent.ACTION_USER_PRESENT);
-//        filter.addAction(Intent.ACTION_USER_INITIALIZE); // Required API 17 :(
+        filter.addAction(Intent.ACTION_USER_INITIALIZE); // Required API 17 :(
         bootReceiver = new BootReceiver();
         registerReceiver(bootReceiver, filter);
 
@@ -127,11 +135,8 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
 
         startForeground();
 
-        // Start the lock main activity
         // TODO: Should I start the activity here?
-        Intent containerIntent = new Intent(this, LockerMainActivity.class);
-        containerIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(containerIntent);
+        startLockerActivity();
 
         return START_STICKY;
     }
@@ -150,73 +155,39 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
         startForeground(9999, notification);
     }
 
+    private void startLockerActivity() {
+        Intent lockerIntent = new Intent(this, LockerMainActivity.class);
+        lockerIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(lockerIntent);
+    }
 
-//    @Override
-//    public void onNotificationPosted(StatusBarNotification sbn) {
-//        super.onNotificationPosted(sbn);
-//    }
-//
-//    @Override
-//    public void onNotificationPosted(StatusBarNotification sbn, RankingMap rankingMap) {
-//        super.onNotificationPosted(sbn, rankingMap);
-//    }
-//
-//    @Override
-//    public void onNotificationRemoved(StatusBarNotification sbn) {
-//        super.onNotificationRemoved(sbn);
-//    }
-//
-//    @Override
-//    public void onNotificationRemoved(StatusBarNotification sbn, RankingMap rankingMap) {
-//        super.onNotificationRemoved(sbn, rankingMap);
-//    }
-//
-//    @Override
-//    public void onListenerConnected() {
-//        super.onListenerConnected();
-//    }
-//
-//    @Override
-//    public void onNotificationRankingUpdate(RankingMap rankingMap) {
-//        super.onNotificationRankingUpdate(rankingMap);
-//    }
-//
-//    @Override
-//    public void onListenerHintsChanged(int hints) {
-//        super.onListenerHintsChanged(hints);
-//    }
-//
-//    @Override
-//    public void onInterruptionFilterChanged(int interruptionFilter) {
-//        super.onInterruptionFilterChanged(interruptionFilter);
-//    }
-//
-//    @Override
-//    public StatusBarNotification[] getActiveNotifications() {
-//        return super.getActiveNotifications();
-//    }
-//
-//    @Override
-//    public StatusBarNotification[] getActiveNotifications(String[] keys) {
-//        return super.getActiveNotifications(keys);
-//    }
-//
-//    @Override
-//    public RankingMap getCurrentRanking() {
-//        return super.getCurrentRanking();
-//    }
+    @Override
+    public void onRebind(Intent intent) {
+        super.onRebind(intent);
+    }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+    }
 
     // Unregister receiver
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(lockReceiver);
-        unregisterReceiver(bootReceiver);
-        unregisterReceiver(timeReceiver);
+
+        if (activity != null) {
+            activity.finish();
+            activity = null;
+        }
 
         if (lockerView != null) {
             windowManager.removeView(lockerView);
         }
+
+        unregisterReceiver(lockReceiver);
+        unregisterReceiver(bootReceiver);
+        unregisterReceiver(timeReceiver);
     }
 
 //////////////////////////////////////////////////////////////////////
@@ -245,7 +216,6 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
 
     @Override
     public void unlock() {
-//        lockerView.setVisibility(View.INVISIBLE);
         if (lockerView != null) {
             try {
                 windowManager.removeView(lockerView);

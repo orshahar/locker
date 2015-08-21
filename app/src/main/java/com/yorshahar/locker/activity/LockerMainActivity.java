@@ -36,7 +36,7 @@ import java.util.Locale;
 public class LockerMainActivity extends FragmentActivity implements NotificationService.Delegate {
 
     private AbstractServiceConnectionImpl lockServiceConnection;
-    private AbstractServiceConnectionImpl notificationServiceConnection;
+//    private AbstractServiceConnectionImpl notificationServiceConnection;
     private LockService lockService;
     private NotificationService notificationService;
     private boolean isLockServiceBound = false;
@@ -45,7 +45,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 
     private ImageView dimView;
     private ViewPager mViewPager;
-    private SectionsPagerAdapter sectionsPagerAdapter;
+    private SectionsPagerAdapter pagerAdapter;
 
     // Set appropriate flags to make the screen appear over the keyguard
     @Override
@@ -89,19 +89,16 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     }
 
     @Override
-    public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
-        return super.onCreateView(parent, name, context, attrs);
+    protected void onStop() {
+        super.onStop();
+
+//        unbindService(lockServiceConnection);
     }
 
-    //    @Override
-//    protected void onStart() {
-//        super.onStart();
-//
-//        Intent intent = new Intent(this, LockService.class);
-//
-////            unbindService(lockServiceConnection);
-//        bindService(intent, lockServiceConnection, Context.BIND_AUTO_CREATE);
-//    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,7 +106,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
-        sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        pagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // unlock screen in case of app get killed by system
         if (getIntent() != null && getIntent().hasExtra("kill")
@@ -125,7 +122,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(sectionsPagerAdapter);
+        mViewPager.setAdapter(pagerAdapter);
 
         View decorView = getWindow().getDecorView();
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
@@ -150,7 +147,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
             @Override
             public void onPageSelected(int position) {
                 if (position == 1) {
-                    PasscodeFragment passcodeFragment = (PasscodeFragment) sectionsPagerAdapter.getRegisteredFragment(0);
+                    PasscodeFragment passcodeFragment = (PasscodeFragment) pagerAdapter.getRegisteredFragment(0);
                     passcodeFragment.reset();
                 }
             }
@@ -164,19 +161,30 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         dimView = (ImageView) findViewById(R.id.dimView);
 
         lockServiceConnection = new LockServiceConnection(LockService.class);
-        notificationServiceConnection = new NotificationServiceConnection(NotificationService.class);
+//        notificationServiceConnection = new NotificationServiceConnection(NotificationService.class);
 
         bindToServices();
     }
 
+    @Override
+    protected void onDestroy() {
+        if (isLockServiceBound) {
+            unbindService(lockServiceConnection);
+        }
+
+        super.onDestroy();
+    }
+
     private boolean hasNotifications() {
-        LockerFragment lockerFragment = (LockerFragment) sectionsPagerAdapter.getRegisteredFragment(1);
+        LockerFragment lockerFragment = (LockerFragment) pagerAdapter.getRegisteredFragment(1);
         return lockerFragment.hasNotifications();
     }
 
     public void updateTimes() {
-        LockerFragment lockerFragment = (LockerFragment) sectionsPagerAdapter.getRegisteredFragment(1);
-        lockerFragment.update();
+        LockerFragment lockerFragment = (LockerFragment) pagerAdapter.getRegisteredFragment(1);
+        if (lockerFragment != null) {
+            lockerFragment.update();
+        }
     }
 
     private class LockServiceConnection extends AbstractServiceConnectionImpl {
@@ -230,7 +238,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     private void bindToServices() {
         if (!isLockServiceBound) {
             Intent intent = new Intent(this, lockServiceConnection.getClazz());
-            bindService(intent, lockServiceConnection, Context.BIND_AUTO_CREATE);
+            bindService(intent, lockServiceConnection, Context.BIND_ADJUST_WITH_ACTIVITY);
         }
 
 //        if (!isNotificationServiceBound) {
@@ -391,28 +399,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     private void unlockDevice() {
         lockService.unlock();
         reset();
-//        finish();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-//        unbindService(lockServiceConnection);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    protected void onDestroy() {
-        if (isLockServiceBound) {
-            unbindService(lockServiceConnection);
-        }
-
-        super.onDestroy();
+//        finish(); // TODO: should I call finish() here or in the service?
     }
 
     public void reset() {
@@ -424,7 +411,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 
     @Override
     public void onNotification(Notification notification) {
-        LockerFragment lockerFragment = (LockerFragment) sectionsPagerAdapter.getRegisteredFragment(1);
+        LockerFragment lockerFragment = (LockerFragment) pagerAdapter.getRegisteredFragment(1);
         lockerFragment.addNotification(notification);
 
         if (lockerFragment.hasNotifications()) {

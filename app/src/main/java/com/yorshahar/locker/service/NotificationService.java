@@ -31,10 +31,6 @@ public class NotificationService extends AccessibilityService {
         this.delegate = delegate;
     }
 
-    public NotificationService() {
-        super();
-    }
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -50,6 +46,12 @@ public class NotificationService extends AccessibilityService {
         allowedApps.add("com.google.android.googlequicksearchbox");
 
         instance = this;
+    }
+
+    @Override
+    public void onDestroy() {
+        instance = null;
+        super.onDestroy();
     }
 
     @Override
@@ -157,5 +159,17 @@ public class NotificationService extends AccessibilityService {
     public static NotificationService getInstance() {
         return instance;
     }
+
+    @Override
+    public boolean stopService(Intent name) {
+
+        return super.stopService(name);
+    }
+
+    public void stop() {
+        delegate = null;
+        stopSelf();
+    }
+
 
 }

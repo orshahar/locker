@@ -40,5 +40,6 @@
     <string name="sample_date">Monday, July 29</string>
     <string name="border">border</string>
     <string name="slide_to_view">slide to view</string>
+    <string name="switch_text">Switch</string>
 
 </resources>

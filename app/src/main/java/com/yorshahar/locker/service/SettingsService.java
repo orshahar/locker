@@ -66,6 +66,10 @@ public class SettingsService extends Service implements LockerSettingsService {
 
     @Override
     public void disableNotifications() {
+//        NotificationService notificationService = NotificationService.getInstance();
+//        if (notificationService != null) {
+//            notificationService.stop();
+//        }
         stopService(new Intent(this, NotificationService.class));
     }
 
