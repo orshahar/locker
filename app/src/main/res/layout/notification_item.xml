@@ -91,7 +91,7 @@
     <View
         android:id="@+id/bottomBorder"
         android:layout_width="fill_parent"
-        android:layout_height="0dp"
+        android:layout_height="1dp"
         android:layout_below="@+id/slideToView"
         android:layout_marginTop="10dp"
         android:background="#6a6376" />
