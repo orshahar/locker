@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -37,8 +36,7 @@ public class LockerFragment extends Fragment {
     private TextView dateView;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         RelativeLayout view = (RelativeLayout) inflater.inflate(R.layout.fragment_locker, container, false);
         view.setBackgroundColor(Color.TRANSPARENT);
 
@@ -67,8 +65,7 @@ public class LockerFragment extends Fragment {
 
     public void addNotification(Notification notification) {
         if (!notifications.contains(notification)) {
-            notifications.add(0, notification);
-            listAdapter.notifyDataSetChanged();
+            listAdapter.insert(notification, 0);
         }
     }
 
