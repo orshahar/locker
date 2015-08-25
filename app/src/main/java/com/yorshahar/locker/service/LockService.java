@@ -49,21 +49,10 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
     public void setLockerView(RelativeLayout lockerView) {
         this.lockerView = lockerView;
 
-        updateLockerView();
-        lock(true);
-    }
-
-    private void updateLockerView() {
         ViewGroup lockerParent = (ViewGroup) lockerView.getParent();
         if (lockerParent != null) {
             lockerParent.removeView(lockerView);
         }
-
-//        windowManager.addView(lockerView, params);
-//        lockerView.setVisibility(View.VISIBLE);
-//
-//        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-//        lockerView.setSystemUiVisibility(uiOptions);
     }
 
     @Override
@@ -99,11 +88,6 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
                 PixelFormat.TRANSLUCENT);
 
         params.gravity = Gravity.CENTER;
-
-// Remember that you should never show the action bar if the
-// status bar is hidden, so hide that too if necessary.
-//        ActionBar actionBar = getActionBar();
-//        actionBar.hide();
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
