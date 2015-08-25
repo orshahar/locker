@@ -13,11 +13,9 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
@@ -36,7 +34,7 @@ import java.util.Locale;
 public class LockerMainActivity extends FragmentActivity implements NotificationService.Delegate {
 
     private AbstractServiceConnectionImpl lockServiceConnection;
-//    private AbstractServiceConnectionImpl notificationServiceConnection;
+    //    private AbstractServiceConnectionImpl notificationServiceConnection;
     private LockService lockService;
     private NotificationService notificationService;
     private boolean isLockServiceBound = false;
@@ -104,6 +102,8 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
+        moveTaskToBack(true);
         setContentView(R.layout.main_activity);
 
         pagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -123,10 +123,6 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(pagerAdapter);
-
-        View decorView = getWindow().getDecorView();
-        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-        decorView.setSystemUiVisibility(uiOptions);
 
         // Display the lock screen fragment by default
         mViewPager.setCurrentItem(1);
