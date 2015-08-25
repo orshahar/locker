@@ -1,14 +1,15 @@
 package com.yorshahar.locker.activity;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.CompoundButton;
 import android.widget.ListView;
@@ -20,17 +21,40 @@ import com.yorshahar.locker.service.SettingsService;
 import com.yorshahar.locker.service.connection.AbstractServiceConnectionImpl;
 
 /**
- * The activity for the settings page
+ * The activity for the settings main page
  * <p/>
  * Created by yorshahar on 8/6/15.
  */
-public class SettingsActivity extends Activity {
+public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+
+    private enum SettingItem {
+        ENABLE_LOCKER,
+        HIDE_STATUS_BAR,
+        ENABLE_NOTIFICATIONS,
+        CHANGE_WALLPAPER,
+        SECURITY,
+        DATE_FORMAT,
+        OTHER;
+
+        public static SettingItem getSettingsItem(int position) {
+            SettingItem item = SettingItem.OTHER;
+
+            for (SettingItem settingItem : values()) {
+                if (settingItem.ordinal() == position) {
+                    item = settingItem;
+                    break;
+                }
+            }
+
+            return item;
+        }
+    }
 
     private SettingsService settingsService;
     private boolean isSettingsServiceBound;
     private SettingsServiceConnection settingsServiceConnection;
 
-    ListView settingsListView;
+    ListView listView;
     BaseAdapter listAdapter;
 
     @Override
@@ -39,9 +63,10 @@ public class SettingsActivity extends Activity {
 
         setContentView(R.layout.settings_layout);
 
-        settingsListView = (ListView) findViewById(R.id.settingsListView);
+        listView = (ListView) findViewById(R.id.listView);
         listAdapter = new MyListAdapter();
-        settingsListView.setAdapter(listAdapter);
+        listView.setAdapter(listAdapter);
+        listView.setOnItemClickListener(this);
 
         settingsServiceConnection = new SettingsServiceConnection(SettingsService.class);
         bindToService();
@@ -59,6 +84,21 @@ public class SettingsActivity extends Activity {
         super.onDestroy();
 
         stopService(new Intent(this, SettingsService.class));
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        switch (SettingItem.getSettingsItem(position)) {
+            case CHANGE_WALLPAPER: {
+                Intent intent = new Intent(this, ChangeWallpaperActivity.class);
+                startActivity(intent);
+
+                break;
+            }
+            default: {
+                break;
+            }
+        }
     }
 
     private class SettingsServiceConnection extends AbstractServiceConnectionImpl {
@@ -201,6 +241,24 @@ public class SettingsActivity extends Activity {
 
                     break;
                 }
+                case 3: {
+                    TextView titleView = (TextView) convertView.findViewById(R.id.title);
+                    titleView.setText("Change wallpaper");
+
+                    break;
+                }
+                case 4: {
+                    TextView titleView = (TextView) convertView.findViewById(R.id.title);
+                    titleView.setText("Security");
+
+                    break;
+                }
+                case 5: {
+                    TextView titleView = (TextView) convertView.findViewById(R.id.title);
+                    titleView.setText("Change date format");
+
+                    break;
+                }
                 default: {
                     TextView titleView = (TextView) convertView.findViewById(R.id.title);
                     titleView.setText("Configure " + position);
@@ -213,6 +271,5 @@ public class SettingsActivity extends Activity {
         }
     }
 
-    ;
-
 }
+

@@ -41,5 +41,9 @@
     <string name="border">border</string>
     <string name="slide_to_view">slide to view</string>
     <string name="switch_text">Switch</string>
+    <string name="title_activity_change_wallpaper">Change wallpaper</string>
+    <string name="wallpaper_preview">Wallpaper Preview</string>
+    <string name="apply">Apply</string>
+    <string name="apply_button">Apply button</string>
 
 </resources>

@@ -7,7 +7,7 @@
     tools:context="com.yorshahar.locker.activity.SettingsActivity">
 
     <ListView
-        android:id="@+id/settingsListView"
+        android:id="@+id/listView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:scrollbars="none" />
