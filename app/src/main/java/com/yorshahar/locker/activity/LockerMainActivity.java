@@ -334,7 +334,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
-    public class SectionsPagerAdapter extends SmartFragmentStatePagerAdapter implements PasscodeFragment.FragmentDelegate {
+    public class SectionsPagerAdapter extends SmartFragmentStatePagerAdapter implements LockerFragment.Delegate, PasscodeFragment.Delegate {
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -351,6 +351,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
                 }
                 case 1: {
                     fragment = new LockerFragment();
+                    ((LockerFragment) fragment).setDelegate(this);
                     break;
                 }
             }
@@ -389,6 +390,10 @@ public class LockerMainActivity extends FragmentActivity implements Notification
             mViewPager.requestDisallowInterceptTouchEvent(disallowIntercept);
         }
 
+    }
+
+    public void requestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+        mViewPager.requestDisallowInterceptTouchEvent(disallowIntercept);
     }
 
     //Simply unlock device by finishing the activity

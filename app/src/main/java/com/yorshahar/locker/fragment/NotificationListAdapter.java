@@ -2,6 +2,7 @@ package com.yorshahar.locker.fragment;
 
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -21,13 +22,21 @@ import java.util.List;
  */
 public class NotificationListAdapter extends ArrayAdapter<Notification> {
 
-//    private int mDiffX;
-//    private int mDiffY;
-//    private float mLastX;
-//    private float mLastY;
+    private int mDiffX;
+    private int mDiffY;
+    private float mLastX;
+    private float mLastY;
+
+    enum Direction {LEFT, RIGHT;}
 
     public NotificationListAdapter(Context context, List<Notification> notifications) {
         super(context, R.layout.notification_item, notifications);
+    }
+
+    @Override
+    public void insert(Notification object, int index) {
+        super.insert(object, index);
+        notifyDataSetChanged();
     }
 
     @Override
@@ -82,15 +91,15 @@ public class NotificationListAdapter extends ArrayAdapter<Notification> {
 //            @Override
 //            public boolean onTouch(View v, MotionEvent event) {
 //                switch (event.getAction()) {
-//                    case MotionEvent.ACTION_DOWN:
+//                    case MotionEvent.ACTION_DOWN: {
 //                        mDiffX = 0;
 //                        mDiffY = 0;
 //
 //                        mLastX = event.getX();
 //                        mLastY = event.getY();
 //                        break;
-//
-//                    case MotionEvent.ACTION_MOVE:
+//                    }
+//                    case MotionEvent.ACTION_MOVE: {
 //                        final float curX = event.getX();
 //                        final float curY = event.getY();
 //                        mDiffX += Math.abs(curX - mLastX);
@@ -99,20 +108,30 @@ public class NotificationListAdapter extends ArrayAdapter<Notification> {
 //                        mLastY = curY;
 //
 //                        // don't intercept event, when user tries to scroll vertically
-//                        if (mDiffX > mDiffY) {
+//                        if (mDiffY > mDiffX) {
 //                            return false; // do not react to horizontal touch events, these events will be passed to your list item view
 //                        }
+//                        v.setTranslationX(mDiffX);
+//                        break;
+//                    }
+//                    default: {
+//                        break;
+//                    }
 //                }
 //
-////                int position = (Integer)v.getTag();
-////                remove(getItem(position));
-////                notifyDataSetInvalidated();
+////                int position = (Integer) v.getTag();
+////                deleteRowWhenSlidingRight(position);
 //                return true;
 //            }
 //        });
 
         return item;
 
+    }
+
+    private void deleteRowWhenSlidingRight(int position) {
+        Notification notification = getItem(position);
+        remove(notification);
     }
 
 }

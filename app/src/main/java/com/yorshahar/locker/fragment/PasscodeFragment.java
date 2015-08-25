@@ -24,7 +24,7 @@ import com.yorshahar.locker.ui.widget.Key;
  */
 public class PasscodeFragment extends Fragment implements View.OnClickListener, Key.KeyDelegate {
 
-    public interface FragmentDelegate {
+    public interface Delegate {
 
         void onPasscodePassed();
 
@@ -32,7 +32,7 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
 
     }
 
-    private FragmentDelegate delegate;
+    private Delegate delegate;
     private int passcodeSize;
     private String passcode;
     private StringBuffer enteredKeysBuffer;
@@ -49,11 +49,11 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
     private boolean passcodeMatch = false;
     private boolean securityFailed = false;
 
-    public FragmentDelegate getDelegate() {
+    public Delegate getDelegate() {
         return delegate;
     }
 
-    public void setDelegate(FragmentDelegate delegate) {
+    public void setDelegate(Delegate delegate) {
         this.delegate = delegate;
     }
 
