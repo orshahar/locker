@@ -16,16 +16,19 @@
         android:id="@+id/dimView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:alpha="0.0"
         android:contentDescription="@string/dim_layer"
-        android:visibility="visible"
         android:src="@drawable/wallpaper_blurred"
-        android:alpha="0.0" />
+        android:visibility="visible" />
 
     <android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:fadingEdge="none"
+        android:fadingEdgeLength="0dp"
+        android:overScrollMode="never"
         tools:context="com.yorshahar.locker.activity.LockerMainActivity" />
 
 </RelativeLayout>
