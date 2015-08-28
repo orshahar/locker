@@ -144,7 +144,9 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:gravity="center"
-            android:text="@string/sample_time" />
+            android:text="@string/sample_time"
+            android:textColor="#ffffff"
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/batteryLevelTextView"
