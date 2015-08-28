@@ -19,7 +19,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -189,11 +189,11 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         dimView = (ImageView) findViewById(R.id.dimView);
 
         carrierTextView = (TextView) findViewById(R.id.carrierTextView);
-        carrierTextView.setTypeface(FontLoader.getTypeface(getApplicationContext(), FontLoader.HELVETICA_NEUE_REGULAR));
+        carrierTextView.setTypeface(FontLoader.getTypeface(getApplicationContext(), FontLoader.HELVETICA_NEUE_LIGHT));
         carrierTextView.setTextColor(Color.WHITE);
 
         batteryLevelTextView = (TextView) findViewById(R.id.batteryLevelTextView);
-        batteryLevelTextView.setTypeface(FontLoader.getTypeface(getApplicationContext(), FontLoader.HELVETICA_NEUE_REGULAR));
+        batteryLevelTextView.setTypeface(FontLoader.getTypeface(getApplicationContext(), FontLoader.HELVETICA_NEUE_LIGHT));
         batteryLevelTextView.setTextColor(Color.WHITE);
 
         batteryFillImageView = (ImageView) findViewById(R.id.batteryFillImageView);
@@ -534,14 +534,26 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         if (charging) {
             batteryFillImageView.setImageResource(R.drawable.battery_fill_charging);
             batteryChargeAnimation.setVisibility(View.VISIBLE);
+            batteryChargeAnimation.getLayoutParams().width = 10;
             batteryChargeAnimation.startAnimation(chargeAnimation);
+            setMargin(batteryChargeAnimation, 5, 0, 0, 0);
         } else {
             batteryFillImageView.setImageResource(R.drawable.battery_fill);
             batteryChargeAnimation.setVisibility(View.INVISIBLE);
+            batteryChargeAnimation.getLayoutParams().width = 0;
             batteryChargeAnimation.clearAnimation();
+            setMargin(batteryChargeAnimation, 0, 0, 0, 0);
         }
 
 
+    }
+
+    private void setMargin(View view, int left, int top, int right, int bottom) {
+        if (view.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
+            ViewGroup.MarginLayoutParams marginLayoutParams = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+            marginLayoutParams.setMargins(left, top, right, bottom);
+            view.requestLayout();
+        }
     }
 
 
