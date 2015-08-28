@@ -45,5 +45,13 @@
     <string name="wallpaper_preview">Wallpaper Preview</string>
     <string name="apply">Apply</string>
     <string name="apply_button">Apply button</string>
+    <string name="battery_level">100 %</string>
+    <string name="carrier_name">AT&amp;T</string>
+    <string name="signal_level_indicator">Signal level indicator</string>
+    <string name="battery_level_image">Battery level image</string>
+    <string name="activity_meter_indicator">Activity Meter Indicator</string>
+    <string name="wifi_indicator">wifi indicator</string>
+    <string name="sample_time">10:45 AM</string>
+    <string name="battery_charging_animation">Battery Charging Animation</string>
 
 </resources>

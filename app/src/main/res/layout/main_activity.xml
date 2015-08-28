@@ -31,4 +31,185 @@
         android:overScrollMode="never"
         tools:context="com.yorshahar.locker.activity.LockerMainActivity" />
 
+    <RelativeLayout
+        android:id="@+id/statusBar"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:gravity="center_vertical"
+        android:paddingEnd="5dp"
+        android:paddingLeft="7dp"
+        android:paddingRight="5dp"
+        android:paddingStart="5dp"
+        android:layout_marginTop="1dp">
+
+        <ImageView
+            android:id="@+id/signal1ImageView"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_alignParentBottom="false"
+            android:layout_alignParentTop="false"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="1dp"
+            android:contentDescription="@string/signal_level_indicator"
+            android:src="@drawable/signal_fill" />
+
+        <ImageView
+            android:id="@+id/signal2ImageView"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_alignParentBottom="false"
+            android:layout_alignParentTop="false"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="1dp"
+            android:layout_marginStart="1dp"
+            android:layout_toEndOf="@+id/signal1ImageView"
+            android:layout_toRightOf="@+id/signal1ImageView"
+            android:contentDescription="@string/signal_level_indicator"
+            android:src="@drawable/signal_fill" />
+
+        <ImageView
+            android:id="@+id/signal3ImageView"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_alignParentBottom="false"
+            android:layout_alignParentTop="false"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="1dp"
+            android:layout_marginStart="1dp"
+            android:layout_toEndOf="@+id/signal2ImageView"
+            android:layout_toRightOf="@+id/signal2ImageView"
+            android:contentDescription="@string/signal_level_indicator"
+            android:src="@drawable/signal_fill" />
+
+        <ImageView
+            android:id="@+id/signal4ImageView"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_alignParentBottom="false"
+            android:layout_alignParentTop="false"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="1dp"
+            android:layout_marginStart="1dp"
+            android:layout_toEndOf="@+id/signal3ImageView"
+            android:layout_toRightOf="@+id/signal3ImageView"
+            android:contentDescription="@string/signal_level_indicator"
+            android:src="@drawable/signal_fill" />
+
+        <ImageView
+            android:id="@+id/signal5ImageView"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_alignParentBottom="false"
+            android:layout_alignParentTop="false"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="1dp"
+            android:layout_marginStart="1dp"
+            android:layout_toEndOf="@+id/signal4ImageView"
+            android:layout_toRightOf="@+id/signal4ImageView"
+            android:contentDescription="@string/signal_level_indicator"
+            android:src="@drawable/signal_empty" />
+
+        <TextView
+            android:id="@+id/carrierTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="false"
+            android:layout_alignParentTop="false"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="4dp"
+            android:layout_marginStart="4dp"
+            android:layout_toEndOf="@+id/signal5ImageView"
+            android:layout_toRightOf="@+id/signal5ImageView"
+            android:gravity="center_vertical"
+            android:text="@string/carrier_name"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:id="@+id/wifiImageView"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentBottom="false"
+            android:layout_alignParentTop="false"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginStart="3dp"
+            android:layout_toEndOf="@+id/carrierTextView"
+            android:layout_toRightOf="@+id/carrierTextView"
+            android:contentDescription="@string/wifi_indicator"
+            android:src="@drawable/wifi_3" />
+
+        <TextView
+            android:id="@+id/clockTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:text="@string/sample_time" />
+
+        <TextView
+            android:id="@+id/batteryLevelTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="false"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentRight="false"
+            android:layout_alignParentTop="false"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_toLeftOf="@+id/batteryOutlineImageView"
+            android:layout_toStartOf="@+id/batteryOutlineImageView"
+            android:gravity="center_vertical"
+            android:text="@string/battery_level"
+            android:textSize="14sp"
+            tools:ignore="RelativeOverlap" />
+
+        <ImageView
+            android:id="@+id/batteryOutlineImageView"
+            android:layout_width="25dp"
+            android:layout_height="10dp"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dp"
+            android:layout_toLeftOf="@+id/batteryChargeAnimation"
+            android:layout_toStartOf="@+id/batteryChargeAnimation"
+            android:contentDescription="@string/battery_level_image"
+            android:src="@drawable/battery_outline" />
+
+        <ImageView
+            android:id="@+id/batteryFillImageView"
+            android:layout_width="25dp"
+            android:layout_height="10dp"
+            android:layout_alignLeft="@+id/batteryOutlineImageView"
+            android:layout_alignStart="@+id/batteryOutlineImageView"
+            android:layout_centerVertical="true"
+            android:contentDescription="@string/battery_level_image"
+            android:src="@drawable/battery_fill" />
+
+        <ImageView
+            android:id="@+id/batteryChargeAnimation"
+            android:layout_width="5dp"
+            android:layout_height="10dp"
+            android:layout_alignParentBottom="false"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="false"
+            android:layout_alignParentTop="false"
+            android:layout_centerVertical="true"
+            android:contentDescription="@string/battery_charging_animation"
+            android:src="@drawable/charging_storm" />
+
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/barImageView"
+        android:layout_width="38dp"
+        android:layout_height="8dp"
+        android:layout_alignBottom="@+id/statusBar"
+        android:layout_alignTop="@+id/statusBar"
+        android:layout_centerHorizontal="true"
+        android:contentDescription="@string/signal_level_indicator"
+        android:src="@drawable/bar" />
+
+
 </RelativeLayout>

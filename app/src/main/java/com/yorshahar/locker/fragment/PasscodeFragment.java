@@ -79,12 +79,10 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
 
 
         TextView enterPasscodeLabelView = (TextView) view.findViewById(R.id.enterPasscodeView);
-        enterPasscodeLabelView.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.APPLE_THIN));
-        enterPasscodeLabelView.getPaint().setFakeBoldText(true);
+        enterPasscodeLabelView.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.HELVETICA_NEUE_LIGHT));
 
         TextView cancelTextView = (TextView) view.findViewById(R.id.cancelTextView);
-        cancelTextView.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.APPLE_THIN));
-        cancelTextView.getPaint().setFakeBoldText(true);
+        cancelTextView.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.HELVETICA_NEUE_LIGHT));
         cancelTextView.setOnClickListener(this);
 
         Key key0 = (Key) view.findViewById(R.id.key0);

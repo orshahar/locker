@@ -3,6 +3,8 @@ package com.yorshahar.locker.activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
@@ -16,10 +18,16 @@ import android.telephony.TelephonyManager;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.yorshahar.locker.R;
+import com.yorshahar.locker.font.FontLoader;
 import com.yorshahar.locker.fragment.LockerFragment;
 import com.yorshahar.locker.fragment.PasscodeFragment;
 import com.yorshahar.locker.fragment.SmartFragmentStatePagerAdapter;
@@ -28,10 +36,17 @@ import com.yorshahar.locker.service.LockService;
 import com.yorshahar.locker.service.NotificationService;
 import com.yorshahar.locker.service.connection.AbstractServiceConnectionImpl;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 
-public class LockerMainActivity extends FragmentActivity implements NotificationService.Delegate {
+public class LockerMainActivity extends FragmentActivity implements NotificationService.Delegate, LockService.Delegate {
+
+    private static final String STATUS_BAR_TIME_FORMAT = "h:mm a";
+    private float BAR_MAX_OFFSET = 30;
 
     private AbstractServiceConnectionImpl lockServiceConnection;
     //    private AbstractServiceConnectionImpl notificationServiceConnection;
@@ -40,10 +55,19 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     private boolean isLockServiceBound = false;
     private boolean isNotificationServiceBound = false;
     private boolean isWindowAttached = false;
+    private DateFormat dateFormat;
+    private Animation chargeAnimation;
+
 
     private ImageView dimView;
     private ViewPager mViewPager;
     private SectionsPagerAdapter pagerAdapter;
+    private TextView batteryLevelTextView;
+    private TextView carrierTextView;
+    private ImageView batteryFillImageView;
+    private ImageView batteryChargeAnimation;
+    private ImageView barImageView;
+    private TextView clockTextView;
 
     // Set appropriate flags to make the screen appear over the keyguard
     @Override
@@ -106,6 +130,8 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         moveTaskToBack(true);
         setContentView(R.layout.main_activity);
 
+        dateFormat = new SimpleDateFormat(STATUS_BAR_TIME_FORMAT, Locale.getDefault());
+
         pagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // unlock screen in case of app get killed by system
@@ -131,11 +157,17 @@ public class LockerMainActivity extends FragmentActivity implements Notification
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 if (hasNotifications()) {
                     dimView.setAlpha(1.0f);
+                    barImageView.setTranslationY(0);
+                    clockTextView.setAlpha(0.0f);
                 } else {
                     if (position == 0) {
                         dimView.setAlpha((1.0f - positionOffset));
+                        barImageView.setTranslationY(-BAR_MAX_OFFSET * (1.0f - positionOffset));
+                        clockTextView.setAlpha(1.0f - positionOffset);
                     } else {
                         dimView.setAlpha(0.0f);
+                        barImageView.setTranslationY(0);
+                        clockTextView.setAlpha(0.0f);
                     }
                 }
             }
@@ -155,6 +187,26 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         });
 
         dimView = (ImageView) findViewById(R.id.dimView);
+
+        carrierTextView = (TextView) findViewById(R.id.carrierTextView);
+        carrierTextView.setTypeface(FontLoader.getTypeface(getApplicationContext(), FontLoader.HELVETICA_NEUE_REGULAR));
+        carrierTextView.setTextColor(Color.WHITE);
+
+        batteryLevelTextView = (TextView) findViewById(R.id.batteryLevelTextView);
+        batteryLevelTextView.setTypeface(FontLoader.getTypeface(getApplicationContext(), FontLoader.HELVETICA_NEUE_REGULAR));
+        batteryLevelTextView.setTextColor(Color.WHITE);
+
+        batteryFillImageView = (ImageView) findViewById(R.id.batteryFillImageView);
+
+        batteryChargeAnimation = (ImageView) findViewById(R.id.batteryChargeAnimation);
+        chargeAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.charging_story_animation);
+
+        barImageView = (ImageView) findViewById(R.id.barImageView);
+
+        clockTextView = (TextView) findViewById(R.id.clockTextView);
+        clockTextView.setAlpha(0.0f);
+        clockTextView.setText(dateFormat.format(System.currentTimeMillis()));
+        clockTextView.setTypeface(FontLoader.getTypeface(getApplicationContext(), FontLoader.HELVETICA_NEUE_BOLD));
 
         lockServiceConnection = new LockServiceConnection(LockService.class);
 //        notificationServiceConnection = new NotificationServiceConnection(NotificationService.class);
@@ -177,6 +229,8 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     }
 
     public void updateTimes() {
+        clockTextView.setText(dateFormat.format(System.currentTimeMillis()));
+
         LockerFragment lockerFragment = (LockerFragment) pagerAdapter.getRegisteredFragment(1);
         if (lockerFragment != null) {
             lockerFragment.update();
@@ -196,6 +250,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
             isLockServiceBound = true;
 
             lockService.setActivity(LockerMainActivity.this);
+            lockService.setDelegate(LockerMainActivity.this);
             sendViewToService();
         }
 
@@ -390,6 +445,26 @@ public class LockerMainActivity extends FragmentActivity implements Notification
             mViewPager.requestDisallowInterceptTouchEvent(disallowIntercept);
         }
 
+        ////////////////////////////////////////////////////
+        // LockerFragment.FragmentDelegate
+        ////////////////////////////////////////////////////
+
+        @Override
+        public List<Notification> getNotifications() {
+            return notificationService != null ? notificationService.getNotifications() : new ArrayList<Notification>();
+        }
+
+        @Override
+        public void deleteNotification(Notification notification) {
+            if (notificationService != null) {
+                notificationService.deleteNotification(notification);
+            }
+        }
+
+        @Override
+        public void onNotificationsChanged() {
+            updateBackgroundBlur();
+        }
     }
 
     public void requestDisallowInterceptTouchEvent(boolean disallowIntercept) {
@@ -413,18 +488,61 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     @Override
     public void onNotification(Notification notification) {
         LockerFragment lockerFragment = (LockerFragment) pagerAdapter.getRegisteredFragment(1);
-        lockerFragment.addNotification(notification);
+        lockerFragment.update();
 
-        if (lockerFragment.hasNotifications()) {
-            if (mViewPager.getCurrentItem() == 1 && dimView.getAlpha() == 0.0f) {
+        updateBackgroundBlur();
+    }
+
+    @Override
+    public void onNotificationsChanged(List<Notification> notifications) {
+        LockerFragment lockerFragment = (LockerFragment) pagerAdapter.getRegisteredFragment(1);
+        lockerFragment.updateNotifications(notifications);
+
+        updateBackgroundBlur();
+    }
+
+    private void updateBackgroundBlur() {
+        LockerFragment lockerFragment = (LockerFragment) pagerAdapter.getRegisteredFragment(1);
+
+        if (mViewPager.getCurrentItem() == 1) {
+            if (lockerFragment.hasNotifications()) {
                 dimView.animate()
                         .alpha(1.0f)
                         .setDuration(1000)
                         .start();
             } else {
-                mViewPager.setAlpha(1.0f);
+                dimView.animate()
+                        .alpha(0.0f)
+                        .setDuration(1000)
+                        .start();
             }
         }
+
     }
+//////////////////////////////////////////////////////////////////
+// LockService.Delegate
+//////////////////////////////////////////////////////////////////
+
+    @Override
+    public void onBatteryLevelChanged(int level, int status) {
+        boolean charging = status == BatteryManager.BATTERY_STATUS_CHARGING;
+
+        batteryLevelTextView.setText(String.valueOf(level) + "%");
+        batteryFillImageView.setScaleX(level / 100.0f);
+        batteryFillImageView.setTranslationX(-batteryFillImageView.getWidth() * (100.0f - level) / 100.0f / 2.0f);
+
+        if (charging) {
+            batteryFillImageView.setImageResource(R.drawable.battery_fill_charging);
+            batteryChargeAnimation.setVisibility(View.VISIBLE);
+            batteryChargeAnimation.startAnimation(chargeAnimation);
+        } else {
+            batteryFillImageView.setImageResource(R.drawable.battery_fill);
+            batteryChargeAnimation.setVisibility(View.INVISIBLE);
+            batteryChargeAnimation.clearAnimation();
+        }
+
+
+    }
+
 
 }

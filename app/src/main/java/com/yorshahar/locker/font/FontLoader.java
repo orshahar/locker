@@ -8,24 +8,22 @@ import android.graphics.Typeface;
  */
 public class FontLoader {
 
-    public static final int APPLE_THIN = 0;
-    public static final int HERCULANUM = 1;
-    public static final int TIME = 2;
-    public static final int HELVETICA_NEUE_ULTRA_LIGHT = 3;
-    public static final int HELVETICA_NEUE = 4;
+    public static final int HELVETICA_NEUE_REGULAR = 0;
+    public static final int HELVETICA_NEUE_LIGHT = 1;
+    public static final int HELVETICA_NEUE_ULTRA_LIGHT = 2;
+    public static final int HELVETICA_NEUE_BOLD = 3;
 
-    private static final int NUM_OF_CUSTOM_FONTS = 5;
+    private static final int NUM_OF_CUSTOM_FONTS = 4;
 
     private static boolean fontsLoaded = false;
 
-    private static Typeface[] fonts = new Typeface[5];
+    private static Typeface[] fonts = new Typeface[4];
 
     private static String[] fontPath = {
-            "fonts/AppleSDGothicNeo-Thin.otf",
-            "fonts/Herculanum.ttf",
-            "fonts/time.ttf",
-            "fonts/hlul.ttf",
-            "fonts/HelveticaNeue.dfont"
+            "fonts/HelveticaNeue.ttf",
+            "fonts/HelveticaNeueLight.ttf",
+            "fonts/HelveticaNeueUltraLight.ttf",
+            "fonts/HelveticaNeueBold.ttf",
     };
 
     public static Typeface getTypeface(Context context, int fontIdentifier) {

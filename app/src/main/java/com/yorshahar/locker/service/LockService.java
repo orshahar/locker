@@ -25,6 +25,13 @@ import com.yorshahar.locker.receiver.TimeReceiver;
 
 public class LockService extends Service implements LockReceiver.Delegate, TimeReceiver.Delegate {
 
+    public interface Delegate {
+
+        void onBatteryLevelChanged(int level, int status);
+
+    }
+
+    private Delegate delegate;
     private BroadcastReceiver lockReceiver;
     private BroadcastReceiver bootReceiver;
     private BroadcastReceiver timeReceiver;
@@ -36,6 +43,14 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
     private WindowManager.LayoutParams params;
 
     public LockService() {
+    }
+
+    public Delegate getDelegate() {
+        return delegate;
+    }
+
+    public void setDelegate(Delegate delegate) {
+        this.delegate = delegate;
     }
 
     public LockerMainActivity getActivity() {
@@ -98,6 +113,7 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
         // Register the lock receiver
         IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
         filter.addAction(Intent.ACTION_SCREEN_OFF);
+        filter.addAction(Intent.ACTION_BATTERY_CHANGED);
         lockReceiver = new LockReceiver();
         ((LockReceiver) lockReceiver).setDelegate(this);
         registerReceiver(lockReceiver, filter);
@@ -209,7 +225,14 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
         }
     }
 
-//////////////////////////////////////////////////////////////////////
+    @Override
+    public void onBatteryChanged(int level, int status) {
+        if (delegate != null) {
+            delegate.onBatteryLevelChanged(level, status);
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////////
 // TimeReceiver.Delegate
 //////////////////////////////////////////////////////////////////////
 

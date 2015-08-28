@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
-    <View
-        android:id="@+id/topBorder"
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:background="#6a6376" />
+    android:layout_height="wrap_content"
+    android:paddingBottom="15dp"
+    android:paddingEnd="15dp"
+    android:paddingLeft="0dp"
+    android:paddingRight="15dp"
+    android:paddingStart="0dp"
+    android:paddingTop="15dp">
 
     <ImageView
         android:id="@+id/icon"
@@ -16,8 +16,6 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_below="@+id/topBorder"
-        android:layout_marginTop="15dp"
         android:contentDescription="@string/notification_icon"
         android:src="@mipmap/ic_launcher" />
 
@@ -27,11 +25,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="false"
         android:layout_alignParentTop="true"
-        android:layout_below="@+id/topBorder"
         android:layout_marginBottom="1dp"
         android:layout_marginLeft="10dp"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="17dp"
+        android:layout_marginTop="2dp"
         android:layout_toEndOf="@+id/icon"
         android:layout_toRightOf="@+id/icon"
         android:gravity="start|top"
@@ -88,11 +85,4 @@
         android:textColor="#9989a6"
         android:textSize="13sp" />
 
-    <View
-        android:id="@+id/bottomBorder"
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:layout_below="@+id/slideToView"
-        android:layout_marginTop="15dp"
-        android:background="#6a6376" />
 </RelativeLayout>

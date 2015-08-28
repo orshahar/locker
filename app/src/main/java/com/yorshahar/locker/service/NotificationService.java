@@ -10,8 +10,10 @@ import android.view.accessibility.AccessibilityEvent;
 
 import com.yorshahar.locker.model.notification.Notification;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class NotificationService extends AccessibilityService {
@@ -20,6 +22,7 @@ public class NotificationService extends AccessibilityService {
 
         void onNotification(Notification notification);
 
+        void onNotificationsChanged(List<Notification> notifications);
     }
 
     private static NotificationService instance;
@@ -27,8 +30,14 @@ public class NotificationService extends AccessibilityService {
     private Set<String> allowedApps = new HashSet<>();
     private PackageManager pm;
 
+    List<Notification> notifications = new ArrayList<>();
+
     public void setDelegate(Delegate delegate) {
         this.delegate = delegate;
+    }
+
+    public List<Notification> getNotifications() {
+        return notifications;
     }
 
     @Override
@@ -82,9 +91,7 @@ public class NotificationService extends AccessibilityService {
                                 icon
                         );
 
-                        if (delegate != null) {
-                            delegate.onNotification(notification);
-                        }
+                        addNotification(notification);
                     }
 
                     break;
@@ -102,6 +109,10 @@ public class NotificationService extends AccessibilityService {
         for (CharSequence text : event.getText()) {
             textBuilder.append(separator).append(text);
             separator = "\n";
+        }
+
+        if (event.getContentDescription() != null && event.getContentDescription().length() > 0) {
+            textBuilder.append(separator).append("-------").append(separator).append(event.getContentDescription());
         }
 
         return textBuilder.toString();
@@ -131,6 +142,22 @@ public class NotificationService extends AccessibilityService {
 
     private boolean isAppAllowed(String packageName) {
         return allowedApps.contains(packageName);
+    }
+
+    public void addNotification(Notification notification) {
+        notifications.add(0, notification);
+
+        if (delegate != null) {
+            delegate.onNotificationsChanged(notifications);
+        }
+    }
+
+    public void deleteNotification(Notification notification) {
+        notifications.remove(notification);
+
+//        if (delegate != null) {
+//            delegate.onNotificationsChanged(notifications);
+//        }
     }
 
     @Override
