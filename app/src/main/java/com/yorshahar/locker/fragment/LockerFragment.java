@@ -20,7 +20,6 @@ import android.widget.Toast;
 import com.yorshahar.locker.R;
 import com.yorshahar.locker.font.FontLoader;
 import com.yorshahar.locker.model.notification.Notification;
-import com.yorshahar.locker.ui.widget.CustomDigitalClock;
 import com.yorshahar.locker.ui.widget.ShinyTextView;
 
 import java.text.SimpleDateFormat;
@@ -50,6 +49,8 @@ public class LockerFragment extends Fragment {
 
     private Delegate delegate;
 
+    public static final String TIME_FORMAT = "h:mm";
+    public static final String DATE_FORMAT = "EEEE, MMMM dd";
     private int REL_SWIPE_MIN_DISTANCE;
     private int REL_SWIPE_MAX_OFF_PATH;
     private int REL_SWIPE_THRESHOLD_VELOCITY;
@@ -58,6 +59,7 @@ public class LockerFragment extends Fragment {
     ListView notificationsListView;
     NotificationListAdapter listAdapter;
     //    List<Notification> notifications = new ArrayList<>();
+    private TextView timeView;
     private TextView dateView;
 
     private Map<Long, Integer> mItemIdTopMap = new HashMap<>();
@@ -75,15 +77,13 @@ public class LockerFragment extends Fragment {
         RelativeLayout view = (RelativeLayout) inflater.inflate(R.layout.fragment_locker, container, false);
         view.setBackgroundColor(Color.TRANSPARENT);
 
-        CustomDigitalClock timeView = (CustomDigitalClock) view.findViewById(R.id.textClock);
+        timeView = (TextView) view.findViewById(R.id.timeTextView);
         timeView.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.HELVETICA_NEUE_ULTRA_LIGHT));
+        updateTime();
 
         dateView = (TextView) view.findViewById(R.id.dateTextView);
         dateView.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.HELVETICA_NEUE_LIGHT));
-
-        SimpleDateFormat sdf = new SimpleDateFormat("EEEE, MMMM dd", Locale.US);
-        String dateString = sdf.format(System.currentTimeMillis());
-        dateView.setText(dateString);
+        updateDate();
 
         ShinyTextView unlockTextView = (ShinyTextView) view.findViewById(R.id.unlockTextView);
         unlockTextView.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.HELVETICA_NEUE_LIGHT));
@@ -141,12 +141,19 @@ public class LockerFragment extends Fragment {
     }
 
     public void update() {
+        updateTime();
         updateDate();
         updateNotifications();
     }
 
+    private void updateTime() {
+        SimpleDateFormat sdf = new SimpleDateFormat(TIME_FORMAT, Locale.US);
+        String timeString = sdf.format(System.currentTimeMillis());
+        timeView.setText(timeString);
+    }
+
     private void updateDate() {
-        SimpleDateFormat sdf = new SimpleDateFormat("EEEE, MMMM dd", Locale.US);
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT, Locale.US);
         String dateString = sdf.format(System.currentTimeMillis());
         dateView.setText(dateString);
     }
@@ -254,16 +261,16 @@ public class LockerFragment extends Fragment {
 //                    deleteNotificationWithAnimationAtPosition(pos);
 //                }
 //            } else {
-                if (tempPosition != ListView.INVALID_POSITION) {
-                    View view = notificationsListView.getChildAt(tempPosition);
-                    if (view != null) {
-                        view.animate()
-                                .translationX(0)
-                                .alpha(1.0f)
-                                .setDuration(200)
-                                .start();
-                    }
+            if (tempPosition != ListView.INVALID_POSITION) {
+                View view = notificationsListView.getChildAt(tempPosition);
+                if (view != null) {
+                    view.animate()
+                            .translationX(0)
+                            .alpha(1.0f)
+                            .setDuration(200)
+                            .start();
                 }
+            }
 //            }
 
             delegate.requestDisallowInterceptTouchEvent(false);

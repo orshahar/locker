@@ -1,6 +1,8 @@
 package com.yorshahar.locker.fragment;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -9,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.yorshahar.locker.R;
+import com.yorshahar.locker.util.BlurUtil;
 
 /**
  * Fragment for choosing a wallpaper from local wallpapers
@@ -48,6 +51,16 @@ public class MyWallpapersFragment extends Fragment {
 
         ImageView imageView = (ImageView) view.findViewById(R.id.imageView);
         imageView.setImageResource(resId);
+
+        try {
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), resId);
+            imageView.setImageBitmap(bitmap);
+
+            Bitmap blurBitmap = BlurUtil.blur(getActivity(), bitmap, 20);
+        } catch (Exception e) {
+            int a = 2;
+        }
+
         return view;
     }
 

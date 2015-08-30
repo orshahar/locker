@@ -2,7 +2,9 @@ package com.yorshahar.locker.fragment;
 
 
 import android.animation.Animator;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -15,6 +17,7 @@ import android.widget.TextView;
 import com.yorshahar.locker.R;
 import com.yorshahar.locker.activity.LockerMainActivity;
 import com.yorshahar.locker.font.FontLoader;
+import com.yorshahar.locker.ui.widget.FillableCircleView;
 import com.yorshahar.locker.ui.widget.Key;
 
 /**
@@ -38,12 +41,12 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
     private StringBuffer enteredKeysBuffer;
     private String currentKey = "";
 
-    ImageView[] circleImageViews;
+    FillableCircleView[] circleViews;
     View circlesContainerView;
-    private static final int SMALL_EMPTY_CIRCLE_IMAGE = R.drawable.white_circle_empty;
-    private static final int SMALL_FILLED_CIRCLE_IMAGE = R.drawable.white_circle_filled;
-    private static final int LARGE_EMPTY_CIRCLE_IMAGE = R.drawable.gray_circle_empty;
-    private static final int LARGE_FILLED_CIRCLE_IMAGE = R.drawable.gray_circle_filled;
+    //    private static final int SMALL_EMPTY_CIRCLE_IMAGE = R.drawable.white_circle_empty;
+//    private static final int SMALL_FILLED_CIRCLE_IMAGE = R.drawable.white_circle_filled;
+//    private static final int LARGE_EMPTY_CIRCLE_IMAGE = R.drawable.gray_circle_empty;
+//    private static final int LARGE_FILLED_CIRCLE_IMAGE = R.drawable.gray_circle_filled;
     private boolean processing = false;
     private int keysAnimating = 0;
     private boolean passcodeMatch = false;
@@ -64,7 +67,7 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
         passcode = getString(R.string.passcode);
         passcodeSize = passcode.length();
         enteredKeysBuffer = new StringBuffer(passcodeSize);
-        circleImageViews = new ImageView[passcodeSize];
+        circleViews = new FillableCircleView[passcodeSize];
     }
 
     @Override
@@ -125,10 +128,10 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
         key9.setDelegate(this);
         key9.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.HELVETICA_NEUE_ULTRA_LIGHT));
 
-        circleImageViews[0] = (ImageView) view.findViewById(R.id.circle1ImageView);
-        circleImageViews[1] = (ImageView) view.findViewById(R.id.circle2ImageView);
-        circleImageViews[2] = (ImageView) view.findViewById(R.id.circle3ImageView);
-        circleImageViews[3] = (ImageView) view.findViewById(R.id.circle4ImageView);
+        circleViews[0] = (FillableCircleView) view.findViewById(R.id.circle1ImageView);
+        circleViews[1] = (FillableCircleView) view.findViewById(R.id.circle2ImageView);
+        circleViews[2] = (FillableCircleView) view.findViewById(R.id.circle3ImageView);
+        circleViews[3] = (FillableCircleView) view.findViewById(R.id.circle4ImageView);
 
         circlesContainerView = view.findViewById(R.id.circlesContainerView);
         return view;
@@ -144,9 +147,9 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
     private void updateCircles() {
         if (enteredKeysBuffer.length() < passcodeSize) {
             if (currentKey == null || currentKey.isEmpty()) {
-                circleImageViews[enteredKeysBuffer.length()].setImageResource(SMALL_EMPTY_CIRCLE_IMAGE);
+                circleViews[enteredKeysBuffer.length()].setFilled(false);
             } else {
-                circleImageViews[enteredKeysBuffer.length()].setImageResource(SMALL_FILLED_CIRCLE_IMAGE);
+                circleViews[enteredKeysBuffer.length()].setFilled(true);
             }
         }
     }
@@ -247,8 +250,8 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
 
     public void reset() {
         enteredKeysBuffer.delete(0, enteredKeysBuffer.length());
-        for (ImageView circleImageView : circleImageViews) {
-            circleImageView.setImageResource(SMALL_EMPTY_CIRCLE_IMAGE);
+        for (FillableCircleView circleView : circleViews) {
+            circleView.setFilled(false);
         }
         processing = false;
         keysAnimating = 0;
@@ -342,7 +345,14 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
         reset();
     }
 
-/////////////////////////////////////////////////
+    @Override
+    public Bitmap getWallpaper() {
+        ImageView wallpaperImageView = ((LockerMainActivity) getActivity()).getWallpaperView();
+        Bitmap bitmap = ((BitmapDrawable) wallpaperImageView.getDrawable()).getBitmap();
+        return bitmap;
+    }
+
+    /////////////////////////////////////////////////
 // View.OnClickListener methods
 /////////////////////////////////////////////////
 

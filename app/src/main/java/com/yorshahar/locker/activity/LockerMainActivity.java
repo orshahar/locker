@@ -57,8 +57,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     private boolean isWindowAttached = false;
     private DateFormat dateFormat;
     private Animation chargeAnimation;
-
-
+    private ImageView wallpaperView;
     private ImageView dimView;
     private ViewPager mViewPager;
     private SectionsPagerAdapter pagerAdapter;
@@ -68,6 +67,10 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     private ImageView batteryChargeAnimation;
     private ImageView barImageView;
     private TextView clockTextView;
+
+    public ImageView getWallpaperView() {
+        return wallpaperView;
+    }
 
     // Set appropriate flags to make the screen appear over the keyguard
     @Override
@@ -187,6 +190,8 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         });
 
         dimView = (ImageView) findViewById(R.id.dimView);
+
+        wallpaperView = (ImageView) findViewById(R.id.backgroundImageView);
 
         carrierTextView = (TextView) findViewById(R.id.carrierTextView);
         carrierTextView.setTypeface(FontLoader.getTypeface(getApplicationContext(), FontLoader.HELVETICA_NEUE_LIGHT));

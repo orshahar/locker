@@ -7,24 +7,22 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.yorshahar.locker.fragment.LockerFragment">
 
-    <com.yorshahar.locker.ui.widget.CustomDigitalClock
-        android:id="@+id/textClock"
+    <TextView
+        android:id="@+id/timeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:gravity="center"
-        android:inputType="time"
-        android:text="@string/digital_clock"
+        android:text="9:38"
         android:textColor="#ffffffff"
         android:textSize="100sp"
-        android:typeface="monospace"
         android:layout_marginTop="-10dp" />
 
     <TextView
         android:id="@+id/dateTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textClock"
+        android:layout_below="@+id/timeTextView"
         android:layout_centerHorizontal="true"
         android:focusableInTouchMode="true"
         android:text="@string/sample_date"
