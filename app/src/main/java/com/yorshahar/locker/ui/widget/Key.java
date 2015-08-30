@@ -2,9 +2,12 @@ package com.yorshahar.locker.ui.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.support.annotation.NonNull;
@@ -35,19 +38,29 @@ public class Key extends View implements Runnable {
 
         void requestDisallowInterceptTouchEvent(boolean disallowIntercept);
 
+        Bitmap getWallpaper();
+
     }
 
-    public static final float CIRCLE_WIDTH = 3.0f;
-    public static final int CIRCLE_COLOR = Color.argb(255, 81, 74, 85);
+    public static final float CIRCLE_SKROKE_WIDTH = 3.0f;
+    public static final int MAX_ADD_AMOUNT = 100;
 
     private Typeface typeface;
     private String value;
     private KeyDelegate delegate;
-    private Paint paint;
-    private Paint paint2;
+    private Paint outlinePaint;
+    private Paint fillPaint;
+    private Paint textPaint;
     private Rect bounds = new Rect();
+    //    private Paint transparentPaint;
+    private Bitmap xferBitmap;
+    private Canvas xferCanvas;
     private boolean animating = false;
-    private int alpha = 0;
+    //    private int alpha = 0;
+    private int addAmount = 0;
+    int viewWidthHalf;
+    int viewHeightHalf;
+    int radius;
 
     public Key(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -61,11 +74,40 @@ public class Key extends View implements Runnable {
             value = a.getString(R.styleable.Key_value);
             setTag(value);
 
-            paint = new Paint();
-            paint.setTextSize(70f);
-            paint.getTextBounds(value, 0, value.length(), bounds);
+            outlinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            outlinePaint.setStyle(Paint.Style.STROKE);
+            outlinePaint.setStrokeWidth(CIRCLE_SKROKE_WIDTH);
+            outlinePaint.setColor(Color.argb(255, MAX_ADD_AMOUNT, MAX_ADD_AMOUNT, MAX_ADD_AMOUNT));
+            outlinePaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.ADD));
 
-            paint2 = new Paint();
+            fillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            fillPaint.setColor(Color.argb(255, MAX_ADD_AMOUNT, MAX_ADD_AMOUNT, MAX_ADD_AMOUNT));
+            fillPaint.setStyle(Paint.Style.FILL);
+            fillPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.ADD));
+//            fillPaint.setMaskFilter(new BlurMaskFilter(20, BlurMaskFilter.Blur.INNER));
+
+            textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            textPaint.setTextSize(70f);
+            bounds = new Rect();
+            textPaint.getTextBounds(value, 0, value.length(), bounds);
+            textPaint.setTypeface(typeface);
+            textPaint.setColor(Color.WHITE);
+
+
+            // Generate bitmap used for background
+//            xferBitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
+//            xferBitmap = delegate.getWallpaper();
+//            xferBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.iphone_wallpaper);
+
+            // Create the outerCirclePaint and set the bitmap
+//            xferCanvas = new Canvas(xferBitmap);
+
+//            transparentPaint = new Paint();
+//            transparentPaint.setAntiAlias(true);
+//            transparentPaint.setStyle(Paint.Style.FILL);
+////            transparentPaint.setColor(getResources().getColor(android.R.color.transparent));
+//            transparentPaint.setColor(Color.argb(255, 100, 100, 100));
+//            transparentPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.ADD));
         } finally {
             a.recycle();
         }
@@ -85,37 +127,53 @@ public class Key extends View implements Runnable {
 
     public void setTypeface(Typeface typeface) {
         this.typeface = typeface;
+        textPaint.setTypeface(typeface);
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        final int width = getMeasuredWidth();
+        final int height = getMeasuredHeight();
+
+        if (xferBitmap == null || xferBitmap.getWidth() != width
+                || xferBitmap.getHeight() != height) {
+
+            if (xferBitmap != null) {
+                xferBitmap.recycle();
+            }
+
+            xferBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            xferCanvas = new Canvas(xferBitmap);
+        }
+
+        viewWidthHalf = width / 2;
+        viewHeightHalf = height / 2;
+        radius = (viewWidthHalf > viewHeightHalf) ? viewHeightHalf - 15 : viewWidthHalf - 20;
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        int viewWidthHalf = this.getMeasuredWidth() / 2;
-        int viewHeightHalf = this.getMeasuredHeight() / 2;
-        int radius = (viewWidthHalf > viewHeightHalf) ? viewHeightHalf - 15 : viewWidthHalf - 20;
-
+        // Generate bitmap used for background
+//        bm = delegate.getWallpaper();
+//        temp.drawBitmap(bm, 0, 0, transparentPaint);
+//        canvas.setBitmap(bm);
 
         // Draw the outer circle
-        paint.setAntiAlias(true);
-        paint.setStrokeWidth(CIRCLE_WIDTH);
-        paint.setColor(CIRCLE_COLOR);
-        paint.setStyle(Paint.Style.STROKE);
-        canvas.drawCircle(viewWidthHalf, viewHeightHalf, radius, paint);
+        canvas.drawCircle(viewWidthHalf, viewHeightHalf, radius, outlinePaint);
 
         // Draw the circle filling
-        paint2.setAntiAlias(true);
-        paint2.setColor(CIRCLE_COLOR);
-        paint2.setStyle(Paint.Style.FILL);
-        paint2.setAlpha(alpha);
-//        paint2.setMaskFilter(new BlurMaskFilter(20, BlurMaskFilter.Blur.INNER));
-        canvas.drawCircle(viewWidthHalf, viewHeightHalf, radius - CIRCLE_WIDTH / 2, paint2);
+//        fillPaint.setAlpha(alpha);
+        fillPaint.setColor(Color.argb(255, addAmount, addAmount, addAmount));
+        canvas.drawCircle(viewWidthHalf, viewHeightHalf, radius - CIRCLE_SKROKE_WIDTH / 2, fillPaint);
 
         // Draw the text
-        paint.setTypeface(typeface);
-        paint.setColor(Color.WHITE);
-        paint.setStrokeWidth(1.0f);
-        canvas.drawText(value, viewWidthHalf - bounds.centerX(), viewHeightHalf - bounds.centerY(), paint);
+        canvas.drawText(value, viewWidthHalf - bounds.centerX(), viewHeightHalf - bounds.centerY(), textPaint);
+
+//        canvas.drawBitmap(xferBitmap, 0, 0, null);
 
         // Invalidate view at about 62fps
         postDelayed(this, 16);
@@ -132,7 +190,8 @@ public class Key extends View implements Runnable {
                 delegate.requestDisallowInterceptTouchEvent(true);
                 delegate.onKeyDown(this);
                 setPressed(true);
-                alpha = 255;
+//                alpha = 255;
+                addAmount = MAX_ADD_AMOUNT;
                 invalidate();
                 handled = true;
                 break;
@@ -153,12 +212,18 @@ public class Key extends View implements Runnable {
                 handled = true;
                 break;
             }
-            case MotionEvent.ACTION_MOVE:
+            case MotionEvent.ACTION_MOVE: {
                 if (event.getX() < -10 || event.getX() > 10) {
                     delegate.requestDisallowInterceptTouchEvent(true);
                 } else {
                     delegate.requestDisallowInterceptTouchEvent(false);
                 }
+                handled = true;
+                break;
+            }
+            default: {
+                break;
+            }
         }
 
         return handled;
@@ -176,9 +241,15 @@ public class Key extends View implements Runnable {
     @Override
     public void run() {
         if (animating) {
-            alpha -= 20;
-            if (alpha < 0) {
-                alpha = 0;
+//            alpha -= 20;
+//            if (alpha < 0) {
+//                alpha = 0;
+//                animating = false;
+//                delegate.onAnimationEnded(this);
+//            }
+            addAmount -= 10;
+            if (addAmount < 0) {
+                addAmount = 0;
                 animating = false;
                 delegate.onAnimationEnded(this);
             }
