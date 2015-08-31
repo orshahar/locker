@@ -11,6 +11,9 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.telephony.PhoneStateListener;
+import android.telephony.SignalStrength;
+import android.telephony.TelephonyManager;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +32,8 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
 
         void onBatteryLevelChanged(int level, int status);
 
+        void onSignalStrengthsChanged(int bars);
+
     }
 
     private Delegate delegate;
@@ -38,6 +43,7 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
     private WindowManager windowManager;
     private LockerMainActivity activity;
     private final IBinder myBinder = new MyLocalBinder();
+    boolean preventLock = false;
 
     private RelativeLayout lockerView;
     private WindowManager.LayoutParams params;
@@ -133,6 +139,11 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
         ((TimeReceiver) timeReceiver).setDelegate(this);
         registerReceiver(timeReceiver, filter);
 
+        MyStateListener phoneStateListener = new MyStateListener();
+        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+        telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+        telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
+
         startForeground();
 
         // TODO: Should I start the activity here?
@@ -196,22 +207,23 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
 
     @Override
     public void lock(boolean reset) {
-        if (reset && activity != null) {
-            activity.reset();
-        }
+        if (!preventLock) {
+            if (reset && activity != null) {
+                activity.reset();
+            }
 
-        if (reset && lockerView != null) {
-            try {
-                windowManager.addView(lockerView, params);
+            if (reset && lockerView != null) {
+                try {
+                    windowManager.addView(lockerView, params);
 
-                int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-                lockerView.setSystemUiVisibility(uiOptions);
-                lockerView.setVisibility(View.VISIBLE);
-            } catch (Exception e) {
-                int a = 2;
+                    int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+                    lockerView.setSystemUiVisibility(uiOptions);
+                    lockerView.setVisibility(View.VISIBLE);
+                } catch (Exception e) {
+                    int a = 2;
+                }
             }
         }
-
     }
 
     @Override
@@ -232,7 +244,7 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
         }
     }
 
-    //////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 // TimeReceiver.Delegate
 //////////////////////////////////////////////////////////////////////
 
@@ -253,5 +265,45 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
             return LockService.this;
         }
     }
+
+
+//////////////////////////////////////////////////////////////////////
+// PhoneStateListener
+//////////////////////////////////////////////////////////////////////
+
+    private class MyStateListener extends PhoneStateListener {
+        @Override
+        public void onCallStateChanged(int state, String incomingNumber) {
+            super.onCallStateChanged(state, incomingNumber);
+
+            switch (state) {
+                case TelephonyManager.CALL_STATE_RINGING: {
+                    preventLock = true;
+                    break;
+                }
+                case TelephonyManager.CALL_STATE_OFFHOOK: {
+                    break;
+                }
+                case TelephonyManager.CALL_STATE_IDLE: {
+                    break;
+                }
+                default: {
+                    break;
+                }
+            }
+        }
+
+        @Override
+        public void onSignalStrengthsChanged(SignalStrength signalStrength) {
+            super.onSignalStrengthsChanged(signalStrength);
+
+            int gsmSignalStrength = signalStrength.getGsmSignalStrength();
+            if (delegate != null) {
+                int bars = 3;
+                delegate.onSignalStrengthsChanged(bars);
+            }
+        }
+    }
+
 
 }

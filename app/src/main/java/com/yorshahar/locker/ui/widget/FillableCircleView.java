@@ -3,6 +3,7 @@ package com.yorshahar.locker.ui.widget;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LightingColorFilter;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -32,6 +33,8 @@ public class FillableCircleView extends View {
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(CIRCLE_SKROKE_WIDTH);
         paint.setColor(Color.argb(255, ADD_AMOUNT, ADD_AMOUNT, ADD_AMOUNT));
+//        LightingColorFilter filter = new LightingColorFilter(0xffffffff, 0x88888888);
+//        paint.setColorFilter(filter);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.ADD));
     }
 

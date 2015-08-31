@@ -3,19 +3,18 @@ package com.yorshahar.locker.activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.LightingColorFilter;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.telephony.PhoneStateListener;
-import android.telephony.TelephonyManager;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,6 +34,7 @@ import com.yorshahar.locker.model.notification.Notification;
 import com.yorshahar.locker.service.LockService;
 import com.yorshahar.locker.service.NotificationService;
 import com.yorshahar.locker.service.connection.AbstractServiceConnectionImpl;
+import com.yorshahar.locker.util.BlurUtil;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -67,9 +67,15 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     private ImageView batteryChargeAnimation;
     private ImageView barImageView;
     private TextView clockTextView;
+    private Bitmap blurredBackground;
+    private ImageView[] signalCircles;
 
     public ImageView getWallpaperView() {
         return wallpaperView;
+    }
+
+    public Bitmap getBlurredBackground() {
+        return blurredBackground;
     }
 
     // Set appropriate flags to make the screen appear over the keyguard
@@ -137,18 +143,6 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 
         pagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        // unlock screen in case of app get killed by system
-        if (getIntent() != null && getIntent().hasExtra("kill")
-                && getIntent().getExtras().getInt("kill") == 1) {
-            unlockDevice();
-        } else {
-            // listen the events get fired during the call
-            StateListener phoneStateListener = new StateListener();
-            TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-            telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
-
-        }
-
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(pagerAdapter);
@@ -158,20 +152,14 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                if (hasNotifications()) {
-                    dimView.setAlpha(1.0f);
+                if (position == 0) {
+                    dimView.setAlpha(hasNotifications() ? 1.0f : 1.0f - positionOffset);
+                    barImageView.setTranslationY(-BAR_MAX_OFFSET * (1.0f - positionOffset));
+                    clockTextView.setAlpha(1.0f - positionOffset);
+                } else {
+                    dimView.setAlpha(hasNotifications() ? 1.0f : 0.0f);
                     barImageView.setTranslationY(0);
                     clockTextView.setAlpha(0.0f);
-                } else {
-                    if (position == 0) {
-                        dimView.setAlpha((1.0f - positionOffset));
-                        barImageView.setTranslationY(-BAR_MAX_OFFSET * (1.0f - positionOffset));
-                        clockTextView.setAlpha(1.0f - positionOffset);
-                    } else {
-                        dimView.setAlpha(0.0f);
-                        barImageView.setTranslationY(0);
-                        clockTextView.setAlpha(0.0f);
-                    }
                 }
             }
 
@@ -189,9 +177,21 @@ public class LockerMainActivity extends FragmentActivity implements Notification
             }
         });
 
-        dimView = (ImageView) findViewById(R.id.dimView);
-
         wallpaperView = (ImageView) findViewById(R.id.backgroundImageView);
+        Bitmap bm = ((BitmapDrawable) wallpaperView.getDrawable()).getBitmap();
+        blurredBackground = BlurUtil.blur(bm);
+
+        dimView = (ImageView) findViewById(R.id.dimView);
+        dimView.setImageResource(0);
+        dimView.setImageBitmap(blurredBackground);
+        dimView.getDrawable().setColorFilter(new LightingColorFilter(0x88888888, 0x00000000));
+
+        signalCircles = new ImageView[5];
+        signalCircles[0] = (ImageView) findViewById(R.id.signal1ImageView);
+        signalCircles[1] = (ImageView) findViewById(R.id.signal2ImageView);
+        signalCircles[2] = (ImageView) findViewById(R.id.signal3ImageView);
+        signalCircles[3] = (ImageView) findViewById(R.id.signal4ImageView);
+        signalCircles[4] = (ImageView) findViewById(R.id.signal5ImageView);
 
         carrierTextView = (TextView) findViewById(R.id.carrierTextView);
         carrierTextView.setTypeface(FontLoader.getTypeface(getApplicationContext(), FontLoader.HELVETICA_NEUE_LIGHT));
@@ -311,62 +311,44 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         }
     }
 
-    // Handle events of calls and unlock screen if necessary
-    private class StateListener extends PhoneStateListener {
-        @Override
-        public void onCallStateChanged(int state, String incomingNumber) {
-
-            super.onCallStateChanged(state, incomingNumber);
-            switch (state) {
-                case TelephonyManager.CALL_STATE_RINGING:
-                    unlockDevice();
-                    break;
-                case TelephonyManager.CALL_STATE_OFFHOOK:
-                    break;
-                case TelephonyManager.CALL_STATE_IDLE:
-                    break;
-            }
-        }
-    }
-
-    // Don't finish Activity on Back press
-    @Override
-    public void onBackPressed() {
-        int a = 2;
-    }
-
-    // Handle button clicks
-    @Override
-    public boolean onKeyDown(int keyCode, android.view.KeyEvent event) {
-        if ((keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)
-                || (keyCode == KeyEvent.KEYCODE_POWER)
-                || (keyCode == KeyEvent.KEYCODE_VOLUME_UP)
-                || (keyCode == KeyEvent.KEYCODE_CAMERA)) {
-            return true;
-        }
-        if ((keyCode == KeyEvent.KEYCODE_HOME)) {
-
-            return true;
-        }
-
-        return false;
-
-    }
-
-    // handle the key press events here itself
-    public boolean dispatchKeyEvent(@NonNull KeyEvent event) {
-        if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP
-                || (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN)
-                || (event.getKeyCode() == KeyEvent.KEYCODE_POWER)) {
-            return false;
-        }
-        if (event.getKeyCode() == KeyEvent.KEYCODE_HOME
-                || event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
-
-            return true;
-        }
-        return false;
-    }
+//    // Don't finish Activity on Back press
+//    @Override
+//    public void onBackPressed() {
+//        int a = 2;
+//    }
+//
+////    // Handle button clicks
+////    @Override
+////    public boolean onKeyDown(int keyCode, android.view.KeyEvent event) {
+////        if ((keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)
+////                || (keyCode == KeyEvent.KEYCODE_POWER)
+////                || (keyCode == KeyEvent.KEYCODE_VOLUME_UP)
+////                || (keyCode == KeyEvent.KEYCODE_CAMERA)) {
+////            return true;
+////        }
+////        if ((keyCode == KeyEvent.KEYCODE_HOME)) {
+////
+////            return true;
+////        }
+////
+////        return false;
+////
+////    }
+//
+//    // handle the key press events here itself
+//    public boolean dispatchKeyEvent(@NonNull KeyEvent event) {
+//        if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP
+//                || (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN)
+//                || (event.getKeyCode() == KeyEvent.KEYCODE_POWER)) {
+//            return false;
+//        }
+//        if (event.getKeyCode() == KeyEvent.KEYCODE_HOME
+//                || event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
+//
+//            return true;
+//        }
+//        return false;
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -551,6 +533,17 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         }
 
 
+    }
+
+    @Override
+    public void onSignalStrengthsChanged(int bars) {
+        for (int i = 0; i < 5; i++) {
+            if (i < bars) {
+                signalCircles[i].setImageResource(R.drawable.signal_fill);
+            } else {
+                signalCircles[i].setImageResource(R.drawable.signal_empty);
+            }
+        }
     }
 
     private void setMargin(View view, int left, int top, int right, int bottom) {

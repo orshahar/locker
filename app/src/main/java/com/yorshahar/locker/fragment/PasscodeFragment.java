@@ -4,14 +4,12 @@ package com.yorshahar.locker.fragment;
 import android.animation.Animator;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.yorshahar.locker.R;
@@ -347,9 +345,11 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
 
     @Override
     public Bitmap getWallpaper() {
-        ImageView wallpaperImageView = ((LockerMainActivity) getActivity()).getWallpaperView();
-        Bitmap bitmap = ((BitmapDrawable) wallpaperImageView.getDrawable()).getBitmap();
-        return bitmap;
+//        ImageView wallpaperImageView = ((LockerMainActivity) getActivity()).getWallpaperView();
+//        Bitmap bitmap = ((BitmapDrawable) wallpaperImageView.getDrawable()).getBitmap();
+//        return bitmap;
+
+        return ((LockerMainActivity) getActivity()).getBlurredBackground();
     }
 
     /////////////////////////////////////////////////

@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LightingColorFilter;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -95,19 +96,8 @@ public class Key extends View implements Runnable {
 
 
             // Generate bitmap used for background
-//            xferBitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
 //            xferBitmap = delegate.getWallpaper();
 //            xferBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.iphone_wallpaper);
-
-            // Create the outerCirclePaint and set the bitmap
-//            xferCanvas = new Canvas(xferBitmap);
-
-//            transparentPaint = new Paint();
-//            transparentPaint.setAntiAlias(true);
-//            transparentPaint.setStyle(Paint.Style.FILL);
-////            transparentPaint.setColor(getResources().getColor(android.R.color.transparent));
-//            transparentPaint.setColor(Color.argb(255, 100, 100, 100));
-//            transparentPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.ADD));
         } finally {
             a.recycle();
         }
@@ -137,16 +127,16 @@ public class Key extends View implements Runnable {
         final int width = getMeasuredWidth();
         final int height = getMeasuredHeight();
 
-        if (xferBitmap == null || xferBitmap.getWidth() != width
-                || xferBitmap.getHeight() != height) {
-
-            if (xferBitmap != null) {
-                xferBitmap.recycle();
-            }
-
-            xferBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            xferCanvas = new Canvas(xferBitmap);
-        }
+//        if (xferBitmap == null || xferBitmap.getWidth() != width
+//                || xferBitmap.getHeight() != height) {
+//
+//            if (xferBitmap != null) {
+//                xferBitmap.recycle();
+//            }
+//
+//            xferBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+//            xferCanvas = new Canvas(xferBitmap);
+//        }
 
         viewWidthHalf = width / 2;
         viewHeightHalf = height / 2;
@@ -158,7 +148,7 @@ public class Key extends View implements Runnable {
         super.onDraw(canvas);
 
         // Generate bitmap used for background
-//        bm = delegate.getWallpaper();
+//        Bitmap bm = delegate.getWallpaper();
 //        temp.drawBitmap(bm, 0, 0, transparentPaint);
 //        canvas.setBitmap(bm);
 
