@@ -136,16 +136,6 @@
             android:src="@drawable/wifi_3" />
 
         <TextView
-            android:id="@+id/clockTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:gravity="center"
-            android:text="@string/sample_time"
-            android:textColor="#ffffff"
-            android:textSize="13sp" />
-
-        <TextView
             android:id="@+id/batteryLevelTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

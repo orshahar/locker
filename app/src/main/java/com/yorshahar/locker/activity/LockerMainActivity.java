@@ -67,7 +67,6 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     private ImageView batteryFillImageView;
     private ImageView batteryChargeAnimation;
     private ImageView barImageView;
-    private TextView clockTextView;
     private Bitmap blurredBackground;
     private ImageView[] signalCircles;
     private View controlCenterView;
@@ -168,12 +167,10 @@ public class LockerMainActivity extends FragmentActivity implements Notification
                     dimView.setAlpha(hasNotifications() ? 1.0f : 1.0f - positionOffset);
                     barImageView.setTranslationY(-50 * (1.0f - positionOffset));
                     controlCenterView.setTranslationY(750 + 50 * (1.0f - positionOffset));
-                    clockTextView.setAlpha(1.0f - positionOffset);
                 } else {
                     dimView.setAlpha(hasNotifications() ? 1.0f : 0.0f);
                     barImageView.setTranslationY(0);
                     controlCenterView.setTranslationY(750);
-                    clockTextView.setAlpha(0.0f);
                 }
             }
 
@@ -221,11 +218,6 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         chargeAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.charging_story_animation);
 
         barImageView = (ImageView) findViewById(R.id.barImageView);
-
-        clockTextView = (TextView) findViewById(R.id.clockTextView);
-        clockTextView.setAlpha(0.0f);
-        clockTextView.setText(dateFormat.format(System.currentTimeMillis()));
-        clockTextView.setTypeface(FontLoader.getTypeface(getApplicationContext(), FontLoader.HELVETICA_NEUE_BOLD));
 
         controlCenterView = findViewById(R.id.controlCenterFragment);
         controlCenterView.setBackgroundColor(Color.TRANSPARENT);
@@ -295,8 +287,6 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     }
 
     public void updateTimes() {
-        clockTextView.setText(dateFormat.format(System.currentTimeMillis()));
-
         LockerFragment lockerFragment = (LockerFragment) pagerAdapter.getRegisteredFragment(1);
         if (lockerFragment != null) {
             lockerFragment.update();
