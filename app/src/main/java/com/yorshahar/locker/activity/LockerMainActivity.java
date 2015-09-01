@@ -17,6 +17,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -71,8 +72,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     private ImageView[] signalCircles;
     private View controlCenterView;
     private ImageView controlCenterPullBar;
-    private ImageView phoneImageView;
-    private ImageView cameraImageView;
+    private RelativeLayout controlCenterTopBar;
 
     public ImageView getWallpaperView() {
         return wallpaperView;
@@ -166,17 +166,13 @@ public class LockerMainActivity extends FragmentActivity implements Notification
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 if (position == 0) {
                     dimView.setAlpha(hasNotifications() ? 1.0f : 1.0f - positionOffset);
-                    barImageView.setTranslationY(-46 * (1.0f - positionOffset));
-                    controlCenterView.setTranslationY(754 + 46 * (1.0f - positionOffset));
-                    phoneImageView.setTranslationX(-80 * (1.0f - positionOffset));
-                    cameraImageView.setTranslationX(754 * (1.0f - positionOffset));
+                    barImageView.setTranslationY(-50 * (1.0f - positionOffset));
+                    controlCenterView.setTranslationY(750 + 50 * (1.0f - positionOffset));
                     clockTextView.setAlpha(1.0f - positionOffset);
                 } else {
                     dimView.setAlpha(hasNotifications() ? 1.0f : 0.0f);
                     barImageView.setTranslationY(0);
-                    controlCenterView.setTranslationY(754);
-                    phoneImageView.setTranslationX(0);
-                    cameraImageView.setTranslationX(0);
+                    controlCenterView.setTranslationY(750);
                     clockTextView.setAlpha(0.0f);
                 }
             }
@@ -233,16 +229,52 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 
         controlCenterView = findViewById(R.id.controlCenterFragment);
         controlCenterView.setBackgroundColor(Color.TRANSPARENT);
-        controlCenterView.setTranslationY(controlCenterView.getLayoutParams().height - 46);
+        controlCenterView.setTranslationY(controlCenterView.getLayoutParams().height - 50);
+
+        controlCenterTopBar = (RelativeLayout) controlCenterView.findViewById(R.id.topBar);
+        controlCenterTopBar.setOnTouchListener(new View.OnTouchListener() {
+            float dY;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                switch (event.getActionMasked()) {
+
+                    case MotionEvent.ACTION_DOWN: {
+                        controlCenterView.setBackgroundColor(0xffaaaaaa);
+
+                        dY = controlCenterView.getY() - event.getRawY();
+                        carrierTextView.setText(String.valueOf(dY));
+                        break;
+                    }
+                    case MotionEvent.ACTION_UP: {
+                        if (dY == 0) {
+                            controlCenterView.setBackgroundColor(0x00ffffff);
+                        }
+                        break;
+                    }
+                    case MotionEvent.ACTION_MOVE: {
+                        carrierTextView.setText(String.valueOf(event.getRawY() + dY));
+                        controlCenterView.animate()
+                                .y(event.getRawY() + dY)
+                                .setDuration(0)
+                                .start();
+                        break;
+                    }
+                    default: {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+        });
 
         controlCenterPullBar = (ImageView) controlCenterView.findViewById(R.id.pullBarImageView);
 
-        phoneImageView = (ImageView) findViewById(R.id.phoneImageView);
-        phoneImageView.setVisibility(View.INVISIBLE);
+        lockServiceConnection = new
 
-        cameraImageView = (ImageView) findViewById(R.id.cameraImageView);
-
-        lockServiceConnection = new LockServiceConnection(LockService.class);
+                LockServiceConnection(LockService.class);
 //        notificationServiceConnection = new NotificationServiceConnection(NotificationService.class);
 
         bindToServices();
@@ -481,6 +513,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         public void onNotificationsChanged() {
             updateBackgroundBlur();
         }
+
     }
 
     public void requestDisallowInterceptTouchEvent(boolean disallowIntercept) {
@@ -560,8 +593,6 @@ public class LockerMainActivity extends FragmentActivity implements Notification
             batteryChargeAnimation.clearAnimation();
             setMargin(batteryChargeAnimation, 0, 0, 0, 0);
         }
-
-
     }
 
     @Override

@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -61,6 +62,8 @@ public class LockerFragment extends Fragment {
     //    List<Notification> notifications = new ArrayList<>();
     private TextView timeView;
     private TextView dateView;
+    private ImageView phoneImageView;
+    private ImageView cameraImageView;
 
     private Map<Long, Integer> mItemIdTopMap = new HashMap<>();
 
@@ -84,6 +87,11 @@ public class LockerFragment extends Fragment {
         dateView = (TextView) view.findViewById(R.id.dateTextView);
         dateView.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.HELVETICA_NEUE_LIGHT));
         updateDate();
+
+        phoneImageView = (ImageView) view.findViewById(R.id.phoneImageView);
+        phoneImageView.setVisibility(View.INVISIBLE);
+
+        cameraImageView = (ImageView)view.findViewById(R.id.cameraImageView);
 
         ShinyTextView unlockTextView = (ShinyTextView) view.findViewById(R.id.unlockTextView);
         unlockTextView.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.HELVETICA_NEUE_LIGHT));

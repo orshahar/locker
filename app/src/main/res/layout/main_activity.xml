@@ -33,7 +33,7 @@
     <RelativeLayout
         android:id="@+id/statusBar"
         android:layout_width="match_parent"
-        android:layout_height="23dp"
+        android:layout_height="25dp"
         android:gravity="center_vertical"
         android:paddingEnd="5dp"
         android:paddingLeft="5dp"
@@ -207,30 +207,11 @@
         android:contentDescription="@string/statusbar_pull_bar"
         android:src="@drawable/bar" />
 
-    <ImageView
-        android:id="@+id/phoneImageView"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
-        android:contentDescription="@string/control_center_phone"
-        android:src="@android:drawable/ic_menu_call" />
-
-    <ImageView
-        android:id="@+id/cameraImageView"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        android:contentDescription="@string/control_center_camera"
-        android:src="@android:drawable/ic_menu_camera" />
-
     <fragment
         android:id="@+id/controlCenterFragment"
         android:name="com.yorshahar.locker.fragment.ControlCenterFragment"
         android:layout_width="match_parent"
         android:layout_height="400dp"
         android:layout_alignParentBottom="true" />
+
 </RelativeLayout>

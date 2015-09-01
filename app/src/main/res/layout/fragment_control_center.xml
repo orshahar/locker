@@ -10,7 +10,7 @@
     <RelativeLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
-        android:layout_height="23dp">
+        android:layout_height="25dp">
 
         <ImageView
             android:id="@+id/pullBarImageView"
