@@ -1,0 +1,26 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="400dp"
+    android:background="#ff333333"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    tools:context="com.yorshahar.locker.ui.widget.ControlCenterView">
+
+    <RelativeLayout
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="23dp">
+
+        <ImageView
+            android:id="@+id/pullBarImageView"
+            android:layout_width="38dp"
+            android:layout_height="8dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:contentDescription="@string/control_center_pull_bar"
+            android:src="@drawable/bar" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

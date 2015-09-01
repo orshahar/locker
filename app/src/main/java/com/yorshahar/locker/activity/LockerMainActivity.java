@@ -69,6 +69,10 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     private TextView clockTextView;
     private Bitmap blurredBackground;
     private ImageView[] signalCircles;
+    private View controlCenterView;
+    private ImageView controlCenterPullBar;
+    private ImageView phoneImageView;
+    private ImageView cameraImageView;
 
     public ImageView getWallpaperView() {
         return wallpaperView;
@@ -82,6 +86,14 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
+
+//        Display display = getWindowManager().getDefaultDisplay();
+//        Point size = new Point();
+//        display.getSize(size);
+//        int width = size.x;
+//        int height = size.y;
+//
+//        controlCenterView.setTop(height - 20);
 
         isWindowAttached = true;
         sendViewToService();
@@ -154,11 +166,17 @@ public class LockerMainActivity extends FragmentActivity implements Notification
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 if (position == 0) {
                     dimView.setAlpha(hasNotifications() ? 1.0f : 1.0f - positionOffset);
-                    barImageView.setTranslationY(-BAR_MAX_OFFSET * (1.0f - positionOffset));
+                    barImageView.setTranslationY(-46 * (1.0f - positionOffset));
+                    controlCenterView.setTranslationY(754 + 46 * (1.0f - positionOffset));
+                    phoneImageView.setTranslationX(-80 * (1.0f - positionOffset));
+                    cameraImageView.setTranslationX(754 * (1.0f - positionOffset));
                     clockTextView.setAlpha(1.0f - positionOffset);
                 } else {
                     dimView.setAlpha(hasNotifications() ? 1.0f : 0.0f);
                     barImageView.setTranslationY(0);
+                    controlCenterView.setTranslationY(754);
+                    phoneImageView.setTranslationX(0);
+                    cameraImageView.setTranslationX(0);
                     clockTextView.setAlpha(0.0f);
                 }
             }
@@ -212,6 +230,17 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         clockTextView.setAlpha(0.0f);
         clockTextView.setText(dateFormat.format(System.currentTimeMillis()));
         clockTextView.setTypeface(FontLoader.getTypeface(getApplicationContext(), FontLoader.HELVETICA_NEUE_BOLD));
+
+        controlCenterView = findViewById(R.id.controlCenterFragment);
+        controlCenterView.setBackgroundColor(Color.TRANSPARENT);
+        controlCenterView.setTranslationY(controlCenterView.getLayoutParams().height - 46);
+
+        controlCenterPullBar = (ImageView) controlCenterView.findViewById(R.id.pullBarImageView);
+
+        phoneImageView = (ImageView) findViewById(R.id.phoneImageView);
+        phoneImageView.setVisibility(View.INVISIBLE);
+
+        cameraImageView = (ImageView) findViewById(R.id.cameraImageView);
 
         lockServiceConnection = new LockServiceConnection(LockService.class);
 //        notificationServiceConnection = new NotificationServiceConnection(NotificationService.class);

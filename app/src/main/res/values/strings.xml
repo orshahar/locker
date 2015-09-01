@@ -53,5 +53,9 @@
     <string name="wifi_indicator">wifi indicator</string>
     <string name="sample_time">10:45 AM</string>
     <string name="battery_charging_animation">Battery Charging Animation</string>
+    <string name="statusbar_pull_bar">Status bar pull bar</string>
+    <string name="control_center_pull_bar">Control center pull bar</string>
+    <string name="control_center_phone">Control center phone</string>
+    <string name="control_center_camera">Control center camera</string>
 
 </resources>
