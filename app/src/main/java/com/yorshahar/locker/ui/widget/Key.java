@@ -166,7 +166,7 @@ public class Key extends View implements Runnable {
 //        canvas.drawBitmap(xferBitmap, 0, 0, null);
 
         // Invalidate view at about 62fps
-        postDelayed(this, 16);
+        postDelayed(this, 8);
     }
 
     @Override
@@ -237,7 +237,7 @@ public class Key extends View implements Runnable {
 //                animating = false;
 //                delegate.onAnimationEnded(this);
 //            }
-            addAmount -= 10;
+            addAmount -= 5;
             if (addAmount < 0) {
                 addAmount = 0;
                 animating = false;
