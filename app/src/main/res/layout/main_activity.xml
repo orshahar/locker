@@ -119,7 +119,7 @@
             android:layout_toRightOf="@+id/signal5ImageView"
             android:gravity="center_vertical"
             android:text="@string/carrier_name"
-            android:textSize="13sp" />
+            android:textSize="14sp" />
 
         <ImageView
             android:id="@+id/wifiImageView"
@@ -150,7 +150,7 @@
             android:layout_toStartOf="@+id/batteryOutlineImageView"
             android:gravity="center_vertical"
             android:text="@string/battery_level"
-            android:textSize="13sp"
+            android:textSize="14sp"
             tools:ignore="RelativeOverlap" />
 
         <ImageView
