@@ -1,11 +1,13 @@
 package com.yorshahar.locker.activity;
 
+import android.animation.Animator;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.LightingColorFilter;
+import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.BatteryManager;
 import android.os.Bundle;
@@ -15,6 +17,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -28,6 +31,7 @@ import android.widget.TextView;
 
 import com.yorshahar.locker.R;
 import com.yorshahar.locker.font.FontLoader;
+import com.yorshahar.locker.fragment.ControlCenterFragment;
 import com.yorshahar.locker.fragment.LockerFragment;
 import com.yorshahar.locker.fragment.PasscodeFragment;
 import com.yorshahar.locker.fragment.SmartFragmentStatePagerAdapter;
@@ -47,7 +51,10 @@ import java.util.Locale;
 public class LockerMainActivity extends FragmentActivity implements NotificationService.Delegate, LockService.Delegate {
 
     private static final String STATUS_BAR_TIME_FORMAT = "h:mm a";
-    private float BAR_MAX_OFFSET = 30;
+    private int SCREEN_WIDTH;
+    private int SCREEN_HEIGHT;
+    private int CONTROL_CENTER_HEIGHT;
+    private int BAR_HEIGHT;
 
     private AbstractServiceConnectionImpl lockServiceConnection;
     //    private AbstractServiceConnectionImpl notificationServiceConnection;
@@ -72,6 +79,16 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     private View controlCenterView;
     private ImageView controlCenterPullBar;
     private RelativeLayout controlCenterTopBar;
+    private View totalDimView;
+    private ControlCenterFragment controlCenterFragment;
+
+    public ControlCenterFragment getControlCenterFragment() {
+        return controlCenterFragment;
+    }
+
+    public void setControlCenterFragment(ControlCenterFragment controlCenterFragment) {
+        this.controlCenterFragment = controlCenterFragment;
+    }
 
     public ImageView getWallpaperView() {
         return wallpaperView;
@@ -85,6 +102,8 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
+//        controlCenterView.getLayoutParams().height;
+//        controlCenterView.getCalculatedHeight();
 
 //        Display display = getWindowManager().getDefaultDisplay();
 //        Point size = new Point();
@@ -163,14 +182,15 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                totalDimView.setBackgroundColor(0xff000000);
                 if (position == 0) {
                     dimView.setAlpha(hasNotifications() ? 1.0f : 1.0f - positionOffset);
-                    barImageView.setTranslationY(-50 * (1.0f - positionOffset));
-                    controlCenterView.setTranslationY(750 + 50 * (1.0f - positionOffset));
+                    barImageView.setTranslationY(-BAR_HEIGHT * (1.0f - positionOffset));
+                    controlCenterView.setY(SCREEN_HEIGHT - BAR_HEIGHT * (positionOffset));
                 } else {
                     dimView.setAlpha(hasNotifications() ? 1.0f : 0.0f);
                     barImageView.setTranslationY(0);
-                    controlCenterView.setTranslationY(750);
+                    controlCenterView.setY(SCREEN_HEIGHT - BAR_HEIGHT);
                 }
             }
 
@@ -221,11 +241,25 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 
         controlCenterView = findViewById(R.id.controlCenterFragment);
         controlCenterView.setBackgroundColor(Color.TRANSPARENT);
-        controlCenterView.setTranslationY(controlCenterView.getLayoutParams().height - 50);
+
+        CONTROL_CENTER_HEIGHT = 940; //controlCenterView.getLayoutParams().height;
+
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        SCREEN_WIDTH = size.x;
+        SCREEN_HEIGHT = size.y;
 
         controlCenterTopBar = (RelativeLayout) controlCenterView.findViewById(R.id.topBar);
+
+        BAR_HEIGHT = controlCenterTopBar.getLayoutParams().height;
+
+        controlCenterView.setY(SCREEN_HEIGHT - BAR_HEIGHT);
+
         controlCenterTopBar.setOnTouchListener(new View.OnTouchListener() {
             float dY;
+            float y;
+            boolean slideUp;
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -233,24 +267,59 @@ public class LockerMainActivity extends FragmentActivity implements Notification
                 switch (event.getActionMasked()) {
 
                     case MotionEvent.ACTION_DOWN: {
-                        controlCenterView.setBackgroundColor(0xffaaaaaa);
-
+                        mViewPager.requestDisallowInterceptTouchEvent(true);
+                        controlCenterView.setBackgroundColor(0xffcccccc);
                         dY = controlCenterView.getY() - event.getRawY();
-                        carrierTextView.setText(String.valueOf(dY));
                         break;
                     }
                     case MotionEvent.ACTION_UP: {
-                        if (dY == 0) {
-                            controlCenterView.setBackgroundColor(0x00ffffff);
-                        }
+                        controlCenterView.animate()
+                                .y(slideUp ? SCREEN_HEIGHT - CONTROL_CENTER_HEIGHT : SCREEN_HEIGHT - BAR_HEIGHT)
+                                .setDuration(100)
+                                .setListener(new Animator.AnimatorListener() {
+                                    @Override
+                                    public void onAnimationStart(Animator animation) {
+
+                                    }
+
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        y = slideUp ? SCREEN_HEIGHT - CONTROL_CENTER_HEIGHT : SCREEN_HEIGHT - BAR_HEIGHT;
+                                        if (y == SCREEN_HEIGHT - BAR_HEIGHT) {
+                                            mViewPager.requestDisallowInterceptTouchEvent(false);
+                                            controlCenterView.setBackgroundColor(0x00ffffff);
+                                        }
+
+                                        float dim = y / SCREEN_HEIGHT;
+                                        totalDimView.setAlpha(1.0f - dim);
+                                    }
+
+                                    @Override
+                                    public void onAnimationCancel(Animator animation) {
+
+                                    }
+
+                                    @Override
+                                    public void onAnimationRepeat(Animator animation) {
+
+                                    }
+                                })
+                                .start();
                         break;
                     }
                     case MotionEvent.ACTION_MOVE: {
-                        carrierTextView.setText(String.valueOf(event.getRawY() + dY));
-                        controlCenterView.animate()
-                                .y(event.getRawY() + dY)
-                                .setDuration(0)
-                                .start();
+                        float newY = event.getRawY() + dY;
+                        slideUp = newY < y;
+                        y = newY;
+                        if (y > SCREEN_HEIGHT - BAR_HEIGHT) {
+                            y = SCREEN_HEIGHT - BAR_HEIGHT;
+                        } else if (y < SCREEN_HEIGHT - CONTROL_CENTER_HEIGHT) {
+                            y = SCREEN_HEIGHT - CONTROL_CENTER_HEIGHT;
+                        }
+                        controlCenterView.setY(y);
+                        float dim = y / SCREEN_HEIGHT;
+                        totalDimView.setAlpha(1.0f - dim);
+
                         break;
                     }
                     default: {
@@ -263,6 +332,10 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         });
 
         controlCenterPullBar = (ImageView) controlCenterView.findViewById(R.id.pullBarImageView);
+
+        totalDimView = findViewById(R.id.totalDim);
+        totalDimView.setBackgroundColor(0x00000000);
+        totalDimView.setAlpha(0);
 
         lockServiceConnection = new
 
@@ -558,8 +631,12 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         }
 
     }
+
+
 //////////////////////////////////////////////////////////////////
+//
 // LockService.Delegate
+//
 //////////////////////////////////////////////////////////////////
 
     @Override
@@ -604,5 +681,41 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         }
     }
 
+    @Override
+    public void onAirplaneModeEnabled() {
+        controlCenterFragment.toggleAirplainModeOn();
+    }
+
+    @Override
+    public void onAirplaneModeDisabled() {
+        controlCenterFragment.toggleAirplainModeOff();
+    }
+
+    @Override
+    public void onWifiEnabled() {
+        controlCenterFragment.toggleWifiOn();
+    }
+
+    @Override
+    public void onWifiDisabled() {
+        controlCenterFragment.toggleWifiOff();
+    }
+
+    @Override
+    public void onBluetoothEnabled() {
+        controlCenterFragment.toggleBluetoothOn();
+    }
+
+    @Override
+    public void onBluetoothDisabled() {
+        controlCenterFragment.toggleBluetoothOff();
+    }
+
+
+//////////////////////////////////////////////////////////////////
+//
+// ControlCenterFragment.Delegate
+//
+//////////////////////////////////////////////////////////////////
 
 }

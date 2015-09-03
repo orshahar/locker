@@ -57,5 +57,6 @@
     <string name="control_center_pull_bar">Control center pull bar</string>
     <string name="control_center_phone">Control center phone</string>
     <string name="control_center_camera">Control center camera</string>
+    <string name="toggle_button">Toggle button</string>
 
 </resources>

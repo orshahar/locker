@@ -187,6 +187,12 @@
 
     </RelativeLayout>
 
+    <View
+        android:id="@+id/totalDim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#00ffffff" />
+
     <ImageView
         android:id="@+id/barImageView"
         android:layout_width="38dp"
@@ -201,7 +207,7 @@
         android:id="@+id/controlCenterFragment"
         android:name="com.yorshahar.locker.fragment.ControlCenterFragment"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true" />
 
 </RelativeLayout>

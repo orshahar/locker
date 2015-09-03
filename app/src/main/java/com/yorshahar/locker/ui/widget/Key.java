@@ -57,7 +57,6 @@ public class Key extends View implements Runnable {
     private Bitmap xferBitmap;
     private Canvas xferCanvas;
     private boolean animating = false;
-    //    private int alpha = 0;
     private int addAmount = 0;
     int viewWidthHalf;
     int viewHeightHalf;
@@ -180,7 +179,6 @@ public class Key extends View implements Runnable {
                 delegate.requestDisallowInterceptTouchEvent(true);
                 delegate.onKeyDown(this);
                 setPressed(true);
-//                alpha = 255;
                 addAmount = MAX_ADD_AMOUNT;
                 invalidate();
                 handled = true;

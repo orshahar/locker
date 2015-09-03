@@ -3,10 +3,12 @@ package com.yorshahar.locker.service;
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.Service;
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.PixelFormat;
+import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
@@ -33,6 +35,18 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
         void onBatteryLevelChanged(int level, int status);
 
         void onSignalStrengthsChanged(int bars);
+
+        void onAirplaneModeEnabled();
+
+        void onAirplaneModeDisabled();
+
+        void onWifiEnabled();
+
+        void onWifiDisabled();
+
+        void onBluetoothEnabled();
+
+        void onBluetoothDisabled();
 
     }
 
@@ -120,6 +134,9 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
         IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
         filter.addAction(Intent.ACTION_SCREEN_OFF);
         filter.addAction(Intent.ACTION_BATTERY_CHANGED);
+        filter.addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED);
+        filter.addAction(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION);
+        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         lockReceiver = new LockReceiver();
         ((LockReceiver) lockReceiver).setDelegate(this);
         registerReceiver(lockReceiver, filter);
@@ -244,7 +261,49 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
         }
     }
 
-//////////////////////////////////////////////////////////////////////
+    @Override
+    public void onAirplaneModeEnabled() {
+        if (delegate != null) {
+            delegate.onAirplaneModeEnabled();
+        }
+    }
+
+    @Override
+    public void onAirplaneModeDisabled() {
+        if (delegate != null) {
+            delegate.onAirplaneModeDisabled();
+        }
+    }
+
+    @Override
+    public void onWifiEnabled() {
+        if (delegate != null) {
+            delegate.onWifiEnabled();
+        }
+    }
+
+    @Override
+    public void onWifiDisabled() {
+        if (delegate != null) {
+            delegate.onWifiDisabled();
+        }
+    }
+
+    @Override
+    public void onBluetoothEnabled() {
+        if (delegate != null) {
+            delegate.onBluetoothEnabled();
+        }
+    }
+
+    @Override
+    public void onBluetoothDisabled() {
+        if (delegate != null) {
+            delegate.onBluetoothDisabled();
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////////
 // TimeReceiver.Delegate
 //////////////////////////////////////////////////////////////////////
 
