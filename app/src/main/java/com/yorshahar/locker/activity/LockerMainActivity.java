@@ -39,6 +39,7 @@ import com.yorshahar.locker.model.notification.Notification;
 import com.yorshahar.locker.service.LockService;
 import com.yorshahar.locker.service.NotificationService;
 import com.yorshahar.locker.service.connection.AbstractServiceConnectionImpl;
+import com.yorshahar.locker.ui.widget.FreezableViewPager;
 import com.yorshahar.locker.util.BlurUtil;
 
 import java.text.DateFormat;
@@ -67,7 +68,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     private Animation chargeAnimation;
     private ImageView wallpaperView;
     private ImageView dimView;
-    private ViewPager mViewPager;
+    private FreezableViewPager mViewPager;
     private SectionsPagerAdapter pagerAdapter;
     private TextView batteryLevelTextView;
     private TextView carrierTextView;
@@ -174,7 +175,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         pagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager = (FreezableViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(pagerAdapter);
 
         // Display the lock screen fragment by default
@@ -267,7 +268,8 @@ public class LockerMainActivity extends FragmentActivity implements Notification
                 switch (event.getActionMasked()) {
 
                     case MotionEvent.ACTION_DOWN: {
-                        mViewPager.requestDisallowInterceptTouchEvent(true);
+                        mViewPager.freeze();
+
                         controlCenterView.setBackgroundColor(0xffcccccc);
                         dY = controlCenterView.getY() - event.getRawY();
                         break;
@@ -286,7 +288,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
                                     public void onAnimationEnd(Animator animation) {
                                         y = slideUp ? SCREEN_HEIGHT - CONTROL_CENTER_HEIGHT : SCREEN_HEIGHT - BAR_HEIGHT;
                                         if (y == SCREEN_HEIGHT - BAR_HEIGHT) {
-                                            mViewPager.requestDisallowInterceptTouchEvent(false);
+                                            mViewPager.unfreeze();
                                             controlCenterView.setBackgroundColor(0x00ffffff);
                                         }
 
