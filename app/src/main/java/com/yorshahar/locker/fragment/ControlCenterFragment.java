@@ -63,11 +63,6 @@ public class ControlCenterFragment extends Fragment implements ToggleButtonView.
     private ToggleButtonView nightToggleButton;
     private ToggleButtonView rotationLockToggleButton;
 
-    private AppLauncherView flashlightAppLauncher;
-    private AppLauncherView timeAppLauncher;
-    private AppLauncherView calculatorAppLauncher;
-    private AppLauncherView cameraAppLauncher;
-
     private Camera cam;
     private Camera.Parameters cameraParameters;
 
@@ -120,16 +115,16 @@ public class ControlCenterFragment extends Fragment implements ToggleButtonView.
         rotationLockToggleButton = (ToggleButtonView) view.findViewById(R.id.rotationLockToggleButton);
         rotationLockToggleButton.setDelegate(this);
 
-        flashlightAppLauncher = (AppLauncherView) view.findViewById(R.id.flashlightAppLauncherView);
+        AppLauncherView flashlightAppLauncher = (AppLauncherView) view.findViewById(R.id.flashlightAppLauncherView);
         flashlightAppLauncher.setDelegate(this);
 
-        timeAppLauncher = (AppLauncherView) view.findViewById(R.id.timeAppLauncherView);
+        AppLauncherView timeAppLauncher = (AppLauncherView) view.findViewById(R.id.timeAppLauncherView);
         timeAppLauncher.setDelegate(this);
 
-        calculatorAppLauncher = (AppLauncherView) view.findViewById(R.id.calculatorAppLauncherView);
+        AppLauncherView calculatorAppLauncher = (AppLauncherView) view.findViewById(R.id.calculatorAppLauncherView);
         calculatorAppLauncher.setDelegate(this);
 
-        cameraAppLauncher = (AppLauncherView) view.findViewById(R.id.cameraAppLauncherView);
+        AppLauncherView cameraAppLauncher = (AppLauncherView) view.findViewById(R.id.cameraAppLauncherView);
         cameraAppLauncher.setDelegate(this);
 
         return view;
