@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.yorshahar.locker.R;
@@ -35,6 +36,8 @@ public class ControlCenterFragment extends Fragment implements ToggleButtonView.
         void onToggleButtonStateChanged(ToggleButtonType toggleButtonType, ToggleButtonView.State state);
 
         void onAppLauncherStateChanged(AppLauncher appLauncherType, AppLauncherView.State state);
+
+        void onScreenBrightnessChanged(int brightness);
 
     }
 
@@ -56,6 +59,8 @@ public class ControlCenterFragment extends Fragment implements ToggleButtonView.
     private Delegate delegate;
     private WifiManager wifiManager;
     BluetoothAdapter bluetoothAdapter;
+    private Camera cam;
+    private Camera.Parameters cameraParameters;
 
     private ToggleButtonView airplaneToggleButton;
     private ToggleButtonView wifiToggleButton;
@@ -63,8 +68,7 @@ public class ControlCenterFragment extends Fragment implements ToggleButtonView.
     private ToggleButtonView nightToggleButton;
     private ToggleButtonView rotationLockToggleButton;
 
-    private Camera cam;
-    private Camera.Parameters cameraParameters;
+    private SeekBar brightnessSlider;
 
     public Delegate getDelegate() {
         return delegate;
@@ -127,6 +131,29 @@ public class ControlCenterFragment extends Fragment implements ToggleButtonView.
         AppLauncherView cameraAppLauncher = (AppLauncherView) view.findViewById(R.id.cameraAppLauncherView);
         cameraAppLauncher.setDelegate(this);
 
+        brightnessSlider = (SeekBar) view.findViewById(R.id.brightnessSlider);
+        try {
+            int brightness = Settings.System.getInt(getActivity().getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
+            brightnessSlider.setProgress(brightness - 20);
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+        }
+        brightnessSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                changeBrightness(progress + 20);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
         return view;
     }
 
@@ -263,6 +290,28 @@ public class ControlCenterFragment extends Fragment implements ToggleButtonView.
         bluethoothToggleButton.turnOff();
     }
 
+    public void changeBrightness(int brightness) {
+        Settings.System.putInt(getActivity().getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, brightness);
+
+//        WindowManager.LayoutParams lp = getActivity().getWindow().getAttributes();
+//        lp.screenBrightness = brightness / 256.0f;
+//        getActivity().getWindow().setAttributes(lp);
+
+        if (delegate != null) {
+            delegate.onScreenBrightnessChanged(brightness);
+        }
+
+//        ((LockerMainActivity) getActivity()).onScreenBrightnessChanged(brightness);
+    }
+
+    public void updateBrightnessView() {
+        try {
+            int brightness = Settings.System.getInt(getActivity().getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
+            brightnessSlider.setProgress(brightness - 20);
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void onAppLauncherStateChanges(AppLauncherView launcher, AppLauncherView.State state) {

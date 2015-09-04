@@ -720,4 +720,8 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 //
 //////////////////////////////////////////////////////////////////
 
+    public void onScreenBrightnessChanged(int brightness) {
+        lockService.onScreenBrightnessChanged(brightness);
+    }
+
 }

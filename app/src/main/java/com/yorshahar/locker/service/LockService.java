@@ -365,4 +365,8 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
     }
 
 
+    public void onScreenBrightnessChanged(int brightness) {
+    }
+
+
 }
