@@ -15,6 +15,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -58,7 +59,7 @@ public class ControlCenterFragment extends Fragment implements ToggleButtonView.
 
     private Delegate delegate;
     private WifiManager wifiManager;
-    BluetoothAdapter bluetoothAdapter;
+    private BluetoothAdapter bluetoothAdapter;
     private Camera cam;
     private Camera.Parameters cameraParameters;
 

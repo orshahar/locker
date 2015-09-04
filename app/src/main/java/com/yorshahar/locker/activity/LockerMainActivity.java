@@ -52,6 +52,9 @@ import java.util.Locale;
 public class LockerMainActivity extends FragmentActivity implements NotificationService.Delegate, LockService.Delegate {
 
     private static final String STATUS_BAR_TIME_FORMAT = "h:mm a";
+    private static final int CONTROL_CENTER_COLOR_ON = 0xffcccccc;
+    private static final int CONTROL_CENTER_COLOR_OFF = 0x00ffffff;
+
     private int SCREEN_WIDTH;
     private int SCREEN_HEIGHT;
     private int CONTROL_CENTER_HEIGHT;
@@ -241,7 +244,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         barImageView = (ImageView) findViewById(R.id.barImageView);
 
         controlCenterView = findViewById(R.id.controlCenterFragment);
-        controlCenterView.setBackgroundColor(Color.TRANSPARENT);
+        controlCenterView.setBackgroundColor(CONTROL_CENTER_COLOR_OFF);
 
         CONTROL_CENTER_HEIGHT = 940; //controlCenterView.getLayoutParams().height;
 
@@ -270,14 +273,14 @@ public class LockerMainActivity extends FragmentActivity implements Notification
                     case MotionEvent.ACTION_DOWN: {
                         mViewPager.freeze();
 
-                        controlCenterView.setBackgroundColor(0xffcccccc);
+                        controlCenterView.setBackgroundColor(CONTROL_CENTER_COLOR_ON);
                         dY = controlCenterView.getY() - event.getRawY();
                         break;
                     }
                     case MotionEvent.ACTION_UP: {
                         controlCenterView.animate()
                                 .y(slideUp ? SCREEN_HEIGHT - CONTROL_CENTER_HEIGHT : SCREEN_HEIGHT - BAR_HEIGHT)
-                                .setDuration(100)
+                                .setDuration(150)
                                 .setListener(new Animator.AnimatorListener() {
                                     @Override
                                     public void onAnimationStart(Animator animation) {
@@ -289,7 +292,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
                                         y = slideUp ? SCREEN_HEIGHT - CONTROL_CENTER_HEIGHT : SCREEN_HEIGHT - BAR_HEIGHT;
                                         if (y == SCREEN_HEIGHT - BAR_HEIGHT) {
                                             mViewPager.unfreeze();
-                                            controlCenterView.setBackgroundColor(0x00ffffff);
+                                            controlCenterView.setBackgroundColor(CONTROL_CENTER_COLOR_OFF);
                                         }
 
                                         float dim = y / SCREEN_HEIGHT;
