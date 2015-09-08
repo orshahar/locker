@@ -5,7 +5,6 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.LightingColorFilter;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -53,9 +52,6 @@ public class Key extends View implements Runnable {
     private Paint fillPaint;
     private Paint textPaint;
     private Rect bounds = new Rect();
-    //    private Paint transparentPaint;
-    private Bitmap xferBitmap;
-    private Canvas xferCanvas;
     private boolean animating = false;
     private int addAmount = 0;
     int viewWidthHalf;
@@ -84,7 +80,6 @@ public class Key extends View implements Runnable {
             fillPaint.setColor(Color.argb(255, MAX_ADD_AMOUNT, MAX_ADD_AMOUNT, MAX_ADD_AMOUNT));
             fillPaint.setStyle(Paint.Style.FILL);
             fillPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.ADD));
-//            fillPaint.setMaskFilter(new BlurMaskFilter(20, BlurMaskFilter.Blur.INNER));
 
             textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             textPaint.setTextSize(70f);
@@ -92,11 +87,6 @@ public class Key extends View implements Runnable {
             textPaint.getTextBounds(value, 0, value.length(), bounds);
             textPaint.setTypeface(typeface);
             textPaint.setColor(Color.WHITE);
-
-
-            // Generate bitmap used for background
-//            xferBitmap = delegate.getWallpaper();
-//            xferBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.wallpaper_iphone_stars);
         } finally {
             a.recycle();
         }
@@ -126,17 +116,6 @@ public class Key extends View implements Runnable {
         final int width = getMeasuredWidth();
         final int height = getMeasuredHeight();
 
-//        if (xferBitmap == null || xferBitmap.getWidth() != width
-//                || xferBitmap.getHeight() != height) {
-//
-//            if (xferBitmap != null) {
-//                xferBitmap.recycle();
-//            }
-//
-//            xferBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-//            xferCanvas = new Canvas(xferBitmap);
-//        }
-
         viewWidthHalf = width / 2;
         viewHeightHalf = height / 2;
         radius = (viewWidthHalf > viewHeightHalf) ? viewHeightHalf - 15 : viewWidthHalf - 20;
@@ -146,32 +125,22 @@ public class Key extends View implements Runnable {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        // Generate bitmap used for background
-//        Bitmap bm = delegate.getWallpaper();
-//        temp.drawBitmap(bm, 0, 0, transparentPaint);
-//        canvas.setBitmap(bm);
-
         // Draw the outer circle
         canvas.drawCircle(viewWidthHalf, viewHeightHalf, radius, outlinePaint);
 
         // Draw the circle filling
-//        fillPaint.setAlpha(alpha);
         fillPaint.setColor(Color.argb(255, addAmount, addAmount, addAmount));
         canvas.drawCircle(viewWidthHalf, viewHeightHalf, radius - CIRCLE_SKROKE_WIDTH / 2, fillPaint);
 
         // Draw the text
         canvas.drawText(value, viewWidthHalf - bounds.centerX(), viewHeightHalf - bounds.centerY(), textPaint);
 
-//        canvas.drawBitmap(xferBitmap, 0, 0, null);
-
         // Invalidate view at about 62fps
-        postDelayed(this, 8);
+        postDelayed(this, 16);
     }
 
     @Override
     public boolean onTouchEvent(@NonNull MotionEvent event) {
-//        return super.onTouchEvent(event);
-
         boolean handled = false;
 
         switch (event.getAction()) {
@@ -229,13 +198,7 @@ public class Key extends View implements Runnable {
     @Override
     public void run() {
         if (animating) {
-//            alpha -= 20;
-//            if (alpha < 0) {
-//                alpha = 0;
-//                animating = false;
-//                delegate.onAnimationEnded(this);
-//            }
-            addAmount -= 5;
+            addAmount -= 15;
             if (addAmount < 0) {
                 addAmount = 0;
                 animating = false;
