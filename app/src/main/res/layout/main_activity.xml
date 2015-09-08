@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:contentDescription="@string/background"
-        android:src="@drawable/iphone_wallpaper" />
+        android:src="@drawable/wallpaper_iphone_stars" />
 
     <ImageView
         android:id="@+id/dimView"

@@ -96,7 +96,7 @@ public class Key extends View implements Runnable {
 
             // Generate bitmap used for background
 //            xferBitmap = delegate.getWallpaper();
-//            xferBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.iphone_wallpaper);
+//            xferBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.wallpaper_iphone_stars);
         } finally {
             a.recycle();
         }

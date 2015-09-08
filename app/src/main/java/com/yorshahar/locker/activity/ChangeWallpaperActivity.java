@@ -176,16 +176,16 @@ public class ChangeWallpaperActivity extends FragmentActivity implements View.On
         public Fragment getItem(int position) {
             switch (position) {
                 case 0: {
-                    return MyWallpapersFragment.newInstance(R.drawable.iphone_wallpaper);
+                    return MyWallpapersFragment.newInstance(R.drawable.wallpaper_iphone_stars);
                 }
                 case 1: {
                     return MyWallpapersFragment.newInstance(R.drawable.wallpaper_bambook);
                 }
                 case 2: {
-                    return MyWallpapersFragment.newInstance(R.drawable.iphone_wallpaper);
+                    return MyWallpapersFragment.newInstance(R.drawable.wallpaper_iphone_stars);
                 }
                 default: {
-                    return MyWallpapersFragment.newInstance(R.drawable.iphone_wallpaper);
+                    return MyWallpapersFragment.newInstance(R.drawable.wallpaper_iphone_stars);
                 }
             }
         }
