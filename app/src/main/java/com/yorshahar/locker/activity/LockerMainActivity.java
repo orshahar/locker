@@ -89,6 +89,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     private ImageView controlCenterBackground;
     private ImageView controlCenterGlass;
     private ImageView controlCenterPullBar;
+    private ImageView controlCenterPullBarDark;
     private ImageView controlCenterPullBarDown;
     private RelativeLayout controlCenterTopBar;
     private View totalDimView;
@@ -312,10 +313,12 @@ public class LockerMainActivity extends FragmentActivity implements Notification
                                             controlCenterBackground.setVisibility(View.INVISIBLE);
                                             controlCenterGlass.setVisibility(View.INVISIBLE);
 
-//                                            controlCenterPullBar.setVisibility(View.VISIBLE);
-//                                            controlCenterPullBarDown.setVisibility(View.INVISIBLE);
+                                            controlCenterPullBar.setVisibility(View.VISIBLE);
+                                            controlCenterPullBarDark.setVisibility(View.INVISIBLE);
+                                            controlCenterPullBarDown.setVisibility(View.INVISIBLE);
                                         } else {
                                             controlCenterPullBar.setVisibility(View.INVISIBLE);
+                                            controlCenterPullBarDark.setVisibility(View.INVISIBLE);
                                             controlCenterPullBarDown.setVisibility(View.VISIBLE);
 
                                         }
@@ -339,7 +342,8 @@ public class LockerMainActivity extends FragmentActivity implements Notification
                         break;
                     }
                     case MotionEvent.ACTION_MOVE: {
-                        controlCenterPullBar.setVisibility(View.VISIBLE);
+                        controlCenterPullBar.setVisibility(View.INVISIBLE);
+                        controlCenterPullBarDark.setVisibility(View.VISIBLE);
                         controlCenterPullBarDown.setVisibility(View.INVISIBLE);
 
                         float newY = event.getRawY() + dY;
@@ -367,6 +371,9 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 
         controlCenterPullBar = (ImageView) controlCenterView.findViewById(R.id.pullBarImageView);
         controlCenterPullBar.setVisibility(View.VISIBLE);
+
+        controlCenterPullBarDark = (ImageView) controlCenterView.findViewById(R.id.pullBarDarkImageView);
+        controlCenterPullBarDark.setVisibility(View.INVISIBLE);
 
         controlCenterPullBarDown = (ImageView) controlCenterView.findViewById(R.id.pullBarDownImageView);
         controlCenterPullBarDown.setVisibility(View.INVISIBLE);

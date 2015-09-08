@@ -32,13 +32,22 @@
             android:src="@drawable/bar" />
 
         <ImageView
+            android:id="@+id/pullBarDarkImageView"
+            android:layout_width="38dp"
+            android:layout_height="8dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:contentDescription="@string/control_center_pull_bar"
+            android:src="@drawable/bar_dark" />
+
+        <ImageView
             android:id="@+id/pullBarDownImageView"
             android:layout_width="38dp"
             android:layout_height="12dp"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:contentDescription="@string/control_center_pull_bar"
-            android:src="@drawable/bar_down" />
+            android:src="@drawable/bar_dark_down" />
 
     </RelativeLayout>
 
