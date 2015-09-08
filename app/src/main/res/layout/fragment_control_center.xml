@@ -31,6 +31,15 @@
             android:contentDescription="@string/control_center_pull_bar"
             android:src="@drawable/bar" />
 
+        <ImageView
+            android:id="@+id/pullBarDownImageView"
+            android:layout_width="38dp"
+            android:layout_height="12dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:contentDescription="@string/control_center_pull_bar"
+            android:src="@drawable/bar_down" />
+
     </RelativeLayout>
 
     <LinearLayout
@@ -208,7 +217,7 @@
                     android:id="@+id/volumeLowImageView"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/volume_lowest" />
+                    android:src="@drawable/cp_volumn_low_ios" />
 
                 <SeekBar
                     android:id="@+id/volumeSlider"
@@ -225,7 +234,7 @@
                     android:id="@+id/volumeHighImageView"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/volume_highest" />
+                    android:src="@drawable/cp_volumn_high_ios" />
             </LinearLayout>
 
 
@@ -261,8 +270,7 @@
                 android:layout_width="62dp"
                 android:layout_height="62dp"
                 android:layout_marginRight="10dp"
-                android:padding="8dp"
-                android:src="@drawable/flashlight2" />
+                android:src="@drawable/square_light" />
 
             <com.yorshahar.locker.ui.widget.AppLauncherView
                 android:id="@+id/timeAppLauncherView"
@@ -270,8 +278,7 @@
                 android:layout_height="62dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:padding="15dp"
-                android:src="@drawable/time" />
+                android:src="@drawable/square_clock" />
 
             <com.yorshahar.locker.ui.widget.AppLauncherView
                 android:id="@+id/calculatorAppLauncherView"
@@ -279,16 +286,14 @@
                 android:layout_height="62dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:padding="13dp"
-                android:src="@drawable/calculator" />
+                android:src="@drawable/square_cal" />
 
             <com.yorshahar.locker.ui.widget.AppLauncherView
                 android:id="@+id/cameraAppLauncherView"
                 android:layout_width="62dp"
                 android:layout_height="62dp"
                 android:layout_marginLeft="10dp"
-                android:padding="13dp"
-                android:src="@drawable/camera" />
+                android:src="@drawable/square_camera" />
 
         </LinearLayout>
 

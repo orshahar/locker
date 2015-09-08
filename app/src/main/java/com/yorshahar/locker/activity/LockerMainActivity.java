@@ -89,6 +89,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     private ImageView controlCenterBackground;
     private ImageView controlCenterGlass;
     private ImageView controlCenterPullBar;
+    private ImageView controlCenterPullBarDown;
     private RelativeLayout controlCenterTopBar;
     private View totalDimView;
     private ControlCenterFragment controlCenterFragment;
@@ -310,6 +311,13 @@ public class LockerMainActivity extends FragmentActivity implements Notification
                                             mViewPager.unfreeze();
                                             controlCenterBackground.setVisibility(View.INVISIBLE);
                                             controlCenterGlass.setVisibility(View.INVISIBLE);
+
+//                                            controlCenterPullBar.setVisibility(View.VISIBLE);
+//                                            controlCenterPullBarDown.setVisibility(View.INVISIBLE);
+                                        } else {
+                                            controlCenterPullBar.setVisibility(View.INVISIBLE);
+                                            controlCenterPullBarDown.setVisibility(View.VISIBLE);
+
                                         }
 
                                         float dim = y / SCREEN_HEIGHT;
@@ -331,6 +339,9 @@ public class LockerMainActivity extends FragmentActivity implements Notification
                         break;
                     }
                     case MotionEvent.ACTION_MOVE: {
+                        controlCenterPullBar.setVisibility(View.VISIBLE);
+                        controlCenterPullBarDown.setVisibility(View.INVISIBLE);
+
                         float newY = event.getRawY() + dY;
                         slideUp = newY < y;
                         y = newY;
@@ -355,6 +366,11 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         });
 
         controlCenterPullBar = (ImageView) controlCenterView.findViewById(R.id.pullBarImageView);
+        controlCenterPullBar.setVisibility(View.VISIBLE);
+
+        controlCenterPullBarDown = (ImageView) controlCenterView.findViewById(R.id.pullBarDownImageView);
+        controlCenterPullBarDown.setVisibility(View.INVISIBLE);
+
 
         totalDimView = findViewById(R.id.totalDim);
         totalDimView.setBackgroundColor(0x00000000);
