@@ -3,9 +3,6 @@ package com.yorshahar.locker.fragment;
 import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.hardware.Camera;
-import android.hardware.camera2.CameraManager;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,10 +12,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
-import android.widget.Toast;
 
 import com.yorshahar.locker.R;
 import com.yorshahar.locker.activity.LockerMainActivity;
@@ -31,6 +26,14 @@ import com.yorshahar.locker.ui.widget.ToggleButtonView;
  * Created by yorshahar on 8/31/15.
  */
 public class ControlCenterFragment extends Fragment implements ToggleButtonView.Delegate, AppLauncherView.Delegate {
+
+    public void updateAppLauncher(AppLauncher type, AppLauncherView.State state) {
+        switch (type) {
+            case FLASHLIGHT: {
+                flashlightAppLauncher.updateState(state);
+            }
+        }
+    }
 
     public interface Delegate {
 
@@ -60,14 +63,14 @@ public class ControlCenterFragment extends Fragment implements ToggleButtonView.
     private Delegate delegate;
     private WifiManager wifiManager;
     private BluetoothAdapter bluetoothAdapter;
-    private Camera cam;
-    private Camera.Parameters cameraParameters;
 
     private ToggleButtonView airplaneToggleButton;
     private ToggleButtonView wifiToggleButton;
     private ToggleButtonView bluethoothToggleButton;
     private ToggleButtonView nightToggleButton;
     private ToggleButtonView rotationLockToggleButton;
+
+    private AppLauncherView flashlightAppLauncher;
 
     private SeekBar brightnessSlider;
 
@@ -87,17 +90,14 @@ public class ControlCenterFragment extends Fragment implements ToggleButtonView.
 
         wifiManager = (WifiManager) getActivity().getSystemService(Context.WIFI_SERVICE);
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        cam = Camera.open();
-        cameraParameters = cam.getParameters();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
 
-        if (cam != null) {
-            cam.release();
-        }
+        // TODO: release the wifiManger and bluetoothAdapter ?
+
     }
 
     @Nullable
@@ -120,7 +120,7 @@ public class ControlCenterFragment extends Fragment implements ToggleButtonView.
         rotationLockToggleButton = (ToggleButtonView) view.findViewById(R.id.rotationLockToggleButton);
         rotationLockToggleButton.setDelegate(this);
 
-        AppLauncherView flashlightAppLauncher = (AppLauncherView) view.findViewById(R.id.flashlightAppLauncherView);
+        flashlightAppLauncher = (AppLauncherView) view.findViewById(R.id.flashlightAppLauncherView);
         flashlightAppLauncher.setDelegate(this);
 
         AppLauncherView timeAppLauncher = (AppLauncherView) view.findViewById(R.id.timeAppLauncherView);
@@ -214,8 +214,6 @@ public class ControlCenterFragment extends Fragment implements ToggleButtonView.
                 if (delegate != null) {
                     delegate.onToggleButtonStateChanged(ToggleButtonType.BLUETHOOTH, state);
                 }
-
-                //Disable bluetooth
                 if (state == ToggleButtonView.State.ON) {
                     enableBluetooth();
                 } else {
@@ -321,37 +319,11 @@ public class ControlCenterFragment extends Fragment implements ToggleButtonView.
                 if (delegate != null) {
                     delegate.onAppLauncherStateChanged(AppLauncher.FLASHLIGHT, state);
                 }
-                if (state == AppLauncherView.State.ON) {
-                    turnFlashlightOn();
-                } else {
-                    turnFlashlightOff();
-                }
                 break;
             }
-        }
-    }
-
-    private void turnFlashlightOn() {
-        try {
-            if (getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
-                cameraParameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                cam.setParameters(cameraParameters);
+            default: {
+                break;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(getActivity().getBaseContext(), "Exception flashLightOn()", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void turnFlashlightOff() {
-        try {
-            if (getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
-                cameraParameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-                cam.setParameters(cameraParameters);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(getActivity().getBaseContext(), "Exception flashLightOn()", Toast.LENGTH_SHORT).show();
         }
     }
 

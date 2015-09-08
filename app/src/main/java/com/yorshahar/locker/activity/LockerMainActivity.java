@@ -36,10 +36,13 @@ import com.yorshahar.locker.fragment.LockerFragment;
 import com.yorshahar.locker.fragment.PasscodeFragment;
 import com.yorshahar.locker.fragment.SmartFragmentStatePagerAdapter;
 import com.yorshahar.locker.model.notification.Notification;
+import com.yorshahar.locker.receiver.ControlCenterReceiver;
 import com.yorshahar.locker.service.LockService;
 import com.yorshahar.locker.service.NotificationService;
 import com.yorshahar.locker.service.connection.AbstractServiceConnectionImpl;
+import com.yorshahar.locker.ui.widget.AppLauncherView;
 import com.yorshahar.locker.ui.widget.FreezableViewPager;
+import com.yorshahar.locker.ui.widget.ToggleButtonView;
 import com.yorshahar.locker.util.BlurUtil;
 
 import java.text.DateFormat;
@@ -49,11 +52,13 @@ import java.util.List;
 import java.util.Locale;
 
 
-public class LockerMainActivity extends FragmentActivity implements NotificationService.Delegate, LockService.Delegate {
+public class LockerMainActivity extends FragmentActivity implements NotificationService.Delegate, LockService.Delegate, ControlCenterFragment.Delegate, ControlCenterReceiver.Receiver {
 
     private static final String STATUS_BAR_TIME_FORMAT = "h:mm a";
     private static final int CONTROL_CENTER_COLOR_ON = 0xffcccccc;
     private static final int CONTROL_CENTER_COLOR_OFF = 0x00ffffff;
+    private static final int CONTROL_CENTER_MAX_INTENSITY = 50;
+
 
     private int SCREEN_WIDTH;
     private int SCREEN_HEIGHT;
@@ -81,6 +86,8 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     private Bitmap blurredBackground;
     private ImageView[] signalCircles;
     private View controlCenterView;
+    private ImageView controlCenterBackground;
+    private ImageView controlCenterGlass;
     private ImageView controlCenterPullBar;
     private RelativeLayout controlCenterTopBar;
     private View totalDimView;
@@ -92,6 +99,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 
     public void setControlCenterFragment(ControlCenterFragment controlCenterFragment) {
         this.controlCenterFragment = controlCenterFragment;
+        controlCenterFragment.setDelegate(this);
     }
 
     public ImageView getWallpaperView() {
@@ -244,9 +252,16 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         barImageView = (ImageView) findViewById(R.id.barImageView);
 
         controlCenterView = findViewById(R.id.controlCenterFragment);
-        controlCenterView.setBackgroundColor(CONTROL_CENTER_COLOR_OFF);
+        controlCenterView.setBackgroundColor(Color.TRANSPARENT);
 
-        CONTROL_CENTER_HEIGHT = 940; //controlCenterView.getLayoutParams().height;
+        controlCenterBackground = (ImageView) controlCenterView.findViewById(R.id.background);
+        controlCenterBackground.setBackground(new BitmapDrawable(getResources(), blurredBackground));
+        controlCenterBackground.setVisibility(View.INVISIBLE);
+
+        controlCenterGlass = (ImageView) controlCenterView.findViewById(R.id.glassImageView);
+        controlCenterGlass.setVisibility(View.INVISIBLE);
+
+        CONTROL_CENTER_HEIGHT = 840; //controlCenterView.getLayoutParams().height;
 
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
@@ -272,15 +287,15 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 
                     case MotionEvent.ACTION_DOWN: {
                         mViewPager.freeze();
-
-                        controlCenterView.setBackgroundColor(CONTROL_CENTER_COLOR_ON);
+                        controlCenterBackground.setVisibility(View.VISIBLE);
+                        controlCenterGlass.setVisibility(View.VISIBLE);
                         dY = controlCenterView.getY() - event.getRawY();
                         break;
                     }
                     case MotionEvent.ACTION_UP: {
                         controlCenterView.animate()
                                 .y(slideUp ? SCREEN_HEIGHT - CONTROL_CENTER_HEIGHT : SCREEN_HEIGHT - BAR_HEIGHT)
-                                .setDuration(150)
+                                .setDuration(100)
                                 .setListener(new Animator.AnimatorListener() {
                                     @Override
                                     public void onAnimationStart(Animator animation) {
@@ -290,13 +305,16 @@ public class LockerMainActivity extends FragmentActivity implements Notification
                                     @Override
                                     public void onAnimationEnd(Animator animation) {
                                         y = slideUp ? SCREEN_HEIGHT - CONTROL_CENTER_HEIGHT : SCREEN_HEIGHT - BAR_HEIGHT;
+
                                         if (y == SCREEN_HEIGHT - BAR_HEIGHT) {
                                             mViewPager.unfreeze();
-                                            controlCenterView.setBackgroundColor(CONTROL_CENTER_COLOR_OFF);
+                                            controlCenterBackground.setVisibility(View.INVISIBLE);
+                                            controlCenterGlass.setVisibility(View.INVISIBLE);
                                         }
 
                                         float dim = y / SCREEN_HEIGHT;
                                         totalDimView.setAlpha(1.0f - dim);
+                                        controlCenterBackground.setTranslationY(-y);
                                     }
 
                                     @Override
@@ -324,7 +342,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
                         controlCenterView.setY(y);
                         float dim = y / SCREEN_HEIGHT;
                         totalDimView.setAlpha(1.0f - dim);
-
+                        controlCenterBackground.setTranslationY(-y);
                         break;
                     }
                     default: {
@@ -716,6 +734,15 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         controlCenterFragment.toggleBluetoothOff();
     }
 
+    @Override
+    public void onFlashlightTurnedOn() {
+        controlCenterFragment.updateAppLauncher(ControlCenterFragment.AppLauncher.FLASHLIGHT, AppLauncherView.State.ON);
+    }
+
+    @Override
+    public void onFlashlightTurnedOff() {
+        controlCenterFragment.updateAppLauncher(ControlCenterFragment.AppLauncher.FLASHLIGHT, AppLauncherView.State.OFF);
+    }
 
 //////////////////////////////////////////////////////////////////
 //
@@ -723,8 +750,78 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 //
 //////////////////////////////////////////////////////////////////
 
+    @Override
+    public void onToggleButtonStateChanged(ControlCenterFragment.ToggleButtonType toggleButtonType, ToggleButtonView.State state) {
+
+    }
+
+    @Override
+    public void onAppLauncherStateChanged(ControlCenterFragment.AppLauncher appLauncherType, AppLauncherView.State state) {
+        switch (appLauncherType) {
+            case FLASHLIGHT: {
+                switch (state) {
+                    case ON: {
+//                        final ControlCenterReceiver controlCenterReceiver = new ControlCenterReceiver(new Handler());
+//                        controlCenterReceiver.setReceiver(this);
+//
+//                        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ControlCenterService.class);
+//                        intent.putExtra("receiver", controlCenterReceiver);
+//                        intent.putExtra("turnOn", true);
+//
+//                        startService(intent);
+
+                        lockService.turnFlashlightOn();
+//                        controlCenterFragment.updateAppLauncher(ControlCenterFragment.AppLauncher.FLASHLIGHT, AppLauncherView.State.ON);
+
+                        break;
+                    }
+                    case OFF: {
+//                        final ControlCenterReceiver controlCenterReceiver = new ControlCenterReceiver(new Handler());
+//                        controlCenterReceiver.setReceiver(this);
+//                        controlCenterReceiver.setCamera(camera);
+//
+//                        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ControlCenterService.class);
+//                        intent.putExtra("receiver", controlCenterReceiver);
+//                        intent.putExtra("turnOn", false);
+//
+//                        startService(intent);
+
+                        lockService.turnFlashlightOff();
+//                        controlCenterFragment.updateAppLauncher(ControlCenterFragment.AppLauncher.FLASHLIGHT, AppLauncherView.State.OFF);
+
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+    }
+
+    @Override
     public void onScreenBrightnessChanged(int brightness) {
         lockService.onScreenBrightnessChanged(brightness);
     }
+
+//////////////////////////////////////////////////////////////////
+//
+// ControlCenterReceiver.Receiver
+//
+//////////////////////////////////////////////////////////////////
+
+//    @Override
+//    public void onFlashlightTurnedOn() {
+//        controlCenterFragment.updateAppLauncher(ControlCenterFragment.AppLauncher.FLASHLIGHT, AppLauncherView.State.ON);
+//    }
+//
+//    @Override
+//    public void onFlashlightTurnedOff() {
+//        controlCenterFragment.updateAppLauncher(ControlCenterFragment.AppLauncher.FLASHLIGHT, AppLauncherView.State.OFF);
+//    }
 
 }

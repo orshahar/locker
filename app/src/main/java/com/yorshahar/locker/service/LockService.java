@@ -7,7 +7,9 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.PixelFormat;
+import android.hardware.Camera;
 import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.Build;
@@ -21,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.yorshahar.locker.R;
 import com.yorshahar.locker.activity.LockerMainActivity;
@@ -48,6 +51,10 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
 
         void onBluetoothDisabled();
 
+        void onFlashlightTurnedOn();
+
+        void onFlashlightTurnedOff();
+
     }
 
     private Delegate delegate;
@@ -58,6 +65,9 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
     private LockerMainActivity activity;
     private final IBinder myBinder = new MyLocalBinder();
     boolean preventLock = false;
+    private Camera cam;
+    private Camera.Parameters cameraParameters;
+
 
     private RelativeLayout lockerView;
     private WindowManager.LayoutParams params;
@@ -213,6 +223,11 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
             windowManager.removeView(lockerView);
         }
 
+        if (cam != null) {
+            cam.release();
+            cam = null;
+        }
+
         unregisterReceiver(lockReceiver);
         unregisterReceiver(bootReceiver);
         unregisterReceiver(timeReceiver);
@@ -240,6 +255,11 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
                     int a = 2;
                 }
             }
+
+            if (cam == null) {
+                cam = Camera.open();
+            }
+            cameraParameters = cam.getParameters();
         }
     }
 
@@ -251,6 +271,11 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
             } catch (Exception e) {
                 int a = 2;
             }
+        }
+
+        if (cam != null) {
+            cam.release();
+            cam = null;
         }
     }
 
@@ -368,5 +393,31 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
     public void onScreenBrightnessChanged(int brightness) {
     }
 
+
+    public void turnFlashlightOn() {
+        try {
+            if (getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
+                cameraParameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                cam.setParameters(cameraParameters);
+                delegate.onFlashlightTurnedOn();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(getActivity().getBaseContext(), "Exception flashLightOn()", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void turnFlashlightOff() {
+        try {
+            if (getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
+                cameraParameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                cam.setParameters(cameraParameters);
+                delegate.onFlashlightTurnedOff();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(getActivity().getBaseContext(), "Exception flashLightOn()", Toast.LENGTH_SHORT).show();
+        }
+    }
 
 }

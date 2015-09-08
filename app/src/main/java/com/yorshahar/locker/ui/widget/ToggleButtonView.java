@@ -27,8 +27,7 @@ public class ToggleButtonView extends ImageView implements View.OnClickListener 
 
     }
 
-    private static final int MULTIPLY_AMOUNT = 50;
-    private static final int COLOR_OFF = 0xffbbbbbb;
+    private static final int COLOR_OFF = 0x11000000;
     private static final int COLOR_ON = 0xffffffff;
 
 
@@ -63,7 +62,6 @@ public class ToggleButtonView extends ImageView implements View.OnClickListener 
     public void turnOn() {
         state = State.ON;
         paint.setColor(COLOR_ON);
-//            paint.setXfermode(null);
         if (delegate != null) {
             delegate.onToggleButtonStateChanges(this, state);
         }
@@ -77,7 +75,6 @@ public class ToggleButtonView extends ImageView implements View.OnClickListener 
     public void turnOff() {
         state = State.OFF;
         paint.setColor(COLOR_OFF);
-//            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.MULTIPLY));
         if (delegate != null) {
             delegate.onToggleButtonStateChanges(this, state);
         }
