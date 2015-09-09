@@ -152,11 +152,11 @@
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
                     android:max="256"
-                    android:maxHeight="3dp"
-                    android:minHeight="3dp"
                     android:progress="128"
+                    android:progressDrawable="@drawable/slider"
                     android:thumb="@android:drawable/radiobutton_off_background"
-                    android:thumbOffset="10dp" />
+                    android:thumbOffset="10dp"
+                    android:maxHeight="2.5dp" />
 
                 <ImageView
                     android:id="@+id/brightnessHighImageView"
@@ -235,8 +235,9 @@
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
                     android:max="100"
-                    android:maxHeight="3dp"
+                    android:maxHeight="2.5dp"
                     android:progress="50"
+                    android:progressDrawable="@drawable/slider"
                     android:thumb="@android:drawable/radiobutton_off_background" />
 
                 <ImageView
