@@ -140,7 +140,7 @@ public class LockerFragment extends Fragment {
                         }
 
                         if (tempPosition != ListView.INVALID_POSITION) {
-                            final View notificationItem = notificationsListView.getChildAt(tempPosition);
+                            final View notificationItem = notificationsListView.getChildAt(tempPosition).findViewById(R.id.contentView);
 
                             final boolean delete = slideLeft && x < -REL_SWIPE_MIN_DISTANCE;
 
@@ -189,7 +189,7 @@ public class LockerFragment extends Fragment {
                     }
                     case MotionEvent.ACTION_MOVE: {
                         if (tempPosition != ListView.INVALID_POSITION) {
-                            View itemView = notificationsListView.getChildAt(tempPosition);
+                            View itemView = notificationsListView.getChildAt(tempPosition).findViewById(R.id.contentView);
 
 
                             float newX = event.getRawX() + dX;

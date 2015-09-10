@@ -69,6 +69,20 @@ public class NotificationListAdapter extends ArrayAdapter<Notification> {
         ImageView iconImageView = (ImageView) item.findViewById(R.id.icon);
         iconImageView.setImageDrawable(notification.getIcon());
 
+        View topBorder = item.findViewById(R.id.topBorder);
+        topBorder.setVisibility(View.GONE);
+
+        View bottomBorder = item.findViewById(R.id.bottomBorder);
+        bottomBorder.setVisibility(View.GONE);
+
+        if (position == 0) {
+            topBorder.setVisibility(View.VISIBLE);
+        }
+
+        if (position == getCount() - 1) {
+            bottomBorder.setVisibility(View.VISIBLE);
+        }
+
         item.setTag(position);
 
         return item;
