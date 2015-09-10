@@ -174,8 +174,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:orientation="vertical"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="10dp"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/trackNameTextView"
@@ -285,7 +285,7 @@
                 android:layout_width="62dp"
                 android:layout_height="62dp"
                 android:layout_marginRight="10dp"
-                android:src="@drawable/square_light" />
+                android:src="@drawable/cc_flashlight" />
 
             <com.yorshahar.locker.ui.widget.AppLauncherView
                 android:id="@+id/timeAppLauncherView"
@@ -293,7 +293,7 @@
                 android:layout_height="62dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:src="@drawable/square_clock" />
+                android:src="@drawable/cc_clock" />
 
             <com.yorshahar.locker.ui.widget.AppLauncherView
                 android:id="@+id/calculatorAppLauncherView"
@@ -301,14 +301,14 @@
                 android:layout_height="62dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:src="@drawable/square_cal" />
+                android:src="@drawable/cc_calculator" />
 
             <com.yorshahar.locker.ui.widget.AppLauncherView
                 android:id="@+id/cameraAppLauncherView"
                 android:layout_width="62dp"
                 android:layout_height="62dp"
                 android:layout_marginLeft="10dp"
-                android:src="@drawable/square_camera" />
+                android:src="@drawable/cc_camera" />
 
         </LinearLayout>
 
