@@ -136,6 +136,22 @@
             android:src="@drawable/wifi_3" />
 
         <TextView
+            android:id="@+id/dataSpeedTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="false"
+            android:layout_alignParentTop="false"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/carrierTextView"
+            android:layout_toRightOf="@+id/carrierTextView"
+            android:gravity="center_vertical"
+            android:text="@string/data_LTE"
+            android:textSize="14sp"
+            tools:ignore="RelativeOverlap" />
+
+        <TextView
             android:id="@+id/batteryLevelTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

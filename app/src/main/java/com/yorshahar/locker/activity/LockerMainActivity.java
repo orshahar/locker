@@ -37,8 +37,8 @@ import com.yorshahar.locker.fragment.LockerFragment;
 import com.yorshahar.locker.fragment.PasscodeFragment;
 import com.yorshahar.locker.fragment.SmartFragmentStatePagerAdapter;
 import com.yorshahar.locker.model.notification.Notification;
-import com.yorshahar.locker.receiver.ControlCenterReceiver;
-import com.yorshahar.locker.service.ControlCenterService;
+import com.yorshahar.locker.receiver.ConnectivityReceiver;
+import com.yorshahar.locker.service.ConnectivityService;
 import com.yorshahar.locker.service.LockService;
 import com.yorshahar.locker.service.NotificationService;
 import com.yorshahar.locker.service.connection.AbstractServiceConnectionImpl;
@@ -54,7 +54,7 @@ import java.util.List;
 import java.util.Locale;
 
 
-public class LockerMainActivity extends FragmentActivity implements NotificationService.Delegate, LockService.Delegate, ControlCenterFragment.Delegate, ControlCenterReceiver.Receiver {
+public class LockerMainActivity extends FragmentActivity implements NotificationService.Delegate, LockService.Delegate, ControlCenterFragment.Delegate, ConnectivityReceiver.Receiver {
 
     private static final String STATUS_BAR_TIME_FORMAT = "h:mm a";
     private static final int CONTROL_CENTER_COLOR_ON = 0xffcccccc;
@@ -82,6 +82,8 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     private SectionsPagerAdapter pagerAdapter;
     private TextView batteryLevelTextView;
     private TextView carrierTextView;
+    private ImageView wifiImageView;
+    private TextView dataSpeedTextView;
     private ImageView batteryFillImageView;
     private ImageView batteryChargeAnimation;
     private ImageView barImageView;
@@ -154,6 +156,8 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     protected void onResume() {
         super.onResume();
 
+        updateConnectivity();
+
 //        mViewPager.setCurrentItem(1);
 //        sectionsPagerAdapter.getItem(0)
 //        sectionsPagerAdapter.instantiateItem(mViewPager, 0);
@@ -163,6 +167,17 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 //            Intent intent = new Intent(this, LockService.class);
 //            bindService(intent, lockServiceConnection, Context.BIND_AUTO_CREATE);
 //        }
+    }
+
+    private void updateConnectivity() {
+        final ConnectivityReceiver connectivityReceiver = new ConnectivityReceiver(new Handler());
+        connectivityReceiver.setReceiver(this);
+
+        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ConnectivityService.class);
+        intent.putExtra("receiver", connectivityReceiver);
+        intent.putExtra("action", ConnectivityService.ACTION_GET_STATS);
+
+        startService(intent);
     }
 
     @Override
@@ -243,6 +258,14 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         carrierTextView = (TextView) findViewById(R.id.carrierTextView);
         carrierTextView.setTypeface(FontLoader.getTypeface(getApplicationContext(), FontLoader.HELVETICA_NEUE_LIGHT));
         carrierTextView.setTextColor(Color.WHITE);
+
+        wifiImageView = (ImageView) findViewById(R.id.wifiImageView);
+        wifiImageView.setVisibility(View.VISIBLE);
+
+        dataSpeedTextView = (TextView) findViewById(R.id.dataSpeedTextView);
+        dataSpeedTextView.setTypeface(FontLoader.getTypeface(getApplicationContext(), FontLoader.HELVETICA_NEUE_LIGHT));
+        dataSpeedTextView.setTextColor(Color.WHITE);
+        dataSpeedTextView.setVisibility(View.GONE);
 
         batteryLevelTextView = (TextView) findViewById(R.id.batteryLevelTextView);
         batteryLevelTextView.setTypeface(FontLoader.getTypeface(getApplicationContext(), FontLoader.HELVETICA_NEUE_LIGHT));
@@ -741,11 +764,17 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 
     @Override
     public void onWifiEnabled() {
+        wifiImageView.setVisibility(View.VISIBLE);
+        dataSpeedTextView.setVisibility(View.GONE);
+
         controlCenterFragment.updateToggleButton(ControlCenterFragment.ToggleButtonType.WIFI, ToggleButtonView.State.ON);
     }
 
     @Override
     public void onWifiDisabled() {
+        wifiImageView.setVisibility(View.GONE);
+        dataSpeedTextView.setVisibility(View.VISIBLE);
+
         controlCenterFragment.updateToggleButton(ControlCenterFragment.ToggleButtonType.WIFI, ToggleButtonView.State.OFF);
     }
 
@@ -781,23 +810,23 @@ public class LockerMainActivity extends FragmentActivity implements Notification
             case AIRPLANE: {
                 switch (state) {
                     case ON: {
-                        final ControlCenterReceiver controlCenterReceiver = new ControlCenterReceiver(new Handler());
-                        controlCenterReceiver.setReceiver(this);
+                        final ConnectivityReceiver connectivityReceiver = new ConnectivityReceiver(new Handler());
+                        connectivityReceiver.setReceiver(this);
 
-                        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ControlCenterService.class);
-                        intent.putExtra("receiver", controlCenterReceiver);
-                        intent.putExtra("action", ControlCenterService.ACTION_ENABLE_AIRPLAINE);
+                        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ConnectivityService.class);
+                        intent.putExtra("receiver", connectivityReceiver);
+                        intent.putExtra("action", ConnectivityService.ACTION_ENABLE_AIRPLAINE);
 
                         startService(intent);
                         break;
                     }
                     case OFF: {
-                        final ControlCenterReceiver controlCenterReceiver = new ControlCenterReceiver(new Handler());
-                        controlCenterReceiver.setReceiver(this);
+                        final ConnectivityReceiver connectivityReceiver = new ConnectivityReceiver(new Handler());
+                        connectivityReceiver.setReceiver(this);
 
-                        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ControlCenterService.class);
-                        intent.putExtra("receiver", controlCenterReceiver);
-                        intent.putExtra("action", ControlCenterService.ACTION_DISABLE_AIRPLAINE);
+                        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ConnectivityService.class);
+                        intent.putExtra("receiver", connectivityReceiver);
+                        intent.putExtra("action", ConnectivityService.ACTION_DISABLE_AIRPLAINE);
 
                         startService(intent);
                         break;
@@ -811,23 +840,23 @@ public class LockerMainActivity extends FragmentActivity implements Notification
             case WIFI: {
                 switch (state) {
                     case ON: {
-                        final ControlCenterReceiver controlCenterReceiver = new ControlCenterReceiver(new Handler());
-                        controlCenterReceiver.setReceiver(this);
+                        final ConnectivityReceiver connectivityReceiver = new ConnectivityReceiver(new Handler());
+                        connectivityReceiver.setReceiver(this);
 
-                        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ControlCenterService.class);
-                        intent.putExtra("receiver", controlCenterReceiver);
-                        intent.putExtra("action", ControlCenterService.ACTION_ENABLE_WIFI);
+                        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ConnectivityService.class);
+                        intent.putExtra("receiver", connectivityReceiver);
+                        intent.putExtra("action", ConnectivityService.ACTION_ENABLE_WIFI);
 
                         startService(intent);
                         break;
                     }
                     case OFF: {
-                        final ControlCenterReceiver controlCenterReceiver = new ControlCenterReceiver(new Handler());
-                        controlCenterReceiver.setReceiver(this);
+                        final ConnectivityReceiver connectivityReceiver = new ConnectivityReceiver(new Handler());
+                        connectivityReceiver.setReceiver(this);
 
-                        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ControlCenterService.class);
-                        intent.putExtra("receiver", controlCenterReceiver);
-                        intent.putExtra("action", ControlCenterService.ACTION_DISABLE_WIFI);
+                        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ConnectivityService.class);
+                        intent.putExtra("receiver", connectivityReceiver);
+                        intent.putExtra("action", ConnectivityService.ACTION_DISABLE_WIFI);
 
                         startService(intent);
                         break;
@@ -841,23 +870,23 @@ public class LockerMainActivity extends FragmentActivity implements Notification
             case BLUETHOOTH: {
                 switch (state) {
                     case ON: {
-                        final ControlCenterReceiver controlCenterReceiver = new ControlCenterReceiver(new Handler());
-                        controlCenterReceiver.setReceiver(this);
+                        final ConnectivityReceiver connectivityReceiver = new ConnectivityReceiver(new Handler());
+                        connectivityReceiver.setReceiver(this);
 
-                        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ControlCenterService.class);
-                        intent.putExtra("receiver", controlCenterReceiver);
-                        intent.putExtra("action", ControlCenterService.ACTION_ENABLE_BLUETOOTH);
+                        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ConnectivityService.class);
+                        intent.putExtra("receiver", connectivityReceiver);
+                        intent.putExtra("action", ConnectivityService.ACTION_ENABLE_BLUETOOTH);
 
                         startService(intent);
                         break;
                     }
                     case OFF: {
-                        final ControlCenterReceiver controlCenterReceiver = new ControlCenterReceiver(new Handler());
-                        controlCenterReceiver.setReceiver(this);
+                        final ConnectivityReceiver connectivityReceiver = new ConnectivityReceiver(new Handler());
+                        connectivityReceiver.setReceiver(this);
 
-                        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ControlCenterService.class);
-                        intent.putExtra("receiver", controlCenterReceiver);
-                        intent.putExtra("action", ControlCenterService.ACTION_DISABLE_BLUETOOTH);
+                        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ConnectivityService.class);
+                        intent.putExtra("receiver", connectivityReceiver);
+                        intent.putExtra("action", ConnectivityService.ACTION_DISABLE_BLUETOOTH);
 
                         startService(intent);
                         break;
@@ -880,34 +909,11 @@ public class LockerMainActivity extends FragmentActivity implements Notification
             case FLASHLIGHT: {
                 switch (state) {
                     case ON: {
-//                        final ControlCenterReceiver controlCenterReceiver = new ControlCenterReceiver(new Handler());
-//                        controlCenterReceiver.setReceiver(this);
-//
-//                        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ControlCenterService.class);
-//                        intent.putExtra("receiver", controlCenterReceiver);
-//                        intent.putExtra("turnOn", true);
-//
-//                        startService(intent);
-
                         lockService.turnFlashlightOn();
-//                        controlCenterFragment.updateAppLauncher(ControlCenterFragment.AppLauncher.FLASHLIGHT, AppLauncherView.State.ON);
-
                         break;
                     }
                     case OFF: {
-//                        final ControlCenterReceiver controlCenterReceiver = new ControlCenterReceiver(new Handler());
-//                        controlCenterReceiver.setReceiver(this);
-//                        controlCenterReceiver.setCamera(camera);
-//
-//                        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ControlCenterService.class);
-//                        intent.putExtra("receiver", controlCenterReceiver);
-//                        intent.putExtra("turnOn", false);
-//
-//                        startService(intent);
-
                         lockService.turnFlashlightOff();
-//                        controlCenterFragment.updateAppLauncher(ControlCenterFragment.AppLauncher.FLASHLIGHT, AppLauncherView.State.OFF);
-
                         break;
                     }
                     default: {
@@ -929,32 +935,14 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 
     @Override
     public void getToggleButtonsStatus() {
-        final ControlCenterReceiver controlCenterReceiver = new ControlCenterReceiver(new Handler());
-        controlCenterReceiver.setReceiver(this);
-
-        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ControlCenterService.class);
-        intent.putExtra("receiver", controlCenterReceiver);
-        intent.putExtra("action", ControlCenterService.ACTION_GET_TOGGLE_BUTTONS_STATUS);
-
-        startService(intent);
+        updateConnectivity();
     }
 
-    //////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
 //
-// ControlCenterReceiver.Receiver
+// ConnectivityReceiver.Receiver
 //
 //////////////////////////////////////////////////////////////////
-
-//    @Override
-//    public void onFlashlightTurnedOn() {
-//        controlCenterFragment.updateAppLauncher(ControlCenterFragment.AppLauncher.FLASHLIGHT, AppLauncherView.State.ON);
-//    }
-//
-//    @Override
-//    public void onFlashlightTurnedOff() {
-//        controlCenterFragment.updateAppLauncher(ControlCenterFragment.AppLauncher.FLASHLIGHT, AppLauncherView.State.OFF);
-//    }
-
 
     @Override
     public void onAirplaneTurnedOn() {
@@ -968,11 +956,17 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 
     @Override
     public void onWifiTurnedOn() {
+        wifiImageView.setVisibility(View.VISIBLE);
+        dataSpeedTextView.setVisibility(View.GONE);
+
         controlCenterFragment.updateToggleButton(ControlCenterFragment.ToggleButtonType.WIFI, ToggleButtonView.State.ON);
     }
 
     @Override
     public void onWifiTurnedOff() {
+        wifiImageView.setVisibility(View.GONE);
+        dataSpeedTextView.setVisibility(View.VISIBLE);
+
         controlCenterFragment.updateToggleButton(ControlCenterFragment.ToggleButtonType.WIFI, ToggleButtonView.State.OFF);
     }
 

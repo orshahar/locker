@@ -5,8 +5,6 @@ import android.app.IntentService;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.hardware.Camera;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,19 +12,19 @@ import android.os.ResultReceiver;
 import android.provider.Settings;
 import android.util.Log;
 
-import com.yorshahar.locker.receiver.ControlCenterReceiver;
-
 /**
+ * Service to handle the connectivity activities.
+ * <p/>
  * Created by yorshahar on 9/7/15.
  */
-public class ControlCenterService extends IntentService {
+public class ConnectivityService extends IntentService {
 
     public static final int STATUS_RUNNING = 0;
     public static final int STATUS_FINISHED = 1;
     public static final int STATUS_ERROR = 2;
 
     public static final int ACTION_NONE = 0x0000000000;
-    public static final int ACTION_GET_TOGGLE_BUTTONS_STATUS = 0x0000000001;
+    public static final int ACTION_GET_STATS = 0x0000000001;
     public static final int ACTION_ENABLE_AIRPLAINE = 0x0000000010;
     public static final int ACTION_DISABLE_AIRPLAINE = 0x0000000100;
     public static final int ACTION_ENABLE_WIFI = 0x0000001000;
@@ -41,14 +39,12 @@ public class ControlCenterService extends IntentService {
     public static final int STATUS_BLUETOOTH_ENABLED = 0x0000010000;
     public static final int STATUS_BLUETOOTH_DISABLED = 0x0000100000;
 
-    private Camera cam;
-    private Camera.Parameters cameraParameters;
     private ResultReceiver receiver;
 
-    private static final String TAG = "ControlCenterService";
+    private static final String TAG = "ConnectivityService";
 
-    public ControlCenterService() {
-        super(ControlCenterService.class.getName());
+    public ConnectivityService() {
+        super(ConnectivityService.class.getName());
     }
 
     @Override
@@ -64,7 +60,7 @@ public class ControlCenterService extends IntentService {
 
         try {
             switch (action) {
-                case ACTION_GET_TOGGLE_BUTTONS_STATUS: {
+                case ACTION_GET_STATS: {
                     int statuses = getToggleButtonsStatus();
                     bundle.putInt("status", statuses);
                     receiver.send(STATUS_FINISHED, bundle);
@@ -167,40 +163,6 @@ public class ControlCenterService extends IntentService {
     private void disableBluetooth() {
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         bluetoothAdapter.disable();
-    }
-
-    public void turnFlashlightOn() throws RuntimeException {
-        try {
-            if (cam == null) {
-                cam = Camera.open();
-                ((ControlCenterReceiver) receiver).setCamera(cam);
-            }
-            cameraParameters = cam.getParameters();
-
-            if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
-                cameraParameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                cam.setParameters(cameraParameters);
-            }
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            throw e;
-        }
-    }
-
-    public void turnFlashlightOff() throws RuntimeException {
-        try {
-            cam = ((ControlCenterReceiver) receiver).getCamera();
-            cam.release();
-//            cameraParameters = cam.getParameters();
-//
-//            if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
-//                cameraParameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-//                cam.setParameters(cameraParameters);
-//            }
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            throw e;
-        }
     }
 
 }

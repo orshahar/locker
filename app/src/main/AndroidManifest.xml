@@ -92,7 +92,7 @@
         </service>
 
         <service
-            android:name=".service.ControlCenterService"
+            android:name=".service.ConnectivityService"
             android:exported="false" />
     </application>
 

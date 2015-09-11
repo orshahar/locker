@@ -58,5 +58,8 @@
     <string name="control_center_phone">Control center phone</string>
     <string name="control_center_camera">Control center camera</string>
     <string name="toggle_button">Toggle button</string>
+    <string name="data_LTE">LTE</string>
+    <string name="data_3G">3G</string>
+    <string name="data_2G">2G</string>
 
 </resources>

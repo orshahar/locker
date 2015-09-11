@@ -1,25 +1,22 @@
 package com.yorshahar.locker.receiver;
 
-import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
 
-import com.yorshahar.locker.service.ControlCenterService;
+import com.yorshahar.locker.service.ConnectivityService;
 import com.yorshahar.locker.util.NumberUtil;
 
 import java.util.Set;
 
 /**
+ * Connectivity receiver.
+ * <p/>
  * Created by yorshahar on 9/7/15.
  */
-public class ControlCenterReceiver extends ResultReceiver {
+public class ConnectivityReceiver extends ResultReceiver {
 
     public interface Receiver {
-
-//        void onFlashlightTurnedOn(Camera camera);
-
-//        void onFlashlightTurnedOff();
 
         void onAirplaneTurnedOn();
 
@@ -36,9 +33,8 @@ public class ControlCenterReceiver extends ResultReceiver {
     }
 
     private Receiver mReceiver;
-    private Camera camera;
 
-    public ControlCenterReceiver(Handler handler) {
+    public ConnectivityReceiver(Handler handler) {
         super(handler);
     }
 
@@ -46,43 +42,35 @@ public class ControlCenterReceiver extends ResultReceiver {
         mReceiver = receiver;
     }
 
-    public Camera getCamera() {
-        return camera;
-    }
-
-    public void setCamera(Camera camera) {
-        this.camera = camera;
-    }
-
     @Override
     protected void onReceiveResult(int resultCode, Bundle resultData) {
         if (mReceiver != null) {
             switch (resultCode) {
-                case ControlCenterService.STATUS_FINISHED: {
+                case ConnectivityService.STATUS_FINISHED: {
                     final int status = resultData.getInt("status", -1);
                     Set<Integer> statuses = NumberUtil.getSetBits(status);
 
-                    if (statuses.contains(ControlCenterService.STATUS_AIRPLANE_ENABLED)) {
+                    if (statuses.contains(ConnectivityService.STATUS_AIRPLANE_ENABLED)) {
                         mReceiver.onAirplaneTurnedOn();
                     }
 
-                    if (statuses.contains(ControlCenterService.STATUS_AIRPLANE_DISABLED)) {
+                    if (statuses.contains(ConnectivityService.STATUS_AIRPLANE_DISABLED)) {
                         mReceiver.onAirplaneTurnedOff();
                     }
 
-                    if (statuses.contains(ControlCenterService.STATUS_WIFI_ENABLED)) {
+                    if (statuses.contains(ConnectivityService.STATUS_WIFI_ENABLED)) {
                         mReceiver.onWifiTurnedOn();
                     }
 
-                    if (statuses.contains(ControlCenterService.STATUS_WIFI_DISABLED)) {
+                    if (statuses.contains(ConnectivityService.STATUS_WIFI_DISABLED)) {
                         mReceiver.onWifiTurnedOff();
                     }
 
-                    if (statuses.contains(ControlCenterService.STATUS_BLUETOOTH_ENABLED)) {
+                    if (statuses.contains(ConnectivityService.STATUS_BLUETOOTH_ENABLED)) {
                         mReceiver.onBluetoothTurnedOn();
                     }
 
-                    if (statuses.contains(ControlCenterService.STATUS_BLUETOOTH_DISABLED)) {
+                    if (statuses.contains(ConnectivityService.STATUS_BLUETOOTH_DISABLED)) {
                         mReceiver.onBluetoothTurnedOff();
                     }
 
