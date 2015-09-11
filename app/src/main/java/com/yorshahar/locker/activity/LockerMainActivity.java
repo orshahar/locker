@@ -11,6 +11,7 @@ import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.BatteryManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -37,6 +38,7 @@ import com.yorshahar.locker.fragment.PasscodeFragment;
 import com.yorshahar.locker.fragment.SmartFragmentStatePagerAdapter;
 import com.yorshahar.locker.model.notification.Notification;
 import com.yorshahar.locker.receiver.ControlCenterReceiver;
+import com.yorshahar.locker.service.ControlCenterService;
 import com.yorshahar.locker.service.LockService;
 import com.yorshahar.locker.service.NotificationService;
 import com.yorshahar.locker.service.connection.AbstractServiceConnectionImpl;
@@ -729,32 +731,32 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 
     @Override
     public void onAirplaneModeEnabled() {
-        controlCenterFragment.toggleAirplainModeOn();
+        controlCenterFragment.updateToggleButton(ControlCenterFragment.ToggleButtonType.AIRPLANE, ToggleButtonView.State.ON);
     }
 
     @Override
     public void onAirplaneModeDisabled() {
-        controlCenterFragment.toggleAirplainModeOff();
+        controlCenterFragment.updateToggleButton(ControlCenterFragment.ToggleButtonType.AIRPLANE, ToggleButtonView.State.OFF);
     }
 
     @Override
     public void onWifiEnabled() {
-        controlCenterFragment.toggleWifiOn();
+        controlCenterFragment.updateToggleButton(ControlCenterFragment.ToggleButtonType.WIFI, ToggleButtonView.State.ON);
     }
 
     @Override
     public void onWifiDisabled() {
-        controlCenterFragment.toggleWifiOff();
+        controlCenterFragment.updateToggleButton(ControlCenterFragment.ToggleButtonType.WIFI, ToggleButtonView.State.OFF);
     }
 
     @Override
     public void onBluetoothEnabled() {
-        controlCenterFragment.toggleBluetoothOn();
+        controlCenterFragment.updateToggleButton(ControlCenterFragment.ToggleButtonType.BLUETHOOTH, ToggleButtonView.State.ON);
     }
 
     @Override
     public void onBluetoothDisabled() {
-        controlCenterFragment.toggleBluetoothOff();
+        controlCenterFragment.updateToggleButton(ControlCenterFragment.ToggleButtonType.BLUETHOOTH, ToggleButtonView.State.OFF);
     }
 
     @Override
@@ -775,7 +777,101 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 
     @Override
     public void onToggleButtonStateChanged(ControlCenterFragment.ToggleButtonType toggleButtonType, ToggleButtonView.State state) {
+        switch (toggleButtonType) {
+            case AIRPLANE: {
+                switch (state) {
+                    case ON: {
+                        final ControlCenterReceiver controlCenterReceiver = new ControlCenterReceiver(new Handler());
+                        controlCenterReceiver.setReceiver(this);
 
+                        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ControlCenterService.class);
+                        intent.putExtra("receiver", controlCenterReceiver);
+                        intent.putExtra("action", ControlCenterService.ACTION_ENABLE_AIRPLAINE);
+
+                        startService(intent);
+                        break;
+                    }
+                    case OFF: {
+                        final ControlCenterReceiver controlCenterReceiver = new ControlCenterReceiver(new Handler());
+                        controlCenterReceiver.setReceiver(this);
+
+                        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ControlCenterService.class);
+                        intent.putExtra("receiver", controlCenterReceiver);
+                        intent.putExtra("action", ControlCenterService.ACTION_DISABLE_AIRPLAINE);
+
+                        startService(intent);
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+                break;
+            }
+            case WIFI: {
+                switch (state) {
+                    case ON: {
+                        final ControlCenterReceiver controlCenterReceiver = new ControlCenterReceiver(new Handler());
+                        controlCenterReceiver.setReceiver(this);
+
+                        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ControlCenterService.class);
+                        intent.putExtra("receiver", controlCenterReceiver);
+                        intent.putExtra("action", ControlCenterService.ACTION_ENABLE_WIFI);
+
+                        startService(intent);
+                        break;
+                    }
+                    case OFF: {
+                        final ControlCenterReceiver controlCenterReceiver = new ControlCenterReceiver(new Handler());
+                        controlCenterReceiver.setReceiver(this);
+
+                        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ControlCenterService.class);
+                        intent.putExtra("receiver", controlCenterReceiver);
+                        intent.putExtra("action", ControlCenterService.ACTION_DISABLE_WIFI);
+
+                        startService(intent);
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+                break;
+            }
+            case BLUETHOOTH: {
+                switch (state) {
+                    case ON: {
+                        final ControlCenterReceiver controlCenterReceiver = new ControlCenterReceiver(new Handler());
+                        controlCenterReceiver.setReceiver(this);
+
+                        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ControlCenterService.class);
+                        intent.putExtra("receiver", controlCenterReceiver);
+                        intent.putExtra("action", ControlCenterService.ACTION_ENABLE_BLUETOOTH);
+
+                        startService(intent);
+                        break;
+                    }
+                    case OFF: {
+                        final ControlCenterReceiver controlCenterReceiver = new ControlCenterReceiver(new Handler());
+                        controlCenterReceiver.setReceiver(this);
+
+                        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ControlCenterService.class);
+                        intent.putExtra("receiver", controlCenterReceiver);
+                        intent.putExtra("action", ControlCenterService.ACTION_DISABLE_BLUETOOTH);
+
+                        startService(intent);
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+                break;
+            }
+            default: {
+                break;
+            }
+        }
     }
 
     @Override
@@ -831,7 +927,19 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         lockService.onScreenBrightnessChanged(brightness);
     }
 
-//////////////////////////////////////////////////////////////////
+    @Override
+    public void getToggleButtonsStatus() {
+        final ControlCenterReceiver controlCenterReceiver = new ControlCenterReceiver(new Handler());
+        controlCenterReceiver.setReceiver(this);
+
+        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ControlCenterService.class);
+        intent.putExtra("receiver", controlCenterReceiver);
+        intent.putExtra("action", ControlCenterService.ACTION_GET_TOGGLE_BUTTONS_STATUS);
+
+        startService(intent);
+    }
+
+    //////////////////////////////////////////////////////////////////
 //
 // ControlCenterReceiver.Receiver
 //
@@ -846,5 +954,36 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 //    public void onFlashlightTurnedOff() {
 //        controlCenterFragment.updateAppLauncher(ControlCenterFragment.AppLauncher.FLASHLIGHT, AppLauncherView.State.OFF);
 //    }
+
+
+    @Override
+    public void onAirplaneTurnedOn() {
+        controlCenterFragment.updateToggleButton(ControlCenterFragment.ToggleButtonType.AIRPLANE, ToggleButtonView.State.ON);
+    }
+
+    @Override
+    public void onAirplaneTurnedOff() {
+        controlCenterFragment.updateToggleButton(ControlCenterFragment.ToggleButtonType.AIRPLANE, ToggleButtonView.State.OFF);
+    }
+
+    @Override
+    public void onWifiTurnedOn() {
+        controlCenterFragment.updateToggleButton(ControlCenterFragment.ToggleButtonType.WIFI, ToggleButtonView.State.ON);
+    }
+
+    @Override
+    public void onWifiTurnedOff() {
+        controlCenterFragment.updateToggleButton(ControlCenterFragment.ToggleButtonType.WIFI, ToggleButtonView.State.OFF);
+    }
+
+    @Override
+    public void onBluetoothTurnedOn() {
+        controlCenterFragment.updateToggleButton(ControlCenterFragment.ToggleButtonType.BLUETHOOTH, ToggleButtonView.State.ON);
+    }
+
+    @Override
+    public void onBluetoothTurnedOff() {
+        controlCenterFragment.updateToggleButton(ControlCenterFragment.ToggleButtonType.BLUETHOOTH, ToggleButtonView.State.OFF);
+    }
 
 }

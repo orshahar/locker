@@ -23,7 +23,7 @@ public class ToggleButtonView extends ImageView implements View.OnClickListener 
 
     public interface Delegate {
 
-        void onToggleButtonStateChanges(ToggleButtonView button, State state);
+        void onToggleButtonStateChanged(ToggleButtonView button, State state);
 
     }
 
@@ -59,26 +59,20 @@ public class ToggleButtonView extends ImageView implements View.OnClickListener 
         return state == State.ON;
     }
 
-    public void turnOn() {
-        state = State.ON;
-        paint.setColor(COLOR_ON);
-        if (delegate != null) {
-            delegate.onToggleButtonStateChanges(this, state);
-        }
-        invalidate();
-    }
-
     public boolean isOff() {
         return state == State.OFF;
     }
 
-    public void turnOff() {
-        state = State.OFF;
-        paint.setColor(COLOR_OFF);
+    public void turnOn() {
         if (delegate != null) {
-            delegate.onToggleButtonStateChanges(this, state);
+            delegate.onToggleButtonStateChanged(this, State.ON);
         }
-        invalidate();
+    }
+
+    public void turnOff() {
+        if (delegate != null) {
+            delegate.onToggleButtonStateChanged(this, State.OFF);
+        }
     }
 
     public void toggle() {
@@ -87,7 +81,14 @@ public class ToggleButtonView extends ImageView implements View.OnClickListener 
         } else {
             turnOn();
         }
+    }
 
+    public void updateState(State state) {
+        if (this.state != state) {
+            this.state = state;
+            paint.setColor(isOn() ? COLOR_ON : COLOR_OFF);
+            invalidate();
+        }
     }
 
     @Override
