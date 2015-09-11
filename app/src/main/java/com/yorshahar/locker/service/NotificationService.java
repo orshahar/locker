@@ -70,12 +70,13 @@ public class NotificationService extends AccessibilityService {
             switch (event.getEventType()) {
                 case AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED: {
                     if (event.getText().size() > 0) {
-//                        android.app.Notification androidNotification = (android.app.Notification) event.getParcelableData();
+                        android.app.Notification androidNotification = (android.app.Notification) event.getParcelableData();
 
-                        Drawable icon = getApplicationIcon(packageName);
-                        String applicationName = getApplicationName(packageName);
-                        String text = getNotificationText(event);
-                        Date dateArrived = new Date();
+                        if (androidNotification != null) {
+                            Drawable icon = getApplicationIcon(packageName);
+                            String applicationName = getApplicationName(packageName);
+                            String text = getNotificationText(event, androidNotification);
+                            Date dateArrived = new Date();
 //                        GregorianCalendar cal = new GregorianCalendar();
 //                        cal.set(Calendar.HOUR, 0);
 //                        cal.set(Calendar.MINUTE, 0);
@@ -83,15 +84,16 @@ public class NotificationService extends AccessibilityService {
 //                        cal.add(Calendar.HOUR, -4);
 //                        Date dateArrived = cal.getTime();
 
-                        Notification notification = new Notification(
-                                applicationName,
-                                dateArrived,
-                                "",
-                                text,
-                                icon
-                        );
+                            Notification notification = new Notification(
+                                    applicationName,
+                                    dateArrived,
+                                    "",
+                                    text,
+                                    icon
+                            );
 
-                        addNotification(notification);
+                            addNotification(notification);
+                        }
                     }
 
                     break;
@@ -103,7 +105,7 @@ public class NotificationService extends AccessibilityService {
         }
     }
 
-    private String getNotificationText(AccessibilityEvent event) {
+    private String getNotificationText(AccessibilityEvent event, android.app.Notification androidNotification) {
         StringBuilder textBuilder = new StringBuilder();
         String separator = "";
         for (CharSequence text : event.getText()) {
@@ -114,6 +116,19 @@ public class NotificationService extends AccessibilityService {
         if (event.getContentDescription() != null && event.getContentDescription().length() > 0) {
             textBuilder.append(separator).append("-------").append(separator).append(event.getContentDescription());
         }
+
+//        android.app.Notification androidNotification = (android.app.Notification) event.getParcelableData();
+//        if (androidNotification != null && androidNotification.tickerText != null && androidNotification.tickerText.length() > 0) {
+//            textBuilder.append(separator).append("--- tickerText ---").append(separator).append(androidNotification.tickerText);
+//        }
+
+//        if (androidNotification != null && androidNotification.deleteIntent != null) {
+//            textBuilder.append(separator).append("--- deleteIntent ---").append(separator).append(androidNotification.deleteIntent.toString());
+//        }
+//
+//        if (androidNotification != null && androidNotification.contentView != null) {
+//            textBuilder.append(separator).append("--- deleteIntent ---").append(separator).append(androidNotification.deleteIntent.toString());
+//        }
 
         return textBuilder.toString();
     }
