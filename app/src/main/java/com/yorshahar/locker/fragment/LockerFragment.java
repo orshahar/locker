@@ -16,6 +16,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.yorshahar.locker.R;
+import com.yorshahar.locker.activity.LockerMainActivity;
 import com.yorshahar.locker.font.FontLoader;
 import com.yorshahar.locker.model.notification.Notification;
 import com.yorshahar.locker.ui.widget.ShinyTextView;
@@ -382,4 +383,23 @@ public class LockerFragment extends Fragment {
 //
 //        });
 //    }
+
+    public void controlCenterMoved(float dim) {
+        dateView.setAlpha(1.0f - dim);
+    }
+
+    public void controlCenterOpening() {
+        dateView.animate()
+                .alpha(0.0f)
+                .setDuration(LockerMainActivity.CONTROL_CENTER_OPEN_DURATION)
+                .start();
+    }
+
+    public void controlCenterClosing() {
+        dateView.animate()
+                .alpha(1.0f)
+                .setDuration(LockerMainActivity.CONTROL_CENTER_OPEN_DURATION)
+                .start();
+    }
+
 }

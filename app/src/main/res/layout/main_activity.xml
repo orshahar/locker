@@ -210,7 +210,7 @@
         android:background="#00ffffff" />
 
     <ImageView
-        android:id="@+id/barImageView"
+        android:id="@+id/pullBarImageView"
         android:layout_width="38dp"
         android:layout_height="8dp"
         android:layout_alignBottom="@+id/statusBar"

@@ -60,7 +60,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     private static final int CONTROL_CENTER_COLOR_ON = 0xffcccccc;
     private static final int CONTROL_CENTER_COLOR_OFF = 0x00ffffff;
     private static final int CONTROL_CENTER_MAX_INTENSITY = 50;
-
+    public static final int CONTROL_CENTER_OPEN_DURATION = 150;
 
     private int SCREEN_WIDTH;
     private int SCREEN_HEIGHT;
@@ -86,10 +86,11 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     private TextView dataSpeedTextView;
     private ImageView batteryFillImageView;
     private ImageView batteryChargeAnimation;
-    private ImageView barImageView;
+    private ImageView statusBarPullBar;
     private Bitmap blurredBackground;
     private ImageView[] signalCircles;
     private View controlCenterView;
+    private RelativeLayout controlCenterGlassPanel;
     private ImageView controlCenterBackground;
     private ImageView controlCenterGlass;
     private ImageView controlCenterPullBar;
@@ -216,11 +217,11 @@ public class LockerMainActivity extends FragmentActivity implements Notification
                 totalDimView.setBackgroundColor(0xff000000);
                 if (position == 0) {
                     dimView.setAlpha(hasNotifications() ? 1.0f : 1.0f - positionOffset);
-                    barImageView.setTranslationY(-BAR_HEIGHT * (1.0f - positionOffset));
+                    statusBarPullBar.setTranslationY(-BAR_HEIGHT * (1.0f - positionOffset));
                     controlCenterView.setY(SCREEN_HEIGHT - BAR_HEIGHT * (positionOffset));
                 } else {
                     dimView.setAlpha(hasNotifications() ? 1.0f : 0.0f);
-                    barImageView.setTranslationY(0);
+                    statusBarPullBar.setTranslationY(0);
                     controlCenterView.setY(SCREEN_HEIGHT - BAR_HEIGHT);
                 }
             }
@@ -276,17 +277,15 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         batteryChargeAnimation = (ImageView) findViewById(R.id.batteryChargeAnimation);
         chargeAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.charging_story_animation);
 
-        barImageView = (ImageView) findViewById(R.id.barImageView);
+        statusBarPullBar = (ImageView) findViewById(R.id.pullBarImageView);
 
         controlCenterView = findViewById(R.id.controlCenterFragment);
         controlCenterView.setBackgroundColor(Color.TRANSPARENT);
 
         controlCenterBackground = (ImageView) controlCenterView.findViewById(R.id.background);
         controlCenterBackground.setBackground(new BitmapDrawable(getResources(), blurredBackground));
-        controlCenterBackground.setVisibility(View.INVISIBLE);
 
         controlCenterGlass = (ImageView) controlCenterView.findViewById(R.id.glassImageView);
-        controlCenterGlass.setVisibility(View.INVISIBLE);
 
         CONTROL_CENTER_HEIGHT = 840; //controlCenterView.getLayoutParams().height;
 
@@ -299,6 +298,9 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         controlCenterTopBar = (RelativeLayout) controlCenterView.findViewById(R.id.topBar);
 
         BAR_HEIGHT = controlCenterTopBar.getLayoutParams().height;
+
+        controlCenterGlassPanel = (RelativeLayout) controlCenterView.findViewById(R.id.glassPanel);
+        controlCenterGlassPanel.setTranslationY(BAR_HEIGHT);
 
         controlCenterView.setY(SCREEN_HEIGHT - BAR_HEIGHT);
 
@@ -314,15 +316,32 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 
                     case MotionEvent.ACTION_DOWN: {
                         mViewPager.freeze();
-                        controlCenterBackground.setVisibility(View.VISIBLE);
-                        controlCenterGlass.setVisibility(View.VISIBLE);
                         dY = controlCenterView.getY() - event.getRawY();
+
+                        if (controlCenterGlassPanel.getTranslationY() == BAR_HEIGHT) {
+                            controlCenterGlassPanel.animate()
+                                    .translationY(0)
+                                    .setDuration(100)
+                                    .start();
+                        }
+
+                        statusBarPullBar.animate()
+                                .translationY(-BAR_HEIGHT)
+                                .setDuration(500)
+                                .start();
+
+                        controlCenterPullBar.setVisibility(View.INVISIBLE);
+                        controlCenterPullBarDark.setVisibility(View.VISIBLE);
+                        controlCenterPullBarDown.setVisibility(View.INVISIBLE);
+
                         break;
                     }
                     case MotionEvent.ACTION_UP: {
+                        y = slideUp ? SCREEN_HEIGHT - CONTROL_CENTER_HEIGHT : SCREEN_HEIGHT - BAR_HEIGHT;
+
                         controlCenterView.animate()
-                                .y(slideUp ? SCREEN_HEIGHT - CONTROL_CENTER_HEIGHT : SCREEN_HEIGHT - BAR_HEIGHT)
-                                .setDuration(100)
+                                .y(y)
+                                .setDuration(CONTROL_CENTER_OPEN_DURATION)
                                 .setListener(new Animator.AnimatorListener() {
                                     @Override
                                     public void onAnimationStart(Animator animation) {
@@ -331,12 +350,8 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 
                                     @Override
                                     public void onAnimationEnd(Animator animation) {
-                                        y = slideUp ? SCREEN_HEIGHT - CONTROL_CENTER_HEIGHT : SCREEN_HEIGHT - BAR_HEIGHT;
-
-                                        if (y == SCREEN_HEIGHT - BAR_HEIGHT) {
+                                        if (!slideUp) {
                                             mViewPager.unfreeze();
-                                            controlCenterBackground.setVisibility(View.INVISIBLE);
-                                            controlCenterGlass.setVisibility(View.INVISIBLE);
 
                                             controlCenterPullBar.setVisibility(View.VISIBLE);
                                             controlCenterPullBarDark.setVisibility(View.INVISIBLE);
@@ -345,12 +360,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
                                             controlCenterPullBar.setVisibility(View.INVISIBLE);
                                             controlCenterPullBarDark.setVisibility(View.INVISIBLE);
                                             controlCenterPullBarDown.setVisibility(View.VISIBLE);
-
                                         }
-
-                                        float dim = y / SCREEN_HEIGHT;
-                                        totalDimView.setAlpha(1.0f - dim);
-                                        controlCenterBackground.setTranslationY(-y);
                                     }
 
                                     @Override
@@ -364,6 +374,36 @@ public class LockerMainActivity extends FragmentActivity implements Notification
                                     }
                                 })
                                 .start();
+
+                        float dim = y / SCREEN_HEIGHT;
+                        totalDimView.animate()
+                                .alpha(1.0f - dim)
+                                .setDuration(CONTROL_CENTER_OPEN_DURATION)
+                                .start();
+
+                        controlCenterBackground.animate()
+                                .translationY(-y)
+                                .setDuration(CONTROL_CENTER_OPEN_DURATION)
+                                .start();
+
+                        if (slideUp) {
+                            LockerFragment lockerFragment = (LockerFragment) pagerAdapter.getRegisteredFragment(1);
+                            lockerFragment.controlCenterOpening();
+                        } else {
+                            controlCenterGlassPanel.animate()
+                                    .translationY(BAR_HEIGHT)
+                                    .setDuration(CONTROL_CENTER_OPEN_DURATION)
+                                    .start();
+
+                            statusBarPullBar.animate()
+                                    .translationY(0)
+                                    .setDuration(500)
+                                    .start();
+
+                            LockerFragment lockerFragment = (LockerFragment) pagerAdapter.getRegisteredFragment(1);
+                            lockerFragment.controlCenterClosing();
+                        }
+
                         break;
                     }
                     case MotionEvent.ACTION_MOVE: {
@@ -383,6 +423,8 @@ public class LockerMainActivity extends FragmentActivity implements Notification
                         float dim = y / SCREEN_HEIGHT;
                         totalDimView.setAlpha(1.0f - dim);
                         controlCenterBackground.setTranslationY(-y);
+                        LockerFragment lockerFragment = (LockerFragment) pagerAdapter.getRegisteredFragment(1);
+                        lockerFragment.controlCenterMoved((SCREEN_HEIGHT - y) / CONTROL_CENTER_HEIGHT);
                         break;
                     }
                     default: {

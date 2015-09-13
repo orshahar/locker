@@ -6,16 +6,23 @@
     android:layout_centerVertical="true"
     tools:context="com.yorshahar.locker.ui.widget.ControlCenterView">
 
-    <ImageView
-        android:id="@+id/background"
+    <RelativeLayout
+        android:id="@+id/glassPanel"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/glassImageView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#88ffffff" />
+        <ImageView
+            android:id="@+id/background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ImageView
+            android:id="@+id/glassImageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#66ffffff" />
+
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/topBar"
@@ -226,8 +233,8 @@
 
                 <ImageView
                     android:id="@+id/volumeLowImageView"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:src="@drawable/cp_volumn_low_ios" />
 
                 <SeekBar
@@ -247,8 +254,8 @@
 
                 <ImageView
                     android:id="@+id/volumeHighImageView"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:src="@drawable/cp_volumn_high_ios" />
             </LinearLayout>
 
