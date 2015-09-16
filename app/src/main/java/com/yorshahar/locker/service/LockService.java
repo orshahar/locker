@@ -14,6 +14,7 @@ import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.SignalStrength;
@@ -166,9 +167,9 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
         ((TimeReceiver) timeReceiver).setDelegate(this);
         registerReceiver(timeReceiver, filter);
 
-        MyStateListener phoneStateListener = new MyStateListener();
+        MyPhoneStateListener phoneStateListener = new MyPhoneStateListener();
         TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-        telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+//        telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
         telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
 
         startForeground();
@@ -355,42 +356,82 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
 // PhoneStateListener
 //////////////////////////////////////////////////////////////////////
 
-    private class MyStateListener extends PhoneStateListener {
-        @Override
-        public void onCallStateChanged(int state, String incomingNumber) {
-            super.onCallStateChanged(state, incomingNumber);
-
-            switch (state) {
-                case TelephonyManager.CALL_STATE_RINGING: {
-                    preventLock = true;
-                    break;
-                }
-                case TelephonyManager.CALL_STATE_OFFHOOK: {
-                    break;
-                }
-                case TelephonyManager.CALL_STATE_IDLE: {
-                    break;
-                }
-                default: {
-                    break;
-                }
-            }
-        }
-
+    private class MyPhoneStateListener extends PhoneStateListener {
+        //        @Override
+//        public void onCallStateChanged(int state, String incomingNumber) {
+//            super.onCallStateChanged(state, incomingNumber);
+//
+//            switch (state) {
+//                case TelephonyManager.CALL_STATE_RINGING: {
+//                    preventLock = true;
+//                    break;
+//                }
+//                case TelephonyManager.CALL_STATE_OFFHOOK: {
+//                    break;
+//                }
+//                case TelephonyManager.CALL_STATE_IDLE: {
+//                    break;
+//                }
+//                default: {
+//                    break;
+//                }
+//            }
+//        }
+//
         @Override
         public void onSignalStrengthsChanged(SignalStrength signalStrength) {
             super.onSignalStrengthsChanged(signalStrength);
+            int bars = 0;
 
-            int gsmSignalStrength = signalStrength.getGsmSignalStrength();
+            if (signalStrength.isGsm()) {
+                int signalStrengthValue;
+                if (signalStrength.getGsmSignalStrength() != 99) {
+                    signalStrengthValue = signalStrength.getGsmSignalStrength() * 2 - 113;
+                } else {
+                    signalStrengthValue = signalStrength.getGsmSignalStrength();
+                }
+            } else {
+                final int snr = signalStrength.getEvdoSnr();
+                final int cdmaDbm = signalStrength.getCdmaDbm();
+                final int cdmaEcio = signalStrength.getCdmaEcio();
+                int levelDbm;
+                int levelEcio;
+                int level = 0;
+
+                if (snr == -1) {
+                    if (cdmaDbm >= -75) levelDbm = 4;
+                    else if (cdmaDbm >= -85) levelDbm = 3;
+                    else if (cdmaDbm >= -95) levelDbm = 2;
+                    else if (cdmaDbm >= -100) levelDbm = 1;
+                    else levelDbm = 0;
+
+                    // Ec/Io are in dB*10
+                    if (cdmaEcio >= -90) levelEcio = 4;
+                    else if (cdmaEcio >= -110) levelEcio = 3;
+                    else if (cdmaEcio >= -130) levelEcio = 2;
+                    else if (cdmaEcio >= -150) levelEcio = 1;
+                    else levelEcio = 0;
+
+                    level = (levelDbm < levelEcio) ? levelDbm : levelEcio;
+                } else {
+                    if (snr == 7 || snr == 8) level = 4;
+                    else if (snr == 5 || snr == 6) level = 3;
+                    else if (snr == 3 || snr == 4) level = 2;
+                    else if (snr == 1 || snr == 2) level = 1;
+
+                }
+
+                bars = level;
+            }
+
             if (delegate != null) {
-                int bars = 3;
                 delegate.onSignalStrengthsChanged(bars);
             }
         }
     }
 
-
     public void onScreenBrightnessChanged(int brightness) {
+        Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, brightness);
     }
 
 
@@ -419,5 +460,16 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
             Toast.makeText(getActivity().getBaseContext(), "Exception flashLightOn()", Toast.LENGTH_SHORT).show();
         }
     }
+
+    public void onPhoneRinging(String incomingNumber) {
+        preventLock = true;
+        unlock();
+    }
+
+    public void onPhoneIdle(String incomingNumber) {
+        preventLock = false;
+        lock(true);
+    }
+
 
 }

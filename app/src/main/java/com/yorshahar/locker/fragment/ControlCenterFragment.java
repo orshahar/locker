@@ -117,16 +117,12 @@ public class ControlCenterFragment extends Fragment implements ToggleButtonView.
         cameraAppLauncher.setDelegate(this);
 
         brightnessSlider = (SeekBar) view.findViewById(R.id.brightnessSlider);
-        try {
-            int brightness = Settings.System.getInt(getActivity().getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
-            brightnessSlider.setProgress(brightness - 20);
-        } catch (Settings.SettingNotFoundException e) {
-            e.printStackTrace();
-        }
         brightnessSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                changeBrightness(progress + 20);
+                if (fromUser) {
+                    changeBrightness(progress + 20);
+                }
             }
 
             @Override
@@ -146,6 +142,7 @@ public class ControlCenterFragment extends Fragment implements ToggleButtonView.
     public void onResume() {
         super.onResume();
         updateToggleButtons();
+        updateBrightnessView();
     }
 
     public void updateToggleButton(ToggleButtonType type, ToggleButtonView.State state) {
@@ -219,7 +216,7 @@ public class ControlCenterFragment extends Fragment implements ToggleButtonView.
     }
 
     public void changeBrightness(int brightness) {
-        Settings.System.putInt(getActivity().getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, brightness);
+//        Settings.System.putInt(getActivity().getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, brightness);
 
 //        WindowManager.LayoutParams lp = getActivity().getWindow().getAttributes();
 //        lp.screenBrightness = brightness / 256.0f;
@@ -233,7 +230,7 @@ public class ControlCenterFragment extends Fragment implements ToggleButtonView.
     public void updateBrightnessView() {
         try {
             int brightness = Settings.System.getInt(getActivity().getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
-            brightnessSlider.setProgress(brightness - 20);
+            brightnessSlider.setProgress(brightness);
         } catch (Settings.SettingNotFoundException e) {
             e.printStackTrace();
         }

@@ -18,6 +18,8 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -450,9 +452,12 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         totalDimView.setBackgroundColor(0x00000000);
         totalDimView.setAlpha(0);
 
-        lockServiceConnection = new
+        // listen the events get fired during the call
+        MyPhoneStateListener phoneStateListener = new MyPhoneStateListener();
+        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+        telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
 
-                LockServiceConnection(LockService.class);
+        lockServiceConnection = new LockServiceConnection(LockService.class);
 //        notificationServiceConnection = new NotificationServiceConnection(NotificationService.class);
 
         bindToServices();
@@ -465,6 +470,29 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         }
 
         super.onDestroy();
+    }
+
+    // Handle events of calls and unlock screen if necessary
+    private class MyPhoneStateListener extends PhoneStateListener {
+        @Override
+        public void onCallStateChanged(int state, String incomingNumber) {
+
+            super.onCallStateChanged(state, incomingNumber);
+            switch (state) {
+                case TelephonyManager.CALL_STATE_RINGING:
+                    if (lockService != null) {
+                        lockService.onPhoneRinging(incomingNumber);
+                    }
+                    break;
+                case TelephonyManager.CALL_STATE_OFFHOOK:
+                    break;
+                case TelephonyManager.CALL_STATE_IDLE:
+                    if (lockService != null) {
+                        lockService.onPhoneIdle(incomingNumber);
+                    }
+                    break;
+            }
+        }
     }
 
     private boolean hasNotifications() {

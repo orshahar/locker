@@ -165,8 +165,7 @@
                     android:paddingTop="10dp"
                     android:progress="128"
                     android:progressDrawable="@drawable/slider"
-                    android:thumb="@drawable/slider_thumb"
-                    android:thumbOffset="10dp" />
+                    android:thumb="@drawable/slider_thumb" />
 
                 <ImageView
                     android:id="@+id/brightnessHighImageView"
