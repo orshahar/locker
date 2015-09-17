@@ -1,9 +1,15 @@
 package com.yorshahar.locker.service;
 
+import com.yorshahar.locker.model.settings.Settings;
+
 /**
  * Created by yorshahar on 8/19/15.
  */
 public interface LockerSettingsService {
+
+    Settings getSettings();
+
+    boolean saveSetings(Settings settings);
 
     void enableLocker();
 
@@ -12,5 +18,13 @@ public interface LockerSettingsService {
     void enableNotifications();
 
     void disableNotifications();
+
+    void enableSecurity();
+
+    void disableSecurity();
+
+    void hideStatusBar();
+
+    void showStatusBar();
 
 }

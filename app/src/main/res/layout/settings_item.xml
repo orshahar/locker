@@ -15,15 +15,4 @@
         android:text="@string/label"
         android:textSize="18sp" />
 
-    <Switch
-        android:id="@+id/switchView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:clickable="true"
-        android:enabled="true"
-        android:gravity="center_horizontal"
-        android:textSize="18sp" />
-
 </RelativeLayout>

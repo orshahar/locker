@@ -61,5 +61,6 @@
     <string name="data_LTE">LTE</string>
     <string name="data_3G">3G</string>
     <string name="data_2G">2G</string>
+    <string name="label">Label</string>
 
 </resources>
