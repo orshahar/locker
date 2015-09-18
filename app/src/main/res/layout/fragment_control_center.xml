@@ -14,13 +14,15 @@
         <ImageView
             android:id="@+id/background"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:contentDescription="@string/glass_background_image" />
 
         <ImageView
             android:id="@+id/glassImageView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#88ffffff" />
+            android:background="#88ffffff"
+            android:contentDescription="@string/glass_cover" />
 
     </RelativeLayout>
 
@@ -80,6 +82,7 @@
                 android:id="@+id/airplaneToggleButton"
                 android:layout_width="55dp"
                 android:layout_height="55dp"
+                android:layout_marginEnd="5dp"
                 android:layout_marginRight="5dp"
                 android:contentDescription="@string/toggle_button"
                 android:padding="17dp"
@@ -120,6 +123,7 @@
                 android:layout_width="55dp"
                 android:layout_height="55dp"
                 android:layout_marginLeft="5dp"
+                android:layout_marginStart="5dp"
                 android:contentDescription="@string/toggle_button"
                 android:padding="12dp"
                 android:src="@android:drawable/ic_menu_always_landscape_portrait" />
@@ -150,6 +154,7 @@
                     android:id="@+id/brightnessLowImageView"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
+                    android:contentDescription="@string/low_brightness"
                     android:src="@drawable/brightness_low" />
 
                 <SeekBar
@@ -171,6 +176,7 @@
                     android:id="@+id/brightnessHighImageView"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
+                    android:contentDescription="@string/high_brightness"
                     android:src="@drawable/brightness_high" />
             </LinearLayout>
         </RelativeLayout>
@@ -188,7 +194,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="Stay"
+                android:text="@string/song_name"
                 android:textColor="#ffffff"
                 android:textSize="20sp" />
 
@@ -290,6 +296,7 @@
                 android:id="@+id/flashlightAppLauncherView"
                 android:layout_width="62dp"
                 android:layout_height="62dp"
+                android:layout_marginEnd="10dp"
                 android:layout_marginRight="10dp"
                 android:src="@drawable/cc_flashlight" />
 
@@ -314,6 +321,7 @@
                 android:layout_width="62dp"
                 android:layout_height="62dp"
                 android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
                 android:src="@drawable/cc_camera" />
 
         </LinearLayout>
