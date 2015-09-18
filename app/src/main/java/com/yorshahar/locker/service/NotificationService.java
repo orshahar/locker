@@ -8,9 +8,9 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.view.accessibility.AccessibilityEvent;
 
+import com.yorshahar.locker.db.DatabaseAdapter;
 import com.yorshahar.locker.model.notification.Notification;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -25,19 +25,14 @@ public class NotificationService extends AccessibilityService {
         void onNotificationsChanged(List<Notification> notifications);
     }
 
+    private DatabaseAdapter databaseAdapter;
     private static NotificationService instance;
     private Delegate delegate;
     private Set<String> allowedApps = new HashSet<>();
     private PackageManager pm;
 
-    List<Notification> notifications = new ArrayList<>();
-
     public void setDelegate(Delegate delegate) {
         this.delegate = delegate;
-    }
-
-    public List<Notification> getNotifications() {
-        return notifications;
     }
 
     @Override
@@ -53,6 +48,8 @@ public class NotificationService extends AccessibilityService {
         allowedApps.add("com.android.vending");
         allowedApps.add("com.android.email");
         allowedApps.add("com.google.android.googlequicksearchbox");
+
+        databaseAdapter = new DatabaseAdapter(getApplicationContext());
 
         instance = this;
     }
@@ -159,18 +156,24 @@ public class NotificationService extends AccessibilityService {
         return allowedApps.contains(packageName);
     }
 
-    public void addNotification(Notification notification) {
-        notifications.add(0, notification);
+    public List<Notification> getNotifications() {
+        return databaseAdapter.getNotifications();
+    }
 
-        if (delegate != null) {
+    public void addNotification(Notification notification) {
+        long id = databaseAdapter.saveNotification(notification);
+
+        if (id != -1 && delegate != null) {
+            List<Notification> notifications = databaseAdapter.getNotifications();
             delegate.onNotificationsChanged(notifications);
         }
     }
 
     public void deleteNotification(Notification notification) {
-        notifications.remove(notification);
+        boolean success = databaseAdapter.deleteNotification(notification);
 
-//        if (delegate != null) {
+//        if (success && delegate != null) {
+//        List<Notification> notifications = databaseAdapter.getNotifications();
 //            delegate.onNotificationsChanged(notifications);
 //        }
     }
