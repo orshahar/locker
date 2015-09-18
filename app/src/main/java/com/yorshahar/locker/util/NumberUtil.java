@@ -12,7 +12,7 @@ public class NumberUtil {
         Set<Integer> setBits = new HashSet<>();
 
         if (null != val) {
-            int valInt = val.intValue();
+            int valInt = val;
             int bit = 1;
             while (valInt > 0) {
                 if ((valInt & 0x1) == 1) {
