@@ -9,12 +9,15 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Shader;
 import android.graphics.drawable.PaintDrawable;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.TextView;
 
 /**
+ * TextView with the effect of light shining on it and moving across it.
+ * <p/>
  * Created by yorshahar on 8/12/15.
  */
 public class ShinyTextView extends TextView {
@@ -72,7 +75,7 @@ public class ShinyTextView extends TextView {
     }
 
     @Override
-    protected void onDraw(final Canvas canvas) {
+    protected void onDraw(@NonNull final Canvas canvas) {
         super.onDraw(canvas);
         if (!isInEditMode() && mShineDrawable != null) {
             mShineDrawable.draw(canvas);
