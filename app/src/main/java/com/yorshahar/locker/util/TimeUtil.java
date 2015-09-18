@@ -1,5 +1,7 @@
 package com.yorshahar.locker.util;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -76,6 +78,23 @@ public class TimeUtil {
         cal.add(Calendar.HOUR, -4);
         Date then = cal.getTime();
         System.out.println(formatDuration(then));
+
+        System.out.println("\n");
+//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        DateFormat dateFormat = SimpleDateFormat.getDateTimeInstance();
+//        ("yyyy-MM-dd HH:mm:ss");
+        Date date = new Date();
+//        String dateStr = date.toString();
+        String dateStr = dateFormat.format(date);
+        System.out.println("date: " + dateStr);
+
+        try {
+            Date date2 = dateFormat.parse(dateStr);
+            System.out.println("date2: " + dateFormat.format(date));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
 
     }
 }
