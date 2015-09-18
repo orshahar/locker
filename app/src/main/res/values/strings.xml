@@ -62,5 +62,10 @@
     <string name="data_3G">3G</string>
     <string name="data_2G">2G</string>
     <string name="label">Label</string>
+    <string name="glass_background_image">Glass background image</string>
+    <string name="glass_cover">Glass cover</string>
+    <string name="low_brightness">Low Brightness</string>
+    <string name="high_brightness">High Brightness</string>
+    <string name="song_name">Stay</string>
 
 </resources>
