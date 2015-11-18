@@ -67,5 +67,6 @@
     <string name="low_brightness">Low Brightness</string>
     <string name="high_brightness">High Brightness</string>
     <string name="song_name">Stay</string>
+    <string name="percentage_level">%d %%</string>
 
 </resources>

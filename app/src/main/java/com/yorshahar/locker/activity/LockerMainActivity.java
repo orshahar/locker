@@ -788,7 +788,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     public void onBatteryLevelChanged(int level, int status) {
         boolean charging = status == BatteryManager.BATTERY_STATUS_CHARGING;
 
-        batteryLevelTextView.setText(String.valueOf(level) + "%");
+        batteryLevelTextView.setText(String.format(getResources().getString(R.string.percentage_level), level));
         batteryFillImageView.setScaleX(level / 100.0f);
         batteryFillImageView.setTranslationX(-batteryFillImageView.getWidth() * (100.0f - level) / 100.0f / 2.0f);
 
