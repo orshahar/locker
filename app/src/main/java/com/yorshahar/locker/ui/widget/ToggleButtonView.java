@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -30,6 +31,7 @@ public class ToggleButtonView extends ImageView implements View.OnClickListener 
     private static final int COLOR_OFF = 0x11000000;
     private static final int COLOR_ON = 0xffffffff;
 
+    private float DENSITY;
 
     private Delegate delegate;
     private State state;
@@ -41,7 +43,10 @@ public class ToggleButtonView extends ImageView implements View.OnClickListener 
     public ToggleButtonView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        paint = new Paint();
+        DisplayMetrics dm = getResources().getDisplayMetrics();
+        DENSITY = dm.density;
+
+        paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         setOnClickListener(this);
         state = State.OFF;
         paint.setColor(COLOR_OFF);
@@ -100,7 +105,7 @@ public class ToggleButtonView extends ImageView implements View.OnClickListener 
 
         viewWidthHalf = width / 2;
         viewHeightHalf = height / 2;
-        radius = (viewWidthHalf > viewHeightHalf) ? viewHeightHalf - 3 : viewWidthHalf - 3;
+        radius = (int) (Math.min(viewWidthHalf, viewHeightHalf) - 2.0 * DENSITY);
     }
 
     @Override

@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -30,8 +31,9 @@ public class AppLauncherView extends ImageView implements View.OnClickListener {
 
     private static final int COLOR_OFF = 0x11000000;
     private static final int COLOR_ON = 0xffffffff;
-    private static final int ROUNDED_CORNERS_SIZE = 30;
+    private static final int ROUNDED_CORNERS_SIZE = 15;
 
+    private float DENSITY;
 
     private Delegate delegate;
     private State state;
@@ -40,6 +42,9 @@ public class AppLauncherView extends ImageView implements View.OnClickListener {
 
     public AppLauncherView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        DisplayMetrics dm = getResources().getDisplayMetrics();
+        DENSITY = dm.density;
 
         setOnClickListener(this);
         state = State.OFF;
@@ -106,7 +111,7 @@ public class AppLauncherView extends ImageView implements View.OnClickListener {
 
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
-        canvas.drawRoundRect(rect, ROUNDED_CORNERS_SIZE, ROUNDED_CORNERS_SIZE, paint);
+        canvas.drawRoundRect(rect, ROUNDED_CORNERS_SIZE * DENSITY, ROUNDED_CORNERS_SIZE * DENSITY, paint);
 
         super.onDraw(canvas);
     }

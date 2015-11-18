@@ -39,8 +39,6 @@ public class ConnectivityService extends IntentService {
     public static final int STATUS_BLUETOOTH_ENABLED = 0x0000010000;
     public static final int STATUS_BLUETOOTH_DISABLED = 0x0000100000;
 
-    private ResultReceiver receiver;
-
     private static final String TAG = "ConnectivityService";
 
     public ConnectivityService() {
@@ -51,7 +49,7 @@ public class ConnectivityService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         Log.d(TAG, "Service Started!");
 
-        receiver = intent.getParcelableExtra("receiver");
+        ResultReceiver receiver = intent.getParcelableExtra("receiver");
         int action = intent.getIntExtra("action", 0);
 
         Bundle bundle = new Bundle();

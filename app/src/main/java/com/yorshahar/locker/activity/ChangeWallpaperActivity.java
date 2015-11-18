@@ -1,6 +1,7 @@
 package com.yorshahar.locker.activity;
 
 import android.animation.Animator;
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -17,6 +18,8 @@ import android.widget.Toast;
 import com.yorshahar.locker.R;
 import com.yorshahar.locker.fragment.MyWallpapersFragment;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 public class ChangeWallpaperActivity extends FragmentActivity implements View.OnClickListener {
@@ -25,6 +28,7 @@ public class ChangeWallpaperActivity extends FragmentActivity implements View.On
     ViewPager mViewPager;
     ImageView applyImageView;
     boolean buttonsVisible;
+    List<Integer> resourceIds = Arrays.asList(R.drawable.wallpaper_iphone_stars, R.drawable.wallpaper_pebbles, R.drawable.wallpaper_bambook, R.drawable.wallpaper_bridge_purple, R.drawable.wallpaper_coffee, R.drawable.wallpaper_nexus5);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -162,7 +166,10 @@ public class ChangeWallpaperActivity extends FragmentActivity implements View.On
 
     @Override
     public void onClick(View v) {
-        Toast.makeText(ChangeWallpaperActivity.this, "Wallpaper applied successfully", Toast.LENGTH_SHORT).show();
+        int itemIndex = mViewPager.getCurrentItem();
+        int resourceId = resourceIds.get(itemIndex);
+        setResult(resourceId);
+
         finish();
     }
 
@@ -174,25 +181,12 @@ public class ChangeWallpaperActivity extends FragmentActivity implements View.On
 
         @Override
         public Fragment getItem(int position) {
-            switch (position) {
-                case 0: {
-                    return MyWallpapersFragment.newInstance(R.drawable.wallpaper_iphone_stars);
-                }
-                case 1: {
-                    return MyWallpapersFragment.newInstance(R.drawable.wallpaper_bambook);
-                }
-                case 2: {
-                    return MyWallpapersFragment.newInstance(R.drawable.wallpaper_iphone_stars);
-                }
-                default: {
-                    return MyWallpapersFragment.newInstance(R.drawable.wallpaper_iphone_stars);
-                }
-            }
+            return MyWallpapersFragment.newInstance(resourceIds.get(position));
         }
 
         @Override
         public int getCount() {
-            return 3;
+            return resourceIds.size();
         }
 
         @Override

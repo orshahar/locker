@@ -12,6 +12,7 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -42,8 +43,10 @@ public class Key extends View implements Runnable {
 
     }
 
-    public static final float CIRCLE_SKROKE_WIDTH = 3.0f;
+    public static final float CIRCLE_SKROKE_WIDTH = 2.0f;
     public static final int MAX_ADD_AMOUNT = 100;
+
+    private float DENSITY;
 
     private Typeface typeface;
     private String value;
@@ -58,6 +61,7 @@ public class Key extends View implements Runnable {
     int viewHeightHalf;
     int radius;
 
+
     public Key(Context context, AttributeSet attrs) {
         super(context, attrs);
 
@@ -67,12 +71,15 @@ public class Key extends View implements Runnable {
                 0, 0);
 
         try {
+            DisplayMetrics dm = getResources().getDisplayMetrics();
+            DENSITY = dm.density;
+
             value = a.getString(R.styleable.Key_value);
             setTag(value);
 
             outlinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             outlinePaint.setStyle(Paint.Style.STROKE);
-            outlinePaint.setStrokeWidth(CIRCLE_SKROKE_WIDTH);
+            outlinePaint.setStrokeWidth(CIRCLE_SKROKE_WIDTH * DENSITY);
             outlinePaint.setColor(Color.argb(255, MAX_ADD_AMOUNT, MAX_ADD_AMOUNT, MAX_ADD_AMOUNT));
             outlinePaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.ADD));
 
@@ -81,10 +88,8 @@ public class Key extends View implements Runnable {
             fillPaint.setStyle(Paint.Style.FILL);
             fillPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.ADD));
 
-            textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            textPaint.setTextSize(70f);
+            textPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FAKE_BOLD_TEXT_FLAG);
             bounds = new Rect();
-            textPaint.getTextBounds(value, 0, value.length(), bounds);
             textPaint.setTypeface(typeface);
             textPaint.setColor(Color.WHITE);
         } finally {
@@ -113,12 +118,15 @@ public class Key extends View implements Runnable {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        final int width = getMeasuredWidth();
-        final int height = getMeasuredHeight();
+        final int width = getLayoutParams().width;
+        final int height = getLayoutParams().height;
 
         viewWidthHalf = width / 2;
         viewHeightHalf = height / 2;
-        radius = (viewWidthHalf > viewHeightHalf) ? viewHeightHalf - 15 : viewWidthHalf - 20;
+        radius = (int) (Math.min(viewWidthHalf, viewHeightHalf) - 8.0 * DENSITY);
+
+        textPaint.setTextSize(height / 2.5f);
+        textPaint.getTextBounds(value, 0, value.length(), bounds);
     }
 
     @Override
@@ -130,7 +138,7 @@ public class Key extends View implements Runnable {
 
         // Draw the circle filling
         fillPaint.setColor(Color.argb(255, addAmount, addAmount, addAmount));
-        canvas.drawCircle(viewWidthHalf, viewHeightHalf, radius - CIRCLE_SKROKE_WIDTH / 2, fillPaint);
+        canvas.drawCircle(viewWidthHalf, viewHeightHalf, radius - CIRCLE_SKROKE_WIDTH * DENSITY / 2.0f, fillPaint);
 
         // Draw the text
         canvas.drawText(value, viewWidthHalf - bounds.centerX(), viewHeightHalf - bounds.centerY(), textPaint);

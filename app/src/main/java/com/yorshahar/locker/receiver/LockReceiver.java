@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 
+import com.yorshahar.locker.activity.SettingsActivity;
+
 public class LockReceiver extends BroadcastReceiver {
 
     public interface Delegate {
@@ -28,6 +30,8 @@ public class LockReceiver extends BroadcastReceiver {
         void onBluetoothEnabled();
 
         void onBluetoothDisabled();
+
+        void onWallpaperChanged(int resourceId);
     }
 
     private Delegate delegate;
@@ -102,6 +106,15 @@ public class LockReceiver extends BroadcastReceiver {
                     }
                     case BluetoothAdapter.STATE_TURNING_ON: {
                         break;
+                    }
+                }
+                break;
+            }
+            case SettingsActivity.ACTION_WALLPAPER_CHANGED: {
+                int resourceId = intent.getIntExtra("resourceId", 0);
+                if (resourceId != 0) {
+                    if (delegate != null) {
+                        delegate.onWallpaperChanged(resourceId);
                     }
                 }
                 break;

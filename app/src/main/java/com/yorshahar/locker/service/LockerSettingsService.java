@@ -9,7 +9,7 @@ public interface LockerSettingsService {
 
     Settings getSettings();
 
-    boolean saveSetings(Settings settings);
+    boolean saveSettings(Settings settings);
 
     void enableLocker();
 

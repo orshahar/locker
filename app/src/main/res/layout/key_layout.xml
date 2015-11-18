@@ -24,6 +24,6 @@
         android:contentDescription="@string/key_description"
         android:gravity="center"
         android:textColor="#ffffffff"
-        android:textSize="35sp" />
+        android:textSize="70sp" />
 
 </FrameLayout>

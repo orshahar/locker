@@ -31,7 +31,7 @@ public class DatabaseAdapter {
         databaseHelper = new DatabaseHelper(context);
     }
 
-    public long updateSettings(boolean lockerEnabled, boolean notificationsEnabled, boolean securityEnabled, boolean statusBarHidden, String passcode) {
+    public long updateSettings(boolean lockerEnabled, boolean notificationsEnabled, boolean securityEnabled, boolean statusBarHidden, String passcode, int wallpaper) {
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseHelper.COLUMN_LOCKER_ENABLED, lockerEnabled);
@@ -39,6 +39,7 @@ public class DatabaseAdapter {
         contentValues.put(DatabaseHelper.COLUMN_SECURITY_ENABLED, securityEnabled);
         contentValues.put(DatabaseHelper.COLUMN_HIDE_STATUS_BAR, statusBarHidden);
         contentValues.put(DatabaseHelper.COLUMN_PASSCODE, passcode);
+        contentValues.put(DatabaseHelper.COLUMN_WALLPAPER, wallpaper);
         String[] args = new String[0];
         return db.update(DatabaseHelper.TABLE_SETTINGS, contentValues, null, args);
     }
@@ -53,7 +54,8 @@ public class DatabaseAdapter {
                 DatabaseHelper.COLUMN_NOTIFICATIONS_ENABLED,
                 DatabaseHelper.COLUMN_SECURITY_ENABLED,
                 DatabaseHelper.COLUMN_HIDE_STATUS_BAR,
-                DatabaseHelper.COLUMN_PASSCODE
+                DatabaseHelper.COLUMN_PASSCODE,
+                DatabaseHelper.COLUMN_WALLPAPER
         };
         Cursor cursor = null;
 
@@ -74,7 +76,8 @@ public class DatabaseAdapter {
                 settings.setNotificationsEnabled(cursor.getInt(columnIndex++) == 1);
                 settings.setSecurityEnabled(cursor.getInt(columnIndex++) == 1);
                 settings.setHideStatusBar(cursor.getInt(columnIndex++) == 1);
-                settings.setPasscode(cursor.getString(columnIndex));
+                settings.setPasscode(cursor.getString(columnIndex++));
+                settings.setWallpaper(cursor.getInt(columnIndex));
             }
         } catch (Exception e) {
             int a = 2;
@@ -184,6 +187,7 @@ public class DatabaseAdapter {
         private static final String COLUMN_SOURCE = "Source";
         private static final String COLUMN_TITLE = "Title";
         private static final String COLUMN_UID = "_id";
+        private static final String COLUMN_WALLPAPER = "wallpaper";
 
         // Queries
         private static final String QUERY_CREATE_TABLE_SETTINGS = "CREATE TABLE " + TABLE_SETTINGS + " ("
@@ -192,7 +196,8 @@ public class DatabaseAdapter {
                 + COLUMN_NOTIFICATIONS_ENABLED + " VARCHAR(1) NOT NULL, "
                 + COLUMN_SECURITY_ENABLED + " VARCHAR(1) NOT NULL, "
                 + COLUMN_HIDE_STATUS_BAR + " VARCHAR(1) NOT NULL, "
-                + COLUMN_PASSCODE + " VARCHAR(16))";
+                + COLUMN_PASSCODE + " VARCHAR(16), "
+                + COLUMN_WALLPAPER + " INTEGER)";
 
         private static final String QUERY_CREATE_TABLE_NOTIFICATION = "CREATE TABLE " + TABLE_NOTIFICATION + " ("
                 + COLUMN_UID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -222,6 +227,7 @@ public class DatabaseAdapter {
                 contentValues.put(COLUMN_SECURITY_ENABLED, false);
                 contentValues.put(COLUMN_HIDE_STATUS_BAR, false);
                 contentValues.putNull(COLUMN_PASSCODE);
+                contentValues.putNull(COLUMN_WALLPAPER);
                 db.insert(TABLE_SETTINGS, null, contentValues);
             } catch (SQLException e) {
                 e.printStackTrace();

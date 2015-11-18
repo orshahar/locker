@@ -74,58 +74,59 @@
             android:id="@+id/toggleButtonsLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:layout_marginBottom="10dp"
             android:gravity="center"
             android:orientation="horizontal">
 
             <com.yorshahar.locker.ui.widget.ToggleButtonView
                 android:id="@+id/airplaneToggleButton"
-                android:layout_width="55dp"
-                android:layout_height="55dp"
-                android:layout_marginEnd="5dp"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
                 android:contentDescription="@string/toggle_button"
-                android:padding="17dp"
+                android:padding="16dp"
                 android:src="@drawable/airplane_on" />
 
             <com.yorshahar.locker.ui.widget.ToggleButtonView
                 android:id="@+id/wifiToggleButton"
-                android:layout_width="55dp"
-                android:layout_height="55dp"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
                 android:contentDescription="@string/toggle_button"
-                android:padding="12dp"
+                android:padding="11dp"
                 android:src="@drawable/wifi_black_3" />
 
             <com.yorshahar.locker.ui.widget.ToggleButtonView
                 android:id="@+id/bluetoothToggleButton"
-                android:layout_width="55dp"
-                android:layout_height="55dp"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
                 android:contentDescription="@string/toggle_button"
-                android:padding="12dp"
+                android:padding="11dp"
                 android:src="@drawable/bluetooth_black_on" />
 
             <com.yorshahar.locker.ui.widget.ToggleButtonView
                 android:id="@+id/nightToggleButton"
-                android:layout_width="55dp"
-                android:layout_height="55dp"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
                 android:contentDescription="@string/toggle_button"
-                android:padding="12dp"
+                android:padding="11dp"
                 android:src="@drawable/night_on" />
 
             <com.yorshahar.locker.ui.widget.ToggleButtonView
                 android:id="@+id/rotationLockToggleButton"
-                android:layout_width="55dp"
-                android:layout_height="55dp"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
                 android:layout_marginLeft="5dp"
-                android:layout_marginStart="5dp"
+                android:layout_marginRight="5dp"
                 android:contentDescription="@string/toggle_button"
-                android:padding="12dp"
+                android:padding="11dp"
                 android:src="@android:drawable/ic_menu_always_landscape_portrait" />
 
         </LinearLayout>

@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.LightingColorFilter;
-import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.BatteryManager;
 import android.os.Bundle;
@@ -20,7 +19,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.view.Display;
+import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -39,10 +38,13 @@ import com.yorshahar.locker.fragment.LockerFragment;
 import com.yorshahar.locker.fragment.PasscodeFragment;
 import com.yorshahar.locker.fragment.SmartFragmentStatePagerAdapter;
 import com.yorshahar.locker.model.notification.Notification;
+import com.yorshahar.locker.model.settings.Settings;
 import com.yorshahar.locker.receiver.ConnectivityReceiver;
+import com.yorshahar.locker.receiver.SettingsReceiver;
 import com.yorshahar.locker.service.ConnectivityService;
 import com.yorshahar.locker.service.LockService;
 import com.yorshahar.locker.service.NotificationService;
+import com.yorshahar.locker.service.SettingsService;
 import com.yorshahar.locker.service.connection.AbstractServiceConnectionImpl;
 import com.yorshahar.locker.ui.widget.AppLauncherView;
 import com.yorshahar.locker.ui.widget.FreezableViewPager;
@@ -56,7 +58,7 @@ import java.util.List;
 import java.util.Locale;
 
 
-public class LockerMainActivity extends FragmentActivity implements NotificationService.Delegate, LockService.Delegate, ControlCenterFragment.Delegate, ConnectivityReceiver.Receiver {
+public class LockerMainActivity extends FragmentActivity implements NotificationService.Delegate, LockService.Delegate, ControlCenterFragment.Delegate, ConnectivityReceiver.Receiver, SettingsReceiver.Receiver {
 
     private static final String STATUS_BAR_TIME_FORMAT = "h:mm a";
     private static final int CONTROL_CENTER_COLOR_ON = 0xffcccccc;
@@ -66,6 +68,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 
     private int SCREEN_WIDTH;
     private int SCREEN_HEIGHT;
+    private float DENSITY;
     private int CONTROL_CENTER_HEIGHT;
     private int BAR_HEIGHT;
 
@@ -133,6 +136,9 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 //        int height = size.y;
 //
 //        controlCenterView.setTop(height - 20);
+
+//        getWindow().getDecorView().getLayoutParams().width = SCREEN_WIDTH;
+//        getWindow().getDecorView().getLayoutParams().height = SCREEN_HEIGHT;
 
         isWindowAttached = true;
         sendViewToService();
@@ -203,6 +209,11 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         moveTaskToBack(true);
         setContentView(R.layout.main_activity);
 
+        DisplayMetrics dm = getResources().getDisplayMetrics();
+        SCREEN_WIDTH = dm.widthPixels;
+        SCREEN_HEIGHT = dm.heightPixels;
+        DENSITY = dm.density;
+
         dateFormat = new SimpleDateFormat(STATUS_BAR_TIME_FORMAT, Locale.getDefault());
 
         pagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -242,14 +253,26 @@ public class LockerMainActivity extends FragmentActivity implements Notification
             }
         });
 
+        final SettingsReceiver settingsReceiver = new SettingsReceiver(new Handler());
+        settingsReceiver.setReceiver(this);
+
+        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, SettingsService.class);
+        intent.putExtra("receiver", settingsReceiver);
+        intent.putExtra("action", SettingsService.ACTION_GET_WALLPAPER);
+
+        startService(intent);
+
         wallpaperView = (ImageView) findViewById(R.id.backgroundImageView);
-        Bitmap bm = ((BitmapDrawable) wallpaperView.getDrawable()).getBitmap();
-        blurredBackground = BlurUtil.blur(bm);
+        wallpaperView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+        Bitmap bmp = ((BitmapDrawable) wallpaperView.getDrawable()).getBitmap();
+        blurredBackground = BlurUtil.blur(bmp);
 
         dimView = (ImageView) findViewById(R.id.dimView);
         dimView.setImageResource(0);
         dimView.setImageBitmap(blurredBackground);
         dimView.getDrawable().setColorFilter(new LightingColorFilter(0x88888888, 0x00000000));
+        dimView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
         signalCircles = new ImageView[5];
         signalCircles[0] = (ImageView) findViewById(R.id.signal1ImageView);
@@ -286,16 +309,12 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 
         controlCenterBackground = (ImageView) controlCenterView.findViewById(R.id.background);
         controlCenterBackground.setBackground(new BitmapDrawable(getResources(), blurredBackground));
+        controlCenterBackground.getLayoutParams().height = SCREEN_HEIGHT;
 
         controlCenterGlass = (ImageView) controlCenterView.findViewById(R.id.glassImageView);
 
-        CONTROL_CENTER_HEIGHT = 840; //controlCenterView.getLayoutParams().height;
-
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        SCREEN_WIDTH = size.x;
-        SCREEN_HEIGHT = size.y;
+        CONTROL_CENTER_HEIGHT = (int) (420 * dm.density);
+//        CONTROL_CENTER_HEIGHT = controlCenterView.getLayoutParams().height;
 
         controlCenterTopBar = (RelativeLayout) controlCenterView.findViewById(R.id.topBar);
 
@@ -552,7 +571,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 
     private void sendViewToService() {
         if (isLockServiceBound && isWindowAttached) {
-            lockService.setLockerView((RelativeLayout) findViewById(R.id.layout));
+            lockService.setLockerView((RelativeLayout) findViewById(R.id.layout), SCREEN_WIDTH, SCREEN_HEIGHT);
         }
     }
 
@@ -868,7 +887,27 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         controlCenterFragment.updateAppLauncher(ControlCenterFragment.AppLauncher.FLASHLIGHT, AppLauncherView.State.OFF);
     }
 
-//////////////////////////////////////////////////////////////////
+    @Override
+    public void onWallpaperChanged(int resourceId) {
+        updateWallpaper(resourceId);
+    }
+
+    private void updateWallpaper(int resourceId) {
+        wallpaperView.setImageResource(resourceId);
+        wallpaperView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+        Bitmap bmp = ((BitmapDrawable) wallpaperView.getDrawable()).getBitmap();
+        blurredBackground = BlurUtil.blur(bmp);
+
+        dimView.setImageBitmap(blurredBackground);
+        dimView.getDrawable().setColorFilter(new LightingColorFilter(0x88888888, 0x00000000));
+        dimView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+        controlCenterBackground.setImageBitmap(blurredBackground);
+        controlCenterBackground.setScaleType(ImageView.ScaleType.CENTER_CROP);
+    }
+
+    //////////////////////////////////////////////////////////////////
 //
 // ControlCenterFragment.Delegate
 //
@@ -1048,6 +1087,38 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     @Override
     public void onBluetoothTurnedOff() {
         controlCenterFragment.updateToggleButton(ControlCenterFragment.ToggleButtonType.BLUETHOOTH, ToggleButtonView.State.OFF);
+    }
+
+
+//////////////////////////////////////////////////////////////////
+//
+// SettingsReceiver.Receiver
+//
+//////////////////////////////////////////////////////////////////
+
+    @Override
+    public void onResultWallpaper(int resourceId) {
+        updateWallpaper(resourceId);
+    }
+
+    @Override
+    public void onResultSettings(Settings settings) {
+
+    }
+
+    @Override
+    public void onSettingsSaved() {
+
+    }
+
+    @Override
+    public void onLockerEnabled() {
+
+    }
+
+    @Override
+    public void onLockerDisabled() {
+
     }
 
 }

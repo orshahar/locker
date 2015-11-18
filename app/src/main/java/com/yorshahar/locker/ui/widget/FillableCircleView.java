@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.View;
 
 /**
@@ -17,8 +18,10 @@ import android.view.View;
  */
 public class FillableCircleView extends View {
 
-    public static final float CIRCLE_SKROKE_WIDTH = 3.0f;
+    public static final float CIRCLE_SKROKE_WIDTH = 2.0f;
     public static final int ADD_AMOUNT = 150;
+
+    private float DENSITY;
 
     private Paint paint;
     int viewWidthHalf;
@@ -29,9 +32,12 @@ public class FillableCircleView extends View {
     public FillableCircleView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
+        DisplayMetrics dm = getResources().getDisplayMetrics();
+        DENSITY = dm.density;
+
         paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(CIRCLE_SKROKE_WIDTH);
+        paint.setStrokeWidth(CIRCLE_SKROKE_WIDTH * DENSITY);
         paint.setColor(Color.argb(255, ADD_AMOUNT, ADD_AMOUNT, ADD_AMOUNT));
 //        LightingColorFilter filter = new LightingColorFilter(0xffffffff, 0x88888888);
 //        paint.setColorFilter(filter);

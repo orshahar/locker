@@ -1,8 +1,6 @@
 package com.yorshahar.locker.fragment;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -11,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.yorshahar.locker.R;
-import com.yorshahar.locker.util.BlurUtil;
 
 /**
  * Fragment for choosing a wallpaper from local wallpapers
@@ -21,7 +18,7 @@ import com.yorshahar.locker.util.BlurUtil;
 public class MyWallpapersFragment extends Fragment {
     final static String ARGS_RESOURCE_ID = "resourceId";
 
-    private int resId;
+    private int resourceId;
 
     public static MyWallpapersFragment newInstance(final int resourceId) {
         MyWallpapersFragment fragment = new MyWallpapersFragment();
@@ -35,12 +32,20 @@ public class MyWallpapersFragment extends Fragment {
 
     }
 
+    public int getResourceId() {
+        return resourceId;
+    }
+
+    public void setResourceId(int resourceId) {
+        this.resourceId = resourceId;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            resId = getArguments().getInt(ARGS_RESOURCE_ID);
+            resourceId = getArguments().getInt(ARGS_RESOURCE_ID);
         }
     }
 
@@ -48,18 +53,11 @@ public class MyWallpapersFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 //        return inflater.inflate(R.layout.fragment_my_wallpapers, container, false);
         View view = inflater.inflate(R.layout.wallpaper_preview_layout, container, false);
+        view.setTag(resourceId);
 
         ImageView imageView = (ImageView) view.findViewById(R.id.imageView);
-        imageView.setImageResource(resId);
-
-        try {
-            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), resId);
-            imageView.setImageBitmap(bitmap);
-
-            Bitmap blurBitmap = BlurUtil.blur(getActivity(), bitmap, 20);
-        } catch (Exception e) {
-            int a = 2;
-        }
+        imageView.setImageResource(resourceId);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
         return view;
     }

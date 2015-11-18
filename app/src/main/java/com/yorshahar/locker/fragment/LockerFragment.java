@@ -47,7 +47,8 @@ public class LockerFragment extends Fragment {
 
     }
 
-    private int SCREEN_WIDTH = 720;
+    private int SCREEN_WIDTH;
+    private int SCREEN_HEIGHT;
     private int REL_SWIPE_MIN_DISTANCE;
     private int REL_SWIPE_MAX_OFF_PATH;
     private int REL_SWIPE_THRESHOLD_VELOCITY;
@@ -79,6 +80,14 @@ public class LockerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         RelativeLayout view = (RelativeLayout) inflater.inflate(R.layout.fragment_locker, container, false);
         view.setBackgroundColor(Color.TRANSPARENT);
+
+        DisplayMetrics dm = getResources().getDisplayMetrics();
+        SCREEN_WIDTH = dm.widthPixels;
+        SCREEN_HEIGHT = dm.heightPixels;
+        REL_SWIPE_MIN_DISTANCE = (int) (120.0f * dm.densityDpi / 160.0f + 0.5);
+        REL_SWIPE_MAX_OFF_PATH = (int) (250.0f * dm.densityDpi / 160.0f + 0.5);
+        REL_SWIPE_THRESHOLD_VELOCITY = (int) (200.0f * dm.densityDpi / 160.0f + 0.5);
+        REL_DISPLAY_WIDTH = dm.widthPixels;
 
         timeView = (TextView) view.findViewById(R.id.timeTextView);
         timeView.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.HELVETICA_NEUE_ULTRA_LIGHT));
@@ -230,12 +239,6 @@ public class LockerFragment extends Fragment {
             }
 
         });
-
-        DisplayMetrics dm = getResources().getDisplayMetrics();
-        REL_SWIPE_MIN_DISTANCE = (int) (120.0f * dm.densityDpi / 160.0f + 0.5);
-        REL_SWIPE_MAX_OFF_PATH = (int) (250.0f * dm.densityDpi / 160.0f + 0.5);
-        REL_SWIPE_THRESHOLD_VELOCITY = (int) (200.0f * dm.densityDpi / 160.0f + 0.5);
-        REL_DISPLAY_WIDTH = dm.widthPixels;
 
         if (delegate != null) {
             delegate.requestDisallowInterceptTouchEvent(true);

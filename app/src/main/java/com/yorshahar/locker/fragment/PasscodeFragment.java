@@ -1,15 +1,19 @@
 package com.yorshahar.locker.fragment;
 
 
-import android.animation.Animator;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.v4.app.Fragment;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.TextView;
 
 import com.yorshahar.locker.R;
@@ -32,6 +36,13 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
         void requestDisallowInterceptTouchEvent(boolean disallowIntercept);
 
     }
+
+    public static final float SHAKE_CIRCLES_SIZE = 15.0f;
+    public static final int SHAKE_CIRCLES_DURATION_MILLIS = 20;
+    public static final int SHAKE_CIRCLES_REPETITIONS = 5;
+    public static final int SHAKE_CIRCLES_VIBRATION_DURATION = 200;
+
+    private float DENSITY;
 
     private Delegate delegate;
     private int passcodeSize;
@@ -74,6 +85,9 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
         View view = inflater.inflate(R.layout.fragment_password, container, false);
         view.setBackgroundColor(Color.TRANSPARENT);
 
+        DisplayMetrics dm = getResources().getDisplayMetrics();
+        DENSITY = dm.density;
+
         WindowManager.LayoutParams windowManager = getActivity().getWindow().getAttributes();
         windowManager.dimAmount = 0.0f;
         getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
@@ -86,45 +100,68 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
         cancelTextView.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.HELVETICA_NEUE_LIGHT));
         cancelTextView.setOnClickListener(this);
 
+//        int keyWidth = SCREEN_WIDTH / 3 - 30;
+//        int keyHeight = keyWidth;
+
         Key key0 = (Key) view.findViewById(R.id.key0);
         key0.setDelegate(this);
         key0.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.HELVETICA_NEUE_ULTRA_LIGHT));
+//        key0.getLayoutParams().height = keyHeight;
+//        key0.getLayoutParams().width = keyWidth;
 
         Key key1 = (Key) view.findViewById(R.id.key1);
         key1.setDelegate(this);
         key1.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.HELVETICA_NEUE_ULTRA_LIGHT));
+//        key1.getLayoutParams().height = keyHeight;
+//        key1.getLayoutParams().width = keyWidth;
 
         Key key2 = (Key) view.findViewById(R.id.key2);
         key2.setDelegate(this);
         key2.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.HELVETICA_NEUE_ULTRA_LIGHT));
+//        key2.getLayoutParams().height = keyHeight;
+//        key2.getLayoutParams().width = keyWidth;
 
         Key key3 = (Key) view.findViewById(R.id.key3);
         key3.setDelegate(this);
         key3.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.HELVETICA_NEUE_ULTRA_LIGHT));
+//        key3.getLayoutParams().height = keyHeight;
+//        key3.getLayoutParams().width = keyWidth;
 
         Key key4 = (Key) view.findViewById(R.id.key4);
         key4.setDelegate(this);
         key4.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.HELVETICA_NEUE_ULTRA_LIGHT));
+//        key4.getLayoutParams().height = keyHeight;
+//        key4.getLayoutParams().width = keyWidth;
 
         Key key5 = (Key) view.findViewById(R.id.key5);
         key5.setDelegate(this);
         key5.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.HELVETICA_NEUE_ULTRA_LIGHT));
+//        key5.getLayoutParams().height = keyHeight;
+//        key5.getLayoutParams().width = keyWidth;
 
         Key key6 = (Key) view.findViewById(R.id.key6);
         key6.setDelegate(this);
         key6.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.HELVETICA_NEUE_ULTRA_LIGHT));
+//        key6.getLayoutParams().height = keyHeight;
+//        key6.getLayoutParams().width = keyWidth;
 
         Key key7 = (Key) view.findViewById(R.id.key7);
         key7.setDelegate(this);
         key7.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.HELVETICA_NEUE_ULTRA_LIGHT));
+//        key7.getLayoutParams().height = keyHeight;
+//        key7.getLayoutParams().width = keyWidth;
 
         Key key8 = (Key) view.findViewById(R.id.key8);
         key8.setDelegate(this);
         key8.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.HELVETICA_NEUE_ULTRA_LIGHT));
+//        key8.getLayoutParams().height = keyHeight;
+//        key8.getLayoutParams().width = keyWidth;
 
         Key key9 = (Key) view.findViewById(R.id.key9);
         key9.setDelegate(this);
         key9.setTypeface(FontLoader.getTypeface(getActivity().getApplicationContext(), FontLoader.HELVETICA_NEUE_ULTRA_LIGHT));
+//        key9.getLayoutParams().height = keyHeight;
+//        key9.getLayoutParams().width = keyWidth;
 
         circleViews[0] = (FillableCircleView) view.findViewById(R.id.circle1ImageView);
         circleViews[1] = (FillableCircleView) view.findViewById(R.id.circle2ImageView);
@@ -161,89 +198,154 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
     }
 
     private void shakeCircles() {
-        circlesContainerView.animate().rotation(10).setDuration(50).setListener(new Animator.AnimatorListener() {
+        Vibrator vibrator = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+        if (vibrator.hasVibrator()) {
+            vibrator.vibrate(SHAKE_CIRCLES_VIBRATION_DURATION);
+        }
+        final Animation animation3 = new TranslateAnimation(SHAKE_CIRCLES_SIZE * DENSITY, 0.0f, 0.0f, 0.0f);
+        animation3.setDuration(SHAKE_CIRCLES_DURATION_MILLIS);
+        animation3.setAnimationListener(new Animation.AnimationListener() {
             @Override
-            public void onAnimationStart(Animator animation) {
+            public void onAnimationStart(Animation animation) {
 
             }
 
             @Override
-            public void onAnimationEnd(Animator animation) {
-                circlesContainerView.animate().rotation(-10).setDuration(100).setListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        circlesContainerView.animate().rotation(10).setDuration(100).setListener(new Animator.AnimatorListener() {
-                            @Override
-                            public void onAnimationStart(Animator animation) {
-
-                            }
-
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                circlesContainerView.animate().rotation(0).setDuration(50).setListener(new Animator.AnimatorListener() {
-                                    @Override
-                                    public void onAnimationStart(Animator animation) {
-
-                                    }
-
-                                    @Override
-                                    public void onAnimationEnd(Animator animation) {
-                                        reset();
-                                    }
-
-                                    @Override
-                                    public void onAnimationCancel(Animator animation) {
-
-                                    }
-
-                                    @Override
-                                    public void onAnimationRepeat(Animator animation) {
-
-                                    }
-                                }).start();
-
-                            }
-
-                            @Override
-                            public void onAnimationCancel(Animator animation) {
-
-                            }
-
-                            @Override
-                            public void onAnimationRepeat(Animator animation) {
-
-                            }
-                        }).start();
-
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animation) {
-
-                    }
-                }).start();
+            public void onAnimationEnd(Animation animation) {
+                reset();
             }
 
             @Override
-            public void onAnimationCancel(Animator animation) {
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+        final Animation animation2 = new TranslateAnimation(-SHAKE_CIRCLES_SIZE * DENSITY, SHAKE_CIRCLES_SIZE * DENSITY, 0.0f, 0.0f);
+        animation2.setRepeatCount(SHAKE_CIRCLES_REPETITIONS);
+        animation2.setRepeatMode(Animation.REVERSE);
+        animation2.setDuration(2 * SHAKE_CIRCLES_DURATION_MILLIS);
+        animation2.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
 
             }
 
             @Override
-            public void onAnimationRepeat(Animator animation) {
+            public void onAnimationEnd(Animation animation) {
+                circlesContainerView.startAnimation(animation3);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
 
             }
-        }).start();
+        });
+
+        final Animation animation1 = new TranslateAnimation(0.0f, -SHAKE_CIRCLES_SIZE * DENSITY, 0.0f, 0.0f);
+        animation1.setDuration(SHAKE_CIRCLES_DURATION_MILLIS);
+        animation1.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                circlesContainerView.startAnimation(animation2);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+        circlesContainerView.startAnimation(animation1);
+
+//        circlesContainerView.animate().translationX(-500).setDuration(20).setListener(new Animator.AnimatorListener() {
+//            @Override
+//            public void onAnimationStart(Animator animation) {
+//
+//            }
+//
+//            @Override
+//            public void onAnimationEnd(Animator animation) {
+//                circlesContainerView.animate().translationX(30).setDuration(40).setListener(new Animator.AnimatorListener() {
+//                    @Override
+//                    public void onAnimationStart(Animator animation) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onAnimationEnd(Animator animation) {
+//                        circlesContainerView.animate().translationX(-30).setDuration(40).setListener(new Animator.AnimatorListener() {
+//                            @Override
+//                            public void onAnimationStart(Animator animation) {
+//
+//                            }
+//
+//                            @Override
+//                            public void onAnimationEnd(Animator animation) {
+//                                circlesContainerView.animate().translationX(0).setDuration(20).setListener(new Animator.AnimatorListener() {
+//                                    @Override
+//                                    public void onAnimationStart(Animator animation) {
+//
+//                                    }
+//
+//                                    @Override
+//                                    public void onAnimationEnd(Animator animation) {
+//                                        reset();
+//                                    }
+//
+//                                    @Override
+//                                    public void onAnimationCancel(Animator animation) {
+//
+//                                    }
+//
+//                                    @Override
+//                                    public void onAnimationRepeat(Animator animation) {
+//
+//                                    }
+//                                }).start();
+//
+//                            }
+//
+//                            @Override
+//                            public void onAnimationCancel(Animator animation) {
+//
+//                            }
+//
+//                            @Override
+//                            public void onAnimationRepeat(Animator animation) {
+//
+//                            }
+//                        }).start();
+//
+//                    }
+//
+//                    @Override
+//                    public void onAnimationCancel(Animator animation) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onAnimationRepeat(Animator animation) {
+//
+//                    }
+//                }).start();
+//            }
+//
+//            @Override
+//            public void onAnimationCancel(Animator animation) {
+//
+//            }
+//
+//            @Override
+//            public void onAnimationRepeat(Animator animation) {
+//
+//            }
+//        }).start();
     }
 
     public void reset() {

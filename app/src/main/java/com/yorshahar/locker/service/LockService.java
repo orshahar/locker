@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.yorshahar.locker.R;
 import com.yorshahar.locker.activity.LockerMainActivity;
+import com.yorshahar.locker.activity.SettingsActivity;
 import com.yorshahar.locker.receiver.BootReceiver;
 import com.yorshahar.locker.receiver.LockReceiver;
 import com.yorshahar.locker.receiver.TimeReceiver;
@@ -55,6 +56,8 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
         void onFlashlightTurnedOn();
 
         void onFlashlightTurnedOff();
+
+        void onWallpaperChanged(int resourceId);
 
     }
 
@@ -92,13 +95,16 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
         this.activity = activity;
     }
 
-    public void setLockerView(RelativeLayout lockerView) {
+    public void setLockerView(RelativeLayout lockerView, int width, int height) {
         this.lockerView = lockerView;
 
         ViewGroup lockerParent = (ViewGroup) lockerView.getParent();
         if (lockerParent != null) {
             lockerParent.removeView(lockerView);
         }
+
+        params.width = width;
+        params.height = height;
     }
 
     @Override
@@ -148,6 +154,7 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
         filter.addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED);
         filter.addAction(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION);
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+        filter.addAction(SettingsActivity.ACTION_WALLPAPER_CHANGED);
         lockReceiver = new LockReceiver();
         ((LockReceiver) lockReceiver).setDelegate(this);
         registerReceiver(lockReceiver, filter);
@@ -257,10 +264,10 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
                 }
             }
 
-            if (cam == null) {
-                cam = Camera.open();
-            }
-            cameraParameters = cam.getParameters();
+//            if (cam == null) {
+//                cam = Camera.open();
+//            }
+//            cameraParameters = cam.getParameters();
         }
     }
 
@@ -274,10 +281,10 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
             }
         }
 
-        if (cam != null) {
-            cam.release();
-            cam = null;
-        }
+//        if (cam != null) {
+//            cam.release();
+//            cam = null;
+//        }
     }
 
     @Override
@@ -326,6 +333,13 @@ public class LockService extends Service implements LockReceiver.Delegate, TimeR
     public void onBluetoothDisabled() {
         if (delegate != null) {
             delegate.onBluetoothDisabled();
+        }
+    }
+
+    @Override
+    public void onWallpaperChanged(int resourceId) {
+        if (delegate != null) {
+            delegate.onWallpaperChanged(resourceId);
         }
     }
 

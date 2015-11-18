@@ -1,10 +1,9 @@
 package com.yorshahar.locker.activity;
 
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.IBinder;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,18 +14,19 @@ import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.yorshahar.locker.R;
 import com.yorshahar.locker.model.settings.Settings;
+import com.yorshahar.locker.receiver.SettingsReceiver;
 import com.yorshahar.locker.service.SettingsService;
-import com.yorshahar.locker.service.connection.AbstractServiceConnectionImpl;
 
 /**
  * The activity for the settings main page
  * <p/>
  * Created by yorshahar on 8/6/15.
  */
-public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, SettingsReceiver.Receiver {
 
     private enum SettingItemType {
         ENABLE_LOCKER("Enable Locker"),
@@ -61,9 +61,12 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         }
     }
 
-    private SettingsService settingsService;
-    private boolean isSettingsServiceBound;
-    private SettingsServiceConnection settingsServiceConnection;
+    private final static int REQUEST_RESOURCE_ID = 1;
+    public static final String ACTION_WALLPAPER_CHANGED = "WALLPAPER_CHANGED";
+
+//    private SettingsService settingsService;
+//    private boolean isSettingsServiceBound;
+//    private SettingsServiceConnection settingsServiceConnection;
 
     Settings settings;
 
@@ -76,60 +79,73 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
 
         setContentView(R.layout.settings_layout);
 
-        settingsServiceConnection = new SettingsServiceConnection(SettingsService.class);
-        bindToService();
+//        settingsServiceConnection = new SettingsServiceConnection(SettingsService.class);
+//        bindToService();
+
+        final SettingsReceiver receiver = new SettingsReceiver(new Handler());
+        receiver.setReceiver(this);
+
+        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, SettingsService.class);
+        intent.putExtra("receiver", receiver);
+        intent.putExtra("action", SettingsService.ACTION_GET_SETTINGS);
+
+        startService(intent);
 
         listView = (ListView) findViewById(R.id.listView);
-        listAdapter = new MyListAdapter();
+//        listAdapter = new MyListAdapter();
         listView.setOnItemClickListener(this);
     }
 
-    private void bindToService() {
-        if (!isSettingsServiceBound) {
-            Intent intent = new Intent(this, settingsServiceConnection.getClazz());
-            startService(intent);
-            bindService(intent, settingsServiceConnection, Context.BIND_AUTO_CREATE);
-        }
-    }
+//    private void bindToService() {
+//        if (!isSettingsServiceBound) {
+//            Intent intent = new Intent(this, settingsServiceConnection.getClazz());
+//            startService(intent);
+//            bindService(intent, settingsServiceConnection, Context.BIND_AUTO_CREATE);
+//        }
+//    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
 
-        boolean success = settingsService.saveSetings(settings);
+//        boolean success = settingsService.saveSettings(settings);
+        saveSettings();
+
         stopService(new Intent(this, SettingsService.class));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        boolean success = settingsService.saveSetings(settings);
+//        boolean success = settingsService.saveSettings(settings);
+        saveSettings();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        if (settingsService != null) {
-            settings = settingsService.getSettings();
-//            listAdapter.notifyDataSetChanged();
-        }
+//        if (settingsService != null) {
+//            settings = settingsService.getSettings();
+////            listAdapter.notifyDataSetChanged();
+//        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        boolean success = settingsService.saveSetings(settings);
+//        boolean success = settingsService.saveSettings(settings);
+        saveSettings();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        if (settingsService != null) {
-            settings = settingsService.getSettings();
-//            listAdapter.notifyDataSetChanged();
-        }
+//        if (settingsService != null) {
+//            settings = settingsService.getSettings();
+////            listAdapter.notifyDataSetChanged();
+//        }
     }
 
     @Override
@@ -137,7 +153,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         switch (SettingItemType.getSettingsItem(position)) {
             case CHANGE_WALLPAPER: {
                 Intent intent = new Intent(this, ChangeWallpaperActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_RESOURCE_ID);
 
                 break;
             }
@@ -147,30 +163,51 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         }
     }
 
-    private class SettingsServiceConnection extends AbstractServiceConnectionImpl {
-
-        public SettingsServiceConnection(Class clazz) {
-            super(clazz);
-        }
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            SettingsService.MyLocalBinder binder = (SettingsService.MyLocalBinder) service;
-            settingsService = binder.getService();
-            isSettingsServiceBound = true;
-
-            settingsService.setActivity(SettingsActivity.this);
-            settings = settingsService.getSettings();
-
-            listView.setAdapter(listAdapter);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            isSettingsServiceBound = false;
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_RESOURCE_ID: {
+                settings.setWallpaper(resultCode);
+//                if (settingsService.saveSettings(settings)) {
+                saveSettings();
+                Intent intent = new Intent();
+                intent.setAction(ACTION_WALLPAPER_CHANGED);
+                intent.putExtra("resourceId", resultCode);
+                sendBroadcast(intent);
+                Toast.makeText(this, "Wallpaper applied successfully", Toast.LENGTH_SHORT).show();
+//                }
+                break;
+            }
+            default: {
+                break;
+            }
         }
     }
 
+//    private class SettingsServiceConnection extends AbstractServiceConnectionImpl {
+//
+//        public SettingsServiceConnection(Class clazz) {
+//            super(clazz);
+//        }
+//
+//        @Override
+//        public void onServiceConnected(ComponentName name, IBinder service) {
+//            SettingsService.MyLocalBinder binder = (SettingsService.MyLocalBinder) service;
+//            settingsService = binder.getService();
+//            isSettingsServiceBound = true;
+//
+//            settingsService.setActivity(SettingsActivity.this);
+//            settings = settingsService.getSettings();
+//
+//            listView.setAdapter(listAdapter);
+//        }
+//
+//        @Override
+//        public void onServiceDisconnected(ComponentName name) {
+//            isSettingsServiceBound = false;
+//        }
+//    }
+//
 
     private class MyListAdapter extends BaseAdapter {
         private static final int TYPE_SWITCH = 0;
@@ -344,47 +381,122 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         }
     }
 
+    private void saveSettings() {
+        final SettingsReceiver receiver = new SettingsReceiver(new Handler());
+        receiver.setReceiver(this);
+
+        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, SettingsService.class);
+        intent.putExtra("receiver", receiver);
+        intent.putExtra("settings", settings);
+        intent.putExtra("action", SettingsService.ACTION_SAVE_SETTINGS);
+
+        startService(intent);
+    }
+
     private void enableLocker() {
         if (!settings.isLockerEnabled()) {
-            settingsService.enableLocker();
-            settings.setLockerEnabled(true);
-            listAdapter.notifyDataSetChanged();
+            final SettingsReceiver receiver = new SettingsReceiver(new Handler());
+            receiver.setReceiver(this);
+
+            Intent intent = new Intent(Intent.ACTION_SYNC, null, this, SettingsService.class);
+            intent.putExtra("receiver", receiver);
+            intent.putExtra("action", SettingsService.ACTION_ENABLE_LOCKER);
+
+            startService(intent);
+
+//            settingsService.enableLocker();
+//            settings.setLockerEnabled(true);
+//            listAdapter.notifyDataSetChanged();
         }
     }
 
     private void disableLocker() {
         if (settings.isLockerEnabled()) {
-            settingsService.disableLocker();
-            settings.setLockerEnabled(false);
-            listAdapter.notifyDataSetChanged();
+            final SettingsReceiver receiver = new SettingsReceiver(new Handler());
+            receiver.setReceiver(this);
+
+            Intent intent = new Intent(Intent.ACTION_SYNC, null, this, SettingsService.class);
+            intent.putExtra("receiver", receiver);
+            intent.putExtra("action", SettingsService.ACTION_DISABLE_LOCKER);
+
+            startService(intent);
+
+//            settingsService.disableLocker();
+//            settings.setLockerEnabled(false);
+//            listAdapter.notifyDataSetChanged();
         }
     }
 
     private void enableNotifications() {
-        if (!settings.isNotificationsEnabled()) {
-            settingsService.enableNotifications();
-            settings.setNotificationsEnabled(true);
-        }
+//        if (!settings.isNotificationsEnabled()) {
+//            settingsService.enableNotifications();
+//            settings.setNotificationsEnabled(true);
+//        }
     }
 
     private void disableNotifications() {
-        if (settings.isNotificationsEnabled()) {
-            settingsService.disableNotifications();
-            settings.setNotificationsEnabled(false);
-        }
+//        if (settings.isNotificationsEnabled()) {
+//            settingsService.disableNotifications();
+//            settings.setNotificationsEnabled(false);
+//        }
     }
 
     private void hideStatusBar() {
-        if (!settings.isHideStatusBar()) {
-            settingsService.hideStatusBar();
-            settings.setHideStatusBar(true);
-        }
+//        if (!settings.isHideStatusBar()) {
+//            settingsService.hideStatusBar();
+//            settings.setHideStatusBar(true);
+//        }
     }
 
     private void showStatusBar() {
-        if (settings.isNotificationsEnabled()) {
-            settingsService.showStatusBar();
-            settings.setHideStatusBar(false);
+//        if (settings.isNotificationsEnabled()) {
+//            settingsService.showStatusBar();
+//            settings.setHideStatusBar(false);
+//        }
+    }
+
+
+//////////////////////////////////////////////////////////////////
+//
+// SettingsReceiver.Receiver
+//
+//////////////////////////////////////////////////////////////////
+
+
+    @Override
+    public void onResultSettings(Settings settings) {
+        this.settings = settings;
+        if (settings != null && listAdapter == null) {
+            listAdapter = new MyListAdapter();
+            listView.setAdapter(listAdapter);
+        } else {
+            listAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onSettingsSaved() {
+
+    }
+
+    @Override
+    public void onResultWallpaper(int resourceId) {
+
+    }
+
+    @Override
+    public void onLockerEnabled() {
+        if (!settings.isLockerEnabled()) {
+            settings.setLockerEnabled(true);
+            listAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onLockerDisabled() {
+        if (settings.isLockerEnabled()) {
+            settings.setLockerEnabled(false);
+            listAdapter.notifyDataSetChanged();
         }
     }
 
