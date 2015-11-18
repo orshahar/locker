@@ -51,16 +51,12 @@ import com.yorshahar.locker.ui.widget.FreezableViewPager;
 import com.yorshahar.locker.ui.widget.ToggleButtonView;
 import com.yorshahar.locker.util.BlurUtil;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-
 public class LockerMainActivity extends FragmentActivity implements NotificationService.Delegate, LockService.Delegate, ControlCenterFragment.Delegate, ConnectivityReceiver.Receiver, SettingsReceiver.Receiver {
 
-    private static final String STATUS_BAR_TIME_FORMAT = "h:mm a";
     private static final int CONTROL_CENTER_COLOR_ON = 0xffcccccc;
     private static final int CONTROL_CENTER_COLOR_OFF = 0x00ffffff;
     private static final int CONTROL_CENTER_MAX_INTENSITY = 50;
@@ -68,7 +64,6 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 
     private int SCREEN_WIDTH;
     private int SCREEN_HEIGHT;
-    private float DENSITY;
     private int CONTROL_CENTER_HEIGHT;
     private int BAR_HEIGHT;
 
@@ -79,14 +74,12 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     private boolean isLockServiceBound = false;
     private boolean isNotificationServiceBound = false;
     private boolean isWindowAttached = false;
-    private DateFormat dateFormat;
     private Animation chargeAnimation;
     private ImageView wallpaperView;
     private ImageView dimView;
     private FreezableViewPager mViewPager;
     private SectionsPagerAdapter pagerAdapter;
     private TextView batteryLevelTextView;
-    private TextView carrierTextView;
     private ImageView wifiImageView;
     private TextView dataSpeedTextView;
     private ImageView batteryFillImageView;
@@ -97,11 +90,9 @@ public class LockerMainActivity extends FragmentActivity implements Notification
     private View controlCenterView;
     private RelativeLayout controlCenterGlassPanel;
     private ImageView controlCenterBackground;
-    private ImageView controlCenterGlass;
     private ImageView controlCenterPullBar;
     private ImageView controlCenterPullBarDark;
     private ImageView controlCenterPullBarDown;
-    private RelativeLayout controlCenterTopBar;
     private View totalDimView;
     private ControlCenterFragment controlCenterFragment;
 
@@ -212,9 +203,6 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         DisplayMetrics dm = getResources().getDisplayMetrics();
         SCREEN_WIDTH = dm.widthPixels;
         SCREEN_HEIGHT = dm.heightPixels;
-        DENSITY = dm.density;
-
-        dateFormat = new SimpleDateFormat(STATUS_BAR_TIME_FORMAT, Locale.getDefault());
 
         pagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
@@ -281,7 +269,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         signalCircles[3] = (ImageView) findViewById(R.id.signal4ImageView);
         signalCircles[4] = (ImageView) findViewById(R.id.signal5ImageView);
 
-        carrierTextView = (TextView) findViewById(R.id.carrierTextView);
+        TextView carrierTextView = (TextView) findViewById(R.id.carrierTextView);
         carrierTextView.setTypeface(FontLoader.getTypeface(getApplicationContext(), FontLoader.HELVETICA_NEUE_LIGHT));
         carrierTextView.setTextColor(Color.WHITE);
 
@@ -311,12 +299,9 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         controlCenterBackground.setBackground(new BitmapDrawable(getResources(), blurredBackground));
         controlCenterBackground.getLayoutParams().height = SCREEN_HEIGHT;
 
-        controlCenterGlass = (ImageView) controlCenterView.findViewById(R.id.glassImageView);
-
         CONTROL_CENTER_HEIGHT = (int) (420 * dm.density);
-//        CONTROL_CENTER_HEIGHT = controlCenterView.getLayoutParams().height;
 
-        controlCenterTopBar = (RelativeLayout) controlCenterView.findViewById(R.id.topBar);
+        RelativeLayout controlCenterTopBar = (RelativeLayout) controlCenterView.findViewById(R.id.topBar);
 
         BAR_HEIGHT = controlCenterTopBar.getLayoutParams().height;
 
