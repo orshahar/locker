@@ -3,7 +3,6 @@ package com.yorshahar.locker.ui.widget;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -22,7 +21,10 @@ import android.widget.TextView;
  */
 public class ShinyTextView extends TextView {
 
-    private float mGradientDiameter = 0.3f;
+    public static final int COLOR_OFF = 0x55ffffff;
+    public static final int COLOR_ON = 0xffffffff;
+    public static final float GRADIENT_DIAMETER = 0.3f;
+    public static final int DURATION = 6;
 
     private ValueAnimator mAnimator;
     private float mGradientCenter;
@@ -54,7 +56,7 @@ public class ShinyTextView extends TextView {
             mShineDrawable.getPaint().setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
 
             mAnimator = ValueAnimator.ofFloat(0, 1);
-            mAnimator.setDuration(5 * w); // custom
+            mAnimator.setDuration(DURATION * w); // custom
             mAnimator.setRepeatCount(ValueAnimator.INFINITE);
             mAnimator.setRepeatMode(ValueAnimator.RESTART);
             mAnimator.setInterpolator(new LinearInterpolator()); // Custom
@@ -62,9 +64,9 @@ public class ShinyTextView extends TextView {
                 @Override
                 public void onAnimationUpdate(final ValueAnimator animation) {
                     final float value = animation.getAnimatedFraction();
-                    mGradientCenter = (1 + 2 * mGradientDiameter) * value - mGradientDiameter;
-                    final float gradientStart = mGradientCenter - mGradientDiameter;
-                    final float gradientEnd = mGradientCenter + mGradientDiameter;
+                    mGradientCenter = (1 + 2 * GRADIENT_DIAMETER) * value - GRADIENT_DIAMETER;
+                    final float gradientStart = mGradientCenter - GRADIENT_DIAMETER;
+                    final float gradientEnd = mGradientCenter + GRADIENT_DIAMETER;
                     Shader shader = generateGradientShader(w, gradientStart, mGradientCenter, gradientEnd);
                     mShineDrawable.getPaint().setShader(shader);
                     invalidate();
@@ -83,7 +85,7 @@ public class ShinyTextView extends TextView {
     }
 
     private Shader generateGradientShader(int width, float... positions) {
-        int[] colorRepartition = {Color.GRAY, Color.WHITE, Color.GRAY};
+        int[] colorRepartition = {COLOR_OFF, COLOR_ON, COLOR_OFF};
         return new LinearGradient(
                 0,
                 0,
