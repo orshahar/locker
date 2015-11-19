@@ -1,6 +1,8 @@
 package com.yorshahar.locker.fragment;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -56,7 +58,11 @@ public class MyWallpapersFragment extends Fragment {
         view.setTag(resourceId);
 
         ImageView imageView = (ImageView) view.findViewById(R.id.imageView);
-        imageView.setImageResource(resourceId);
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 4;
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), resourceId, options);
+        imageView.setImageBitmap(bitmap);
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
         return view;
