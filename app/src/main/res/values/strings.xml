@@ -30,7 +30,7 @@
     <string name="digital_clock">DigitalClock</string>
     <string name="slide_to_unlock_text"><![CDATA[> slide to unlock]]></string>
 
-    <string name="passcode">2483</string>
+    <string name="default_passcode">2483</string>
     <string name="welcome">Welcome</string>
     <string name="notification_icon">Nitification icon</string>
     <string name="title">Title</string>

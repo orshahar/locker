@@ -246,21 +246,16 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 
         Intent intent = new Intent(Intent.ACTION_SYNC, null, this, SettingsService.class);
         intent.putExtra("receiver", settingsReceiver);
-        intent.putExtra("action", SettingsService.ACTION_GET_WALLPAPER);
+        intent.putExtra("action", SettingsService.ACTION_GET_SETTINGS);
 
         startService(intent);
 
         wallpaperView = (ImageView) findViewById(R.id.backgroundImageView);
         wallpaperView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
-        Bitmap bmp = ((BitmapDrawable) wallpaperView.getDrawable()).getBitmap();
-        blurredBackground = BlurUtil.blur(bmp);
-
         dimView = (ImageView) findViewById(R.id.dimView);
-        dimView.setImageResource(0);
-        dimView.setImageBitmap(blurredBackground);
-        dimView.getDrawable().setColorFilter(new LightingColorFilter(0x88888888, 0x00000000));
         dimView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        dimView.setImageResource(0);
 
         signalCircles = new ImageView[5];
         signalCircles[0] = (ImageView) findViewById(R.id.signal1ImageView);
@@ -296,8 +291,7 @@ public class LockerMainActivity extends FragmentActivity implements Notification
         controlCenterView.setBackgroundColor(Color.TRANSPARENT);
 
         controlCenterBackground = (ImageView) controlCenterView.findViewById(R.id.background);
-        controlCenterBackground.setBackground(new BitmapDrawable(getResources(), blurredBackground));
-        controlCenterBackground.getLayoutParams().height = SCREEN_HEIGHT;
+        controlCenterBackground.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
         CONTROL_CENTER_HEIGHT = (int) (420 * dm.density);
 
@@ -879,17 +873,14 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 
     private void updateWallpaper(int resourceId) {
         wallpaperView.setImageResource(resourceId);
-        wallpaperView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
         Bitmap bmp = ((BitmapDrawable) wallpaperView.getDrawable()).getBitmap();
         blurredBackground = BlurUtil.blur(bmp);
 
         dimView.setImageBitmap(blurredBackground);
         dimView.getDrawable().setColorFilter(new LightingColorFilter(0x88888888, 0x00000000));
-        dimView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
         controlCenterBackground.setImageBitmap(blurredBackground);
-        controlCenterBackground.setScaleType(ImageView.ScaleType.CENTER_CROP);
     }
 
     //////////////////////////////////////////////////////////////////
@@ -1088,6 +1079,12 @@ public class LockerMainActivity extends FragmentActivity implements Notification
 
     @Override
     public void onResultSettings(Settings settings) {
+        if (settings != null) {
+            updateWallpaper(settings.getWallpaper());
+
+            PasscodeFragment passcodeFragment = (PasscodeFragment) pagerAdapter.getRegisteredFragment(0);
+            passcodeFragment.setPasscode(settings.getPasscode());
+        }
 
     }
 

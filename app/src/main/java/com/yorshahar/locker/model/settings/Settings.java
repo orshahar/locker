@@ -86,7 +86,7 @@ public class Settings extends DomainObject implements Parcelable {
         dest.writeInt(notificationsEnabled ? 1 : 0);
         dest.writeInt(securityEnabled ? 1 : 0);
         dest.writeInt(hideStatusBar ? 1 : 0);
-//        dest.writeString("passcode");
+        dest.writeString(passcode);
         dest.writeInt(wallpaper);
     }
 
@@ -105,7 +105,7 @@ public class Settings extends DomainObject implements Parcelable {
         notificationsEnabled = in.readInt() == 1;
         securityEnabled = in.readInt() == 1;
         hideStatusBar = in.readInt() == 1;
-//        passcode = in.readString();
+        passcode = in.readString();
         wallpaper = in.readInt();
     }
 

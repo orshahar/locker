@@ -69,11 +69,15 @@ public class PasscodeFragment extends Fragment implements View.OnClickListener, 
         this.delegate = delegate;
     }
 
+    public void setPasscode(String passcode) {
+        this.passcode = passcode;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        passcode = getString(R.string.passcode);
+        passcode = getString(R.string.default_passcode);
         passcodeSize = passcode.length();
         enteredKeysBuffer = new StringBuffer(passcodeSize);
         circleViews = new FillableCircleView[passcodeSize];

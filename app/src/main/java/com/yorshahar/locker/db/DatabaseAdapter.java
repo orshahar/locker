@@ -7,6 +7,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.yorshahar.locker.R;
 import com.yorshahar.locker.model.notification.Notification;
 import com.yorshahar.locker.model.settings.Settings;
 import com.yorshahar.locker.util.BitmapUtil;
@@ -225,9 +226,9 @@ public class DatabaseAdapter {
                 contentValues.put(COLUMN_LOCKER_ENABLED, false);
                 contentValues.put(COLUMN_NOTIFICATIONS_ENABLED, false);
                 contentValues.put(COLUMN_SECURITY_ENABLED, false);
-                contentValues.put(COLUMN_HIDE_STATUS_BAR, false);
-                contentValues.putNull(COLUMN_PASSCODE);
-                contentValues.putNull(COLUMN_WALLPAPER);
+                contentValues.put(COLUMN_HIDE_STATUS_BAR, true);
+                contentValues.put(COLUMN_PASSCODE, "2483");
+                contentValues.put(COLUMN_WALLPAPER, R.drawable.wallpaper_iphone_stars);
                 db.insert(TABLE_SETTINGS, null, contentValues);
             } catch (SQLException e) {
                 e.printStackTrace();
