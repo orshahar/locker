@@ -84,7 +84,6 @@ public class Settings extends DomainObject implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(lockerEnabled ? 1 : 0);
         dest.writeInt(notificationsEnabled ? 1 : 0);
-        dest.writeInt(notificationsEnabled ? 1 : 0);
         dest.writeInt(securityEnabled ? 1 : 0);
         dest.writeInt(hideStatusBar ? 1 : 0);
 //        dest.writeString("passcode");
